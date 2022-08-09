@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "commonjs",
+    "declaration": true,
+    "rootDir": "src",
+    "outDir": "lib",
+    "typeRoots": ["./node_modules/@types"],
+    "declarationDir": "typings",
+    "declarationMap": true,
+  },
+  "include": [
+      "src",
+    ],
+  "exclude": [
+    "node_modules",
+    "src/test"
+  ],
+}
