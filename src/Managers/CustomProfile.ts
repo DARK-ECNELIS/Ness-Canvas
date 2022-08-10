@@ -13,6 +13,11 @@ export default class CustomProfile extends NessBuilder {
       x: 25, y: 25,
       w: 150, h: 150,
       radius: 15,
+    },
+    Octogon: {
+      x: 25, y: 25,
+      w: 175, h: 175,
+      radius: 5,
     }
   }
 

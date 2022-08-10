@@ -11,9 +11,9 @@ async function test() {
 
   // new NessBuilder(700, 250).setCornerRadius(15).setBackground(background).setFrame("Square", { x: 25, y:25 }, { widht: 150, height: 150 }, 15, avatar).setExp({x: 45, y: 200}, {width: 655, height: 30}, 20, 65).generatedTo('src/test/', "test", "PNG");
 
-  // new CustomProfile('classic', background, avatar, 'Square').generatedTo('src/test/', "test", "PNG")
+  // new CustomProfile('classic', background, avatar, 'Octogon').generatedTo('src/test/', "test", "PNG")
 
-  new RankupBuilder("classic", rank, avatar, "Square").generatedTo('src/test', "rank", "PNG")
+  new RankupBuilder("classic", rank, avatar, "Octogon").generatedTo('src/test', "rank", "PNG")
 }
 
 test()

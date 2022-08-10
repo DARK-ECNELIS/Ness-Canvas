@@ -14,6 +14,11 @@ export default class RankupBuilder extends NessBuilder {
       x: 15, y: 15,
       w: 100, h: 100,
       radius: 15,
+    },
+    Octogon: {
+      x: 15, y: 15,
+      w: 115, h: 115,
+      radius: 5,
     }
   }
 

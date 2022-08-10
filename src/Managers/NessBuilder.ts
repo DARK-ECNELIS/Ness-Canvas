@@ -110,30 +110,62 @@ export default class NessBuilder {
     this.frameCoordinate.w = size.widht
     this.frameCoordinate.h = size.height
 
-    this.context!.save();
-    this.context!.beginPath();
+    this.context.save();
+    this.context.beginPath();
 
     const r = coordinate.x + size.widht;
     const b = coordinate.y + size.height;
+    this.context.strokeStyle = options.color? options.color : "#FF0000";
+    this.context.lineWidth = options.lineWidth;
 
     switch (typeShape) {
       case "Square": {
-        this.context!.strokeStyle = options.color? options.color : "#FF0000";
-        this.context!.lineWidth = options.lineWidth;
-        this.context!.moveTo(coordinate.x + radius, coordinate.y);
-        this.context!.lineTo(r - radius, coordinate.y);
-        this.context!.quadraticCurveTo(r, coordinate.y, r, coordinate.y + radius);
-        this.context!.lineTo(r, coordinate.y + size.height - radius);
-        this.context!.quadraticCurveTo(r, b, r - radius, b);
-        this.context!.lineTo(coordinate.x + radius, b);
-        this.context!.quadraticCurveTo(coordinate.x, b, coordinate.x, b - radius);
-        this.context!.lineTo(coordinate.x, coordinate.y + radius);
-        this.context!.quadraticCurveTo(coordinate.x, coordinate.y, coordinate.x + radius, coordinate.y);
+        this.context.moveTo(coordinate.x + radius, coordinate.y);
+        this.context.lineTo(r - radius, coordinate.y);
+        this.context.quadraticCurveTo(r, coordinate.y, r, coordinate.y + radius);
+        this.context.lineTo(r, coordinate.y + size.height - radius);
+        this.context.quadraticCurveTo(r, b, r - radius, b);
+        this.context.lineTo(coordinate.x + radius, b);
+        this.context.quadraticCurveTo(coordinate.x, b, coordinate.x, b - radius);
+        this.context.lineTo(coordinate.x, coordinate.y + radius);
+        this.context.quadraticCurveTo(coordinate.x, coordinate.y, coordinate.x + radius, coordinate.y);
+        break;
+      };
+      case "Octogon": {
+        const rad4 = radius / 4;
+        this.context.moveTo(coordinate.x + (size.widht / 4) - 1 + rad4, coordinate.y);
+        this.context.lineTo(size.widht - (size.widht / 4) - radius, coordinate.y);
+        this.context.quadraticCurveTo(size.widht - (size.widht / 4), coordinate.y, size.widht - (size.widht / 4), coordinate.y + rad4);
+
+        this.context.lineTo(size.widht - radius , coordinate.y + (size.height / 4) - radius);
+        this.context.quadraticCurveTo(size.widht , coordinate.y + (size.height / 4), size.widht, coordinate.y + (size.height / 4)+ rad4)
+
+        //
+        this.context.lineTo(size.widht, size.height - (size.height / 4) - radius);
+        this.context.quadraticCurveTo(size.widht, size.height - (size.height / 4), size.widht - rad4, size.height - (size.height / 4))
+        //
+
+        this.context.lineTo(size.widht - (size.widht / 4) + radius, size.height - radius);
+        this.context.quadraticCurveTo(size.widht - (size.widht / 4), size.height, size.widht - (size.widht / 4) - rad4, size.height)
+
+        this.context.lineTo(coordinate.x + (size.widht / 4) + radius, size.height);
+        this.context.quadraticCurveTo(coordinate.x + (size.widht / 4), size.height, coordinate.x + (size.widht / 4), size.height - rad4);
+
+        this.context.lineTo(coordinate.x + radius, size.height - (size.height / 4) + radius);
+        this.context.quadraticCurveTo(coordinate.x, size.height - (size.height / 4), coordinate.x, size.height - (size.height / 4) - rad4);
+
+        //
+        this.context.lineTo(coordinate.x, coordinate.y + (size.height / 4) + radius);
+        this.context.quadraticCurveTo(coordinate.x, coordinate.y + (size.height / 4), coordinate.x + rad4, coordinate.y + (size.height / 4));
+        //
+
+        this.context.lineTo(coordinate.x + (size.widht / 4) - radius, coordinate.y + radius);
+        this.context.quadraticCurveTo(coordinate.x + (size.widht / 4), coordinate.y, coordinate.x + (size.widht / 4) + rad4, coordinate.y);
         break;
       };
     };
-    this.context!.stroke();
-    this.context!.clip();
+    this.context.stroke();
+    this.context.clip();
 
     if (image) {
       return this.setFrameBackground(image);

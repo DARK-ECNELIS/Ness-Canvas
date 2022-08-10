@@ -1,7 +1,7 @@
 {
   "name": "ness-canvas",
   "version": "0.0.1-alpha.b1",
-  "description": "Just a test",
+  "description": "Canvas Builder",
   "main": "lib/index.js",
   "types": "typings",
   "author": "DARK ECNELIS darkecnelis@gmail.com",
@@ -10,7 +10,11 @@
   "files": [
     "lib/**/*"
   ],
-  "keywords": [],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DARK-ECNELIS/ness-canvas.git"
+  },
+  "keywords": ["canvas", "canvasBuilder", "ness"],
   "devDependencies": {
     "@types/node": "^18.6.4",
     "typescript": "^4.7.4"
