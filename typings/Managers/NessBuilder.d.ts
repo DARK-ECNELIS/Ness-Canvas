@@ -1,12 +1,13 @@
 /// <reference types="node" />
 import { Canvas } from "canvas";
 import { CanvasImage, CustomColor, Shape } from "../../typings";
-import { ImagelocationOption, DrawlocationOption, FramelocationOption, FrameSizeOption, ExpLocationOption, ExpSizeOption } from "../../typings/Interface";
+import { ImagelocationOption, DrawlocationOption, FramelocationOption, FrameSizeOption, ExpLocationOption, ExpSizeOption, FrameOption, TextOption } from "../../typings/Interface";
 export default class NessBuilder {
     protected canvas: Canvas;
     private context;
     private canvasSize;
     private frameCoordinate;
+    private frameTextCoordinate;
     constructor(width: number, height: number);
     /**
      * New Canvas Dimension
@@ -38,19 +39,28 @@ export default class NessBuilder {
      * @param typeShape Frame format
      * @param coordinate Coordinate X and Y from upper left corner of the frame
      * @param size Frame size
-     * @param radius Frame outline radius (is ignored if the frame does not have this functionality)
-     * @param image Image to be placed in the frame
-     * @param options
-     *
-     * @param options - The employee who is responsible for the project.
-     * @param options.color - Frame color (a degrade can be applied with [createRadialGradient | createLinearGradient] of canvas module).
-     * @param options.lineWidth - Frame line size.
+     * @param options Frame configuration
      */
-    setFrame(typeShape: Shape, coordinate: FramelocationOption, size: FrameSizeOption, radius: number, image?: CanvasImage, options?: {
-        color?: CustomColor;
-        lineWidth?: number;
-    }): this;
+    setFrame(typeShape: Shape, coordinate: FramelocationOption, size: FrameSizeOption, options?: FrameOption): this;
     private setFrameBackground;
+    /**
+     * Set text to canvas
+     *
+     * @param text Text to write
+     * @param option Text option
+     * @param coordinate Text location
+     */
+    setText(text: string, option: TextOption, coordinate: {
+        x: number;
+        y: number;
+    }): this;
+    /**
+     * Set new font
+     *
+     * @param path Path to font file (file.ttf)
+     * @param option Font settings
+     */
+    private setFont;
     private restore;
     /**
      * Set progress bar

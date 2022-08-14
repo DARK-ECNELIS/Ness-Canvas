@@ -1,3 +1,5 @@
+import { CanvasImage, CustomColor } from ".";
+
 /**
  * Source image coordinates to draw in the context of Canvas.
  */
@@ -96,4 +98,89 @@ export interface ExpSizeOption {
    * Height from ExpBar
    */
    height: number;
+}
+
+/**
+ * Frame configuration
+ */
+export interface FrameOption {
+   /**
+    * Frame outline radius (is ignored if the frame does not have this functionality)
+    */
+   radius?: number,
+   /**
+    * Frame content configuration
+    */
+   content?: {
+      /**
+       * Image or text to be placed in the frame
+       */
+      imageOrText: CanvasImage | number | string,
+      /**
+       * Text configuration (not used if imageOrText is a CanvasImage)
+       */
+      textOptions?: TextOption
+   },
+   /**
+    * Frame outline configuration
+    */
+   outline?: {
+      /**
+       * Frame color (a degrade can be applied with [createRadialGradient | createLinearGradient] of canvas module)
+       */
+      color: CustomColor,
+      /**
+       * Frame line size
+       */
+      lineWidth?: number
+   }
+}
+
+/**
+ * Text configuration
+ */
+export interface TextOption {
+   /**
+    * text size
+    */
+   size: number,
+   /**
+    *  system font name | register font name
+    */
+   font: string | RegisterFont,
+
+   /**
+    * Text alignment on the X axis
+    */
+   textAlign?: "left" | "right" | "center" | "start" | "end",
+   /**
+    * Text alignment on the Y axis
+    */
+   textBaseline?: "top" | "hanging" | "middle" | "alphabetic" | "ideographic" | "bottom"
+}
+
+
+export interface RegisterFont {
+
+   /**
+    * Path to font file (file.ttf)
+    */
+   path: string,
+   /**
+    * Default option
+    */
+   option: {
+      /**
+       * Default name to use
+       */
+      family: string,
+      /**
+       * Default font size
+       */
+      weight?: string,
+      /**
+       * Default police style
+       */
+      style?: "italic" | "normal" | "oblique" | "inherit" | "initial" | "unset"
+   }
 }

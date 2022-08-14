@@ -1,6 +1,6 @@
 {
   "name": "ness-canvas",
-  "version": "0.0.1-alpha.b1",
+  "version": "0.0.1-alpha.b3",
   "description": "Canvas Builder",
   "main": "lib/index.js",
   "types": "typings",

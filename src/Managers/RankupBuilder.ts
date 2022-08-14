@@ -22,7 +22,7 @@ export default class RankupBuilder extends NessBuilder {
     }
   }
 
-  constructor(presetType: Preset, Background: Image, avatar: CanvasImage, shape: Shape) {
+  constructor(presetType: Preset, Background: Image, avatar: CanvasImage | number, shape: Shape) {
     if (presetType == 'classic') {
       super(740, 128)
     } else {
@@ -32,10 +32,10 @@ export default class RankupBuilder extends NessBuilder {
     this.init(Background, this.preset[presetType].cornerRadius, avatar, shape)
   };
 
-  private init(background: CanvasImage, radius: number, avatar: CanvasImage, shape: Shape) {
+  private init(background: CanvasImage, radius: number, avatar: CanvasImage | number, shape: Shape) {
     this.setCornerRadius(radius);
     this.setBackground(background);
-    this.setFrame(shape, {x: this.avatar[shape].x, y: this.avatar[shape].y}, {widht: this.avatar[shape].w, height: this.avatar[shape].h}, this.avatar[shape].radius, avatar, {lineWidth: 3});
+    this.setFrame(shape, {x: this.avatar[shape].x, y: this.avatar[shape].y}, {widht: this.avatar[shape].w, height: this.avatar[shape].h}, { radius: this.avatar[shape].radius, content: { imageOrText: avatar }, outline: { color: "#FF0000", lineWidth: 3 }});
     
     return this;
   };

@@ -1,7 +1,7 @@
 import { writeFileSync } from "fs"
-import { Canvas, CanvasRenderingContext2D } from "canvas"
+import { Canvas, CanvasRenderingContext2D, registerFont } from "canvas"
 import { CanvasImage, CustomColor, Shape } from "../../typings";
-import { ImagelocationOption, DrawlocationOption, FramelocationOption, FrameSizeOption, ExpLocationOption, ExpSizeOption } from "../../typings/Interface";
+import { ImagelocationOption, DrawlocationOption, FramelocationOption, FrameSizeOption, ExpLocationOption, ExpSizeOption, FrameOption, TextOption, RegisterFont } from "../../typings/Interface";
 
 export default class NessBuilder {
   
@@ -14,6 +14,7 @@ export default class NessBuilder {
   };
 
   private frameCoordinate = { x: 0, y: 0, w: 0, h: 0 };
+  private frameTextCoordinate = { x: 0, y: 0};
 
   constructor(width: number, height: number) {
     
@@ -94,15 +95,9 @@ export default class NessBuilder {
    * @param typeShape Frame format
    * @param coordinate Coordinate X and Y from upper left corner of the frame
    * @param size Frame size
-   * @param radius Frame outline radius (is ignored if the frame does not have this functionality)
-   * @param image Image to be placed in the frame
-   * @param options
-   * 
-   * @param options - The employee who is responsible for the project.
-   * @param options.color - Frame color (a degrade can be applied with [createRadialGradient | createLinearGradient] of canvas module).
-   * @param options.lineWidth - Frame line size.
+   * @param options Frame configuration
    */
-  public setFrame(typeShape: Shape, coordinate: FramelocationOption, size: FrameSizeOption, radius: number, image?: CanvasImage, options?: {color?: CustomColor, lineWidth?: number}): this {
+  public setFrame(typeShape: Shape, coordinate: FramelocationOption, size: FrameSizeOption, options?: FrameOption): this {
 
     // Sauvegarde de la position et taille du frame
     this.frameCoordinate.x = coordinate.x
@@ -115,61 +110,69 @@ export default class NessBuilder {
 
     const r = coordinate.x + size.widht;
     const b = coordinate.y + size.height;
-    this.context.strokeStyle = options.color? options.color : "#FF0000";
-    this.context.lineWidth = options.lineWidth;
+    this.context.strokeStyle = options.outline? options.outline.color : "#FF0000";
+    this.context.lineWidth = options.outline?.lineWidth? options.outline.lineWidth : 3;
 
     switch (typeShape) {
       case "Square": {
-        this.context.moveTo(coordinate.x + radius, coordinate.y);
-        this.context.lineTo(r - radius, coordinate.y);
-        this.context.quadraticCurveTo(r, coordinate.y, r, coordinate.y + radius);
-        this.context.lineTo(r, coordinate.y + size.height - radius);
-        this.context.quadraticCurveTo(r, b, r - radius, b);
-        this.context.lineTo(coordinate.x + radius, b);
-        this.context.quadraticCurveTo(coordinate.x, b, coordinate.x, b - radius);
-        this.context.lineTo(coordinate.x, coordinate.y + radius);
-        this.context.quadraticCurveTo(coordinate.x, coordinate.y, coordinate.x + radius, coordinate.y);
+        this.context.moveTo(coordinate.x + options.radius, coordinate.y);
+        this.context.lineTo(r - options.radius, coordinate.y);
+        this.context.quadraticCurveTo(r, coordinate.y, r, coordinate.y + options.radius);
+        this.context.lineTo(r, coordinate.y + size.height - options.radius);
+        this.context.quadraticCurveTo(r, b, r - options.radius, b);
+        this.context.lineTo(coordinate.x + options.radius, b);
+        this.context.quadraticCurveTo(coordinate.x, b, coordinate.x, b - options.radius);
+        this.context.lineTo(coordinate.x, coordinate.y + options.radius);
+        this.context.quadraticCurveTo(coordinate.x, coordinate.y, coordinate.x + options.radius, coordinate.y);
+
+        this.frameTextCoordinate.x = coordinate.x + size.widht/2;
+        this.frameTextCoordinate.y = coordinate.y + size.height/2;
         break;
       };
       case "Octogon": {
-        const rad4 = radius / 4;
-        this.context.moveTo(coordinate.x + (size.widht / 4) - 1 + rad4, coordinate.y);
-        this.context.lineTo(size.widht - (size.widht / 4) - radius, coordinate.y);
-        this.context.quadraticCurveTo(size.widht - (size.widht / 4), coordinate.y, size.widht - (size.widht / 4), coordinate.y + rad4);
-
-        this.context.lineTo(size.widht - radius , coordinate.y + (size.height / 4) - radius);
-        this.context.quadraticCurveTo(size.widht , coordinate.y + (size.height / 4), size.widht, coordinate.y + (size.height / 4)+ rad4)
-
-        //
-        this.context.lineTo(size.widht, size.height - (size.height / 4) - radius);
-        this.context.quadraticCurveTo(size.widht, size.height - (size.height / 4), size.widht - rad4, size.height - (size.height / 4))
-        //
-
-        this.context.lineTo(size.widht - (size.widht / 4) + radius, size.height - radius);
-        this.context.quadraticCurveTo(size.widht - (size.widht / 4), size.height, size.widht - (size.widht / 4) - rad4, size.height)
-
-        this.context.lineTo(coordinate.x + (size.widht / 4) + radius, size.height);
-        this.context.quadraticCurveTo(coordinate.x + (size.widht / 4), size.height, coordinate.x + (size.widht / 4), size.height - rad4);
-
-        this.context.lineTo(coordinate.x + radius, size.height - (size.height / 4) + radius);
-        this.context.quadraticCurveTo(coordinate.x, size.height - (size.height / 4), coordinate.x, size.height - (size.height / 4) - rad4);
-
-        //
-        this.context.lineTo(coordinate.x, coordinate.y + (size.height / 4) + radius);
-        this.context.quadraticCurveTo(coordinate.x, coordinate.y + (size.height / 4), coordinate.x + rad4, coordinate.y + (size.height / 4));
-        //
-
-        this.context.lineTo(coordinate.x + (size.widht / 4) - radius, coordinate.y + radius);
-        this.context.quadraticCurveTo(coordinate.x + (size.widht / 4), coordinate.y, coordinate.x + (size.widht / 4) + rad4, coordinate.y);
+        this.context.moveTo(coordinate.x, coordinate.y + (size.height/4));
+        this.context.lineTo(coordinate.x + (size.widht/4), coordinate.y);
+        this.context.lineTo(coordinate.x + (size.widht/1.7), coordinate.y);
+        this.context.lineTo(coordinate.x + (size.widht/1.2), coordinate.y + (size.height/4));
+        this.context.lineTo(coordinate.x + (size.widht/1.2), coordinate.y + (size.height/1.7));
+        this.context.lineTo(coordinate.x + (size.widht/1.7), coordinate.y + (size.widht/1.2));
+        this.context.lineTo(coordinate.x + (size.widht/4), coordinate.y + (size.height/1.2));
+        this.context.lineTo(coordinate.x, coordinate.y + (size.height/1.7));
+        this.context.lineTo(coordinate.x, coordinate.y + (size.height/4));
+        this.context.lineTo(coordinate.x + (size.widht/4), coordinate.y);
+        
+        this.frameTextCoordinate.x = coordinate.x + (size.widht/1.2)/2;
+        this.frameTextCoordinate.y = coordinate.y + (size.height/1.2)/2;
+        break;
+      };
+      case "Pentagone": {
+        this.context.moveTo(coordinate.x, coordinate.y + size.height*0.35);
+        this.context.lineTo(coordinate.x + size.widht/2, coordinate.y);
+        this.context.lineTo(coordinate.x + size.widht, coordinate.y + size.height*0.35);
+        this.context.lineTo(coordinate.x + size.widht*0.85, coordinate.y + size.height / 1.08);
+        this.context.lineTo(coordinate.x + size.widht*0.15, coordinate.y + size.height / 1.08);
+        this.context.lineTo(coordinate.x, coordinate.y + size.height*0.35);
+        
+        this.frameTextCoordinate.x = coordinate.x + size.widht/2;
+        this.frameTextCoordinate.y = coordinate.y + size.height/2;
         break;
       };
     };
     this.context.stroke();
     this.context.clip();
 
-    if (image) {
-      return this.setFrameBackground(image);
-    } else return this.restore();
+    if (typeof options?.content?.imageOrText == "object") {
+      return this.setFrameBackground(options.content.imageOrText);
+    } else if (typeof options?.content?.imageOrText == "string" || typeof options?.content?.imageOrText == "number") {
+      this.restore();
+
+      this.setText(options.content.imageOrText.toString(), { size: options.content?.textOptions?.size, font: 'sans-serif', textAlign: options.content?.textOptions?.textAlign, textBaseline: options.content?.textOptions?.textBaseline }, {x: this.frameTextCoordinate.x, y: this.frameTextCoordinate.y });
+      
+      return this;
+    } else {
+      this.restore();
+      return this;
+    }
   };
 
   // Définition du background du cadre
@@ -179,6 +182,39 @@ export default class NessBuilder {
     this.context.restore();
 
     return this
+  };
+
+  /**
+   * Set text to canvas
+   * 
+   * @param text Text to write
+   * @param option Text option
+   * @param coordinate Text location
+   */
+  public setText(text: string, option: TextOption, coordinate: {x: number, y: number}) {
+
+    if (typeof option.font !== "string") {
+      this.setFont(option.font.path, option.font.option)
+    };
+
+    this.context.font = `${option.size}px ${option.font}`;
+    this.context.textAlign = option.textAlign;
+    this.context.textBaseline = option.textBaseline;
+    this.context.fillText(text, coordinate.x, coordinate.y);
+
+    return this;
+  };
+
+  /**
+   * Set new font
+   * 
+   * @param path Path to font file (file.ttf)
+   * @param option Font settings
+   */
+  private setFont(path: string, option: RegisterFont["option"]) {
+    registerFont(path, { family: option.family, weight: option.weight, style: option.style});
+    
+    return this;
   };
 
   // Restore la sélection
@@ -262,3 +298,41 @@ export default class NessBuilder {
 };
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// function draw() {
+//   const canvas = document.getElementById('canvas');
+//   if (canvas.getContext) {
+//     const ctx = canvas.getContext('2d');
+    
+//     // Triangle plein
+//     ctx.beginPath();
+//     ctx.moveTo(25, 25);
+//     ctx.lineTo(105, 25);
+//     ctx.lineTo(25, 105);
+//     ctx.fill();
+    
+//     // Triangle filaire
+//     ctx.beginPath();
+//     ctx.moveTo(125, 125)
+//     ctx.lineTo(125, 45);
+//     ctx.lineTo(45, 125);
+//     ctx.closePath();
+//     ctx.stroke();
+//   }
+// }
