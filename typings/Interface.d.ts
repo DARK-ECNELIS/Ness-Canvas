@@ -3,7 +3,7 @@ import { CanvasImage, CustomColor } from ".";
 /**
  * Source image coordinates to draw in the context of Canvas.
  */
- export interface ImagelocationOption {
+export interface ImagelocationOption {
   /**
    * Coordinate X in the destination canvas (the upper left corner of the source image).
    */
@@ -61,7 +61,7 @@ export interface FramelocationOption {
 /**
  * Coordinates to draw frame in Canvas.
  */
- export interface FrameSizeOption {
+export interface FrameSizeOption {
   /**
    * frame width
    */
@@ -148,7 +148,15 @@ export interface TextOption {
     *  system font name | register font name
     */
    font: string | RegisterFont,
+   /**
+    * Text color (a degrade can be applied with <createRadialGradient | createLinearGradient] of the Canvas module), White color is used by Default
+    */
+   color?: CustomColor,
 
+   /**
+    * write text with no fill (Color change for white and not compatible with number)
+    */
+   stroke?: boolean,
    /**
     * Text alignment on the X axis
     */
