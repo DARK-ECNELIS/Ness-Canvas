@@ -1,6 +1,6 @@
 /// <reference types="node" />
 import { Canvas } from "canvas";
-import { CanvasImage, CustomColor, Shape } from "../../typings";
+import { CanvasImage, CustomColor, ImageExtention, Shape } from "../../typings";
 import { ImagelocationOption, DrawlocationOption, FramelocationOption, FrameSizeOption, ExpLocationOption, ExpSizeOption, FrameOption, TextOption } from "../../typings/Interface";
 export default class NessBuilder {
     protected canvas: Canvas;
@@ -31,6 +31,8 @@ export default class NessBuilder {
      * Draw an image to S coordinates with D dimensions
      *
      * @param image The image to set (no link, use loadImage() from canvas)
+     * @param imageOption Source image coordinates to draw in the context of Canvas
+     * @param locationOption Modify image coordinates to draw in the context of Canvas
      */
     draw(image: CanvasImage, imageOption: ImagelocationOption, locationOption?: DrawlocationOption): this;
     /**
@@ -47,13 +49,13 @@ export default class NessBuilder {
      * Set text to canvas
      *
      * @param text Text to write
-     * @param option Text option
      * @param coordinate Text location
+     * @param option Text option
      */
-    setText(text: string, option: TextOption, coordinate: {
+    setText(text: string, coordinate: {
         x: number;
         y: number;
-    }): this;
+    }, option: TextOption): this;
     /**
      * Set new font
      *
@@ -69,20 +71,20 @@ export default class NessBuilder {
      * @param size Size of the first progression bar
      * @param radius Radius to set
      * @param cloneWidth Size of the second progression bar
-     * @param color Couleur du cadre (un dégrader peut être appliquer avec <[createRadialGradient | createLinearGradient] du module canvas)
+     * @param color Text color (a degrade can be applied with <createRadialGradient | createLinearGradient] of the Canvas module), White color is used by Default
      */
     setExp(location: ExpLocationOption, size: ExpSizeOption, radius: number, cloneWidth: number, color?: CustomColor): this;
     /**
-     * For image canvases, encodes the canvas as a PNG.
+     * No more information, wait next update
      */
-    protected toBuffer(): Buffer;
+    toBuffer(): Buffer;
     /**
      * Transforms the embed to a plain object
      *
      * @param location Image Generation Path
      * @param name Image name
-     * @param type Image Type
+     * @param type Image extention
      */
-    generatedTo(location: string, name: string, type: "PNG"): void;
+    generatedTo(location: string, name: string, type: ImageExtention): void;
 }
 //# sourceMappingURL=NessBuilder.d.ts.map
