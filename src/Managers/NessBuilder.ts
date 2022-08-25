@@ -284,7 +284,7 @@ export default class NessBuilder {
    * @param size Size of the first progression bar
    * @param radius Radius to set
    * @param cloneWidth Size of the second progression bar
-   * @param color Couleur du cadre (un dégrader peut être appliquer avec <[createRadialGradient | createLinearGradient] du module canvas)
+   * @param color Text color (a degrade can be applied with <createRadialGradient | createLinearGradient] of the Canvas module), White color is used by Default
    */
   public setExp(location: ExpLocationOption, size: ExpSizeOption, radius: number, cloneWidth: number, color?: CustomColor) {
     
