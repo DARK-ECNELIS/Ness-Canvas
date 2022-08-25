@@ -217,8 +217,8 @@ export default class NessBuilder {
       return this.setFrameBackground(options.content.imageOrText);
     } else if (typeof options?.content?.imageOrText == "string" || typeof options?.content?.imageOrText == "number") {
       this.restore();
-
-      this.setText(options.content.imageOrText.toString(), { size: options.content?.textOptions?.size, font: 'sans-serif', textAlign: options.content?.textOptions?.textAlign, textBaseline: options.content?.textOptions?.textBaseline }, {x: this.frameTextCoordinate.x, y: this.frameTextCoordinate.y });
+      
+      this.setText(options.content.imageOrText.toString(), { x: this.frameTextCoordinate.x, y: this.frameTextCoordinate.y }, { size: options.content?.textOptions?.size, font: 'sans-serif', color: options.content.textOptions.color, textAlign: options.content?.textOptions?.textAlign, textBaseline: options.content?.textOptions?.textBaseline });
       
       return this;
     } else {
@@ -240,19 +240,20 @@ export default class NessBuilder {
    * Set text to canvas
    * 
    * @param text Text to write
-   * @param option Text option
    * @param coordinate Text location
+   * @param option Text option
    */
-  public setText(text: string, option: TextOption, coordinate: {x: number, y: number}) {
+  public setText(text: string, coordinate: {x: number, y: number}, option: TextOption) {
 
     if (typeof option.font !== "string") {
       this.setFont(option.font.path, option.font.option)
     };
 
     this.context.font = `${option.size}px ${option.font}`;
+    this.context.fillStyle = option.color ? option.color : "#FFF";
     this.context.textAlign = option.textAlign;
     this.context.textBaseline = option.textBaseline;
-    this.context.fillText(text, coordinate.x, coordinate.y);
+    option.stroke ? this.context.strokeText(text, coordinate.x, coordinate.y) : this.context.fillText(text, coordinate.x, coordinate.y);
 
     return this;
   };
