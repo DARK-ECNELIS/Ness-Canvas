@@ -1,6 +1,6 @@
 import { writeFileSync } from "fs"
 import { Canvas, CanvasRenderingContext2D, registerFont } from "canvas"
-import { CanvasImage, CustomColor, Shape } from "../../typings";
+import { CanvasImage, CustomColor, ImageExtention, Shape } from "../../typings";
 import { ImagelocationOption, DrawlocationOption, FramelocationOption, FrameSizeOption, ExpLocationOption, ExpSizeOption, FrameOption, TextOption, RegisterFont } from "../../typings/Interface";
 
 export default class NessBuilder {
@@ -332,10 +332,10 @@ export default class NessBuilder {
     return this;
   };
 
-  /**
-   * For image canvases, encodes the canvas as a PNG.
-   */
-  protected toBuffer() {
+    /**
+     * No more information, wait next update
+     */
+  toBuffer() {
     return this.canvas.toBuffer();
   };
 
@@ -344,9 +344,9 @@ export default class NessBuilder {
    * 
    * @param location Image Generation Path
    * @param name Image name
-   * @param type Image Type
+   * @param type Image extention
    */
-  public generatedTo(location: string, name: string, type: "PNG"): void {
+  public generatedTo(location: string, name: string, type: ImageExtention): void {
   writeFileSync(`${location}/${name}.${type}`, this.toBuffer());
 };
 
