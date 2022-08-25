@@ -75,6 +75,8 @@ export default class NessBuilder {
    * Draw an image to S coordinates with D dimensions
    *
    * @param image The image to set (no link, use loadImage() from canvas)
+   * @param imageOption Source image coordinates to draw in the context of Canvas
+   * @param locationOption Modify image coordinates to draw in the context of Canvas
    */
   public draw(image: CanvasImage, imageOption: ImagelocationOption, locationOption?: DrawlocationOption) {
 
@@ -157,6 +159,56 @@ export default class NessBuilder {
         this.frameTextCoordinate.y = coordinate.y + size.height/2;
         break;
       };
+      case "Circle": {
+        this.context.arc(coordinate.x + size.widht / 2, coordinate.y + size.height / 2, size.widht / 2, 0, 2 * Math.PI);
+        this.frameTextCoordinate.x = coordinate.x + size.widht / 2;
+        this.frameTextCoordinate.y = coordinate.y + size.height / 2;
+        break;
+      };
+      case "SymmetricalStar": {
+        let rot = Math.PI / 2 * 3;
+        const spikes = options.radius;
+        const step = Math.PI / spikes;
+        this.context.beginPath();
+
+        for (let i = 0; i < spikes; i++) {
+            let x = coordinate.x + size.widht / 2 + Math.cos(rot) * size.widht / 4;
+            let y = coordinate.y + size.height / 2 + Math.sin(rot) * size.height / 4;
+            this.context.lineTo(x, y);
+            rot += step;
+
+            x = coordinate.x + size.widht / 2 + Math.cos(rot) * size.widht / 2;
+            y = coordinate.y + size.height / 2 + Math.sin(rot) * size.height / 2;
+            this.context.lineTo(x, y);
+            rot += step;
+        }
+
+        this.frameTextCoordinate.x = coordinate.x + size.widht / 2 + Math.cos(rot);
+        this.frameTextCoordinate.y = coordinate.y + size.height / 2 + Math.cos(rot);
+        this.context.closePath();
+        break;
+      };
+      case "Polygones": {
+          let rot = Math.PI / 2 * 3;
+          const spikes = options.radius;
+          const step = Math.PI / spikes;
+          this.context.beginPath();
+
+          for (let i = 0; i < spikes; i++) {
+            let x = coordinate.x + size.widht / 2 + Math.cos(rot) * size.widht / 2;
+            let y = coordinate.y + size.height / 2 + Math.sin(rot) * size.height / 2;
+
+            this.context.lineTo(x, y);
+            rot += step;
+            this.context.lineTo(x, y);
+            rot += step;
+          }
+
+          this.frameTextCoordinate.x = coordinate.x + size.widht / 2 + Math.cos(rot);
+          this.frameTextCoordinate.y = coordinate.y + size.height / 2 + Math.cos(rot);
+          this.context.closePath();
+          break;
+      }
     };
     this.context.stroke();
     this.context.clip();
@@ -298,41 +350,3 @@ export default class NessBuilder {
 };
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// function draw() {
-//   const canvas = document.getElementById('canvas');
-//   if (canvas.getContext) {
-//     const ctx = canvas.getContext('2d');
-    
-//     // Triangle plein
-//     ctx.beginPath();
-//     ctx.moveTo(25, 25);
-//     ctx.lineTo(105, 25);
-//     ctx.lineTo(25, 105);
-//     ctx.fill();
-    
-//     // Triangle filaire
-//     ctx.beginPath();
-//     ctx.moveTo(125, 125)
-//     ctx.lineTo(125, 45);
-//     ctx.lineTo(45, 125);
-//     ctx.closePath();
-//     ctx.stroke();
-//   }
-// }
