@@ -1,5 +1,5 @@
 import { writeFileSync } from "fs";
-import { CanvasImage, Preset, Shape } from "../../typings";
+import type { CanvasImage, Preset, Shape } from "..";
 import NessBuilder from "./NessBuilder";
 
 export default class CustomProfile extends NessBuilder {

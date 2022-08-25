@@ -1,5 +1,5 @@
 import { loadImage } from "canvas";
-import { CustomProfile, NessBuilder } from "../main";
+import { CustomProfile, NessBuilder } from "..";
 import RankupBuilder from "../Managers/RankupBuilder";
 
 async function test() {

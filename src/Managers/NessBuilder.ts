@@ -1,7 +1,6 @@
 import { writeFileSync } from "fs"
 import { Canvas, CanvasRenderingContext2D, registerFont } from "canvas"
-import { CanvasImage, CustomColor, ImageExtention, Shape } from "../../typings";
-import { ImagelocationOption, DrawlocationOption, FramelocationOption, FrameSizeOption, ExpLocationOption, ExpSizeOption, FrameOption, TextOption, RegisterFont } from "../../typings/Interface";
+import type { CanvasImage, CustomColor, ImageExtention, Shape, ImagelocationOption, DrawlocationOption, FramelocationOption, FrameSizeOption, ExpLocationOption, ExpSizeOption, FrameOption, TextOption, RegisterFont } from "..";
 
 export default class NessBuilder {
   

@@ -1,6 +1,6 @@
 import { Image } from "canvas";
 import { writeFileSync } from "fs";
-import { CanvasImage, Preset, Shape } from "../../typings";
+import type { CanvasImage, Preset, Shape } from "..";
 import NessBuilder from "./NessBuilder";
 
 export default class RankupBuilder extends NessBuilder {

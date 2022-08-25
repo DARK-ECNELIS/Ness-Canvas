@@ -1,15 +1,15 @@
 {
   "name": "ness-canvas",
-  "version": "0.0.1-alpha.c1",
+  "version": "0.0.1-alpha.c2",
   "description": "Canvas Builder",
   "main": "lib/index.js",
   "author": "DARK ECNELIS darkecnelis@gmail.com",
   "license": "BSD 3-Clause",
   "private": false,
   "files": [
-    "lib/**/*",
-    "typings"
+    "."
   ],
+  "types": "./index.d.ts",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/DARK-ECNELIS/ness-canvas.git"

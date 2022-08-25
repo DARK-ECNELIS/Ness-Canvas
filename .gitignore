@@ -2,7 +2,7 @@
 node_modules
 package-lock.json
 dist
-lib
+npm
 src/test/assets
 .npmrc
 README copy.md

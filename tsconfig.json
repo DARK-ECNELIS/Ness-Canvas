@@ -2,15 +2,16 @@
   "compilerOptions": {
     "target": "ESNext",
     "module": "commonjs",
+    "moduleResolution": "node",
     "declaration": true,
     "rootDir": "src",
-    "outDir": "lib",
+    "outDir": "npm/lib",
     "typeRoots": ["./node_modules/@types"],
-    "declarationDir": "typings",
+    "declarationDir": "npm",
     "declarationMap": true,
   },
   "include": [
-      "src",
+      "src"
     ],
   "exclude": [
     "node_modules",
