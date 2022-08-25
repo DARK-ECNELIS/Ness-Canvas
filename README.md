@@ -18,7 +18,7 @@ If you are not used to canvas, the latter can request a specific installation th
 const { NessBuilder } = require('ness-canvas')
 const { loadImage } = require('canvas')
 
-const background = await loadImage('https://media.discordapp.net/attachments/983525978091442236/983526115610083368/fly.jpg');
+const background = await loadImage('https://media.discordapp.net/attachments/1006600590408818810/1006600665298116728/background-3147808.jpg');
 const avatar = await loadImage('https://media.discordapp.net/attachments/758031322244710601/1000153437813616650/perso_anime_U565bW7EhY2InkF.png');
 
 const builder = new NessBuilder(700, 250) // Set Image format
