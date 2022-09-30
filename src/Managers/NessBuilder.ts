@@ -346,7 +346,7 @@ export default class NessBuilder {
    * @param type Image extention
    */
   public generatedTo(location: string, name: string, type: ImageExtention): void {
-  writeFileSync(`${location}/${name}.${type}`, this.toBuffer());
-};
+    writeFileSync(`${location}/${name}.${type}`, this.toBuffer());
+  };
 
 }
