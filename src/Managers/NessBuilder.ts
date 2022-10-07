@@ -103,13 +103,12 @@ export default class NessBuilder {
     // Sauvegarde de la position et taille du frame
     this.frameCoordinate.x = coordinate.x
     this.frameCoordinate.y = coordinate.y
-    this.frameCoordinate.w = size.widht
+    this.frameCoordinate.w = size.width
     this.frameCoordinate.h = size.height
 
     this.context.save();
     this.context.beginPath();
 
-    const r = coordinate.x + size.widht;
     const b = coordinate.y + size.height;
     this.context.strokeStyle = options.outline? options.outline.color : "#FF0000";
     this.context.lineWidth = options.outline?.lineWidth? options.outline.lineWidth : 3;
@@ -126,41 +125,41 @@ export default class NessBuilder {
         this.context.lineTo(coordinate.x, coordinate.y + options.radius);
         this.context.quadraticCurveTo(coordinate.x, coordinate.y, coordinate.x + options.radius, coordinate.y);
 
-        this.frameTextCoordinate.x = coordinate.x + size.widht/2;
+        this.frameTextCoordinate.x = coordinate.x + size.width/2;
         this.frameTextCoordinate.y = coordinate.y + size.height/2;
         break;
       };
       case "Octogon": {
         this.context.moveTo(coordinate.x, coordinate.y + (size.height/4));
-        this.context.lineTo(coordinate.x + (size.widht/4), coordinate.y);
-        this.context.lineTo(coordinate.x + (size.widht/1.7), coordinate.y);
-        this.context.lineTo(coordinate.x + (size.widht/1.2), coordinate.y + (size.height/4));
-        this.context.lineTo(coordinate.x + (size.widht/1.2), coordinate.y + (size.height/1.7));
-        this.context.lineTo(coordinate.x + (size.widht/1.7), coordinate.y + (size.widht/1.2));
-        this.context.lineTo(coordinate.x + (size.widht/4), coordinate.y + (size.height/1.2));
+        this.context.lineTo(coordinate.x + (size.width/4), coordinate.y);
+        this.context.lineTo(coordinate.x + (size.width/1.7), coordinate.y);
+        this.context.lineTo(coordinate.x + (size.width/1.2), coordinate.y + (size.height/4));
+        this.context.lineTo(coordinate.x + (size.width/1.2), coordinate.y + (size.height/1.7));
+        this.context.lineTo(coordinate.x + (size.width/1.7), coordinate.y + (size.width/1.2));
+        this.context.lineTo(coordinate.x + (size.width/4), coordinate.y + (size.height/1.2));
         this.context.lineTo(coordinate.x, coordinate.y + (size.height/1.7));
         this.context.lineTo(coordinate.x, coordinate.y + (size.height/4));
-        this.context.lineTo(coordinate.x + (size.widht/4), coordinate.y);
+        this.context.lineTo(coordinate.x + (size.width/4), coordinate.y);
         
-        this.frameTextCoordinate.x = coordinate.x + (size.widht/1.2)/2;
+        this.frameTextCoordinate.x = coordinate.x + (size.width/1.2)/2;
         this.frameTextCoordinate.y = coordinate.y + (size.height/1.2)/2;
         break;
       };
       case "Pentagone": {
         this.context.moveTo(coordinate.x, coordinate.y + size.height*0.35);
-        this.context.lineTo(coordinate.x + size.widht/2, coordinate.y);
-        this.context.lineTo(coordinate.x + size.widht, coordinate.y + size.height*0.35);
-        this.context.lineTo(coordinate.x + size.widht*0.85, coordinate.y + size.height / 1.08);
-        this.context.lineTo(coordinate.x + size.widht*0.15, coordinate.y + size.height / 1.08);
+        this.context.lineTo(coordinate.x + size.width/2, coordinate.y);
+        this.context.lineTo(coordinate.x + size.width, coordinate.y + size.height*0.35);
+        this.context.lineTo(coordinate.x + size.width*0.85, coordinate.y + size.height / 1.08);
+        this.context.lineTo(coordinate.x + size.width*0.15, coordinate.y + size.height / 1.08);
         this.context.lineTo(coordinate.x, coordinate.y + size.height*0.35);
         
-        this.frameTextCoordinate.x = coordinate.x + size.widht/2;
+        this.frameTextCoordinate.x = coordinate.x + size.width/2;
         this.frameTextCoordinate.y = coordinate.y + size.height/2;
         break;
       };
       case "Circle": {
-        this.context.arc(coordinate.x + size.widht / 2, coordinate.y + size.height / 2, size.widht / 2, 0, 2 * Math.PI);
-        this.frameTextCoordinate.x = coordinate.x + size.widht / 2;
+        this.context.arc(coordinate.x + size.width / 2, coordinate.y + size.height / 2, size.width / 2, 0, 2 * Math.PI);
+        this.frameTextCoordinate.x = coordinate.x + size.width / 2;
         this.frameTextCoordinate.y = coordinate.y + size.height / 2;
         break;
       };
@@ -171,42 +170,42 @@ export default class NessBuilder {
         this.context.beginPath();
 
         for (let i = 0; i < spikes; i++) {
-            let x = coordinate.x + size.widht / 2 + Math.cos(rot) * size.widht / 4;
-            let y = coordinate.y + size.height / 2 + Math.sin(rot) * size.height / 4;
-            this.context.lineTo(x, y);
-            rot += step;
+          let x = coordinate.x + size.width / 2 + Math.cos(rot) * size.width / 4;
+          let y = coordinate.y + size.height / 2 + Math.sin(rot) * size.height / 4;
+          this.context.lineTo(x, y);
+          rot += step;
 
-            x = coordinate.x + size.widht / 2 + Math.cos(rot) * size.widht / 2;
-            y = coordinate.y + size.height / 2 + Math.sin(rot) * size.height / 2;
-            this.context.lineTo(x, y);
-            rot += step;
+          x = coordinate.x + size.width / 2 + Math.cos(rot) * size.width / 2;
+          y = coordinate.y + size.height / 2 + Math.sin(rot) * size.height / 2;
+          this.context.lineTo(x, y);
+          rot += step;
         }
 
-        this.frameTextCoordinate.x = coordinate.x + size.widht / 2 + Math.cos(rot);
+        this.frameTextCoordinate.x = coordinate.x + size.width / 2 + Math.cos(rot);
         this.frameTextCoordinate.y = coordinate.y + size.height / 2 + Math.cos(rot);
         this.context.closePath();
         break;
       };
       case "Polygones": {
-          let rot = Math.PI / 2 * 3;
-          const spikes = options.radius;
-          const step = Math.PI / spikes;
-          this.context.beginPath();
+        let rot = Math.PI / 2 * 3;
+        const spikes = options.radius;
+        const step = Math.PI / spikes;
+        this.context.beginPath();
 
-          for (let i = 0; i < spikes; i++) {
-            let x = coordinate.x + size.widht / 2 + Math.cos(rot) * size.widht / 2;
-            let y = coordinate.y + size.height / 2 + Math.sin(rot) * size.height / 2;
+        for (let i = 0; i < spikes; i++) {
+          let x = coordinate.x + size.width / 2 + Math.cos(rot) * size.width / 2;
+          let y = coordinate.y + size.height / 2 + Math.sin(rot) * size.height / 2;
 
-            this.context.lineTo(x, y);
-            rot += step;
-            this.context.lineTo(x, y);
-            rot += step;
-          }
+          this.context.lineTo(x, y);
+          rot += step;
+          this.context.lineTo(x, y);
+          rot += step;
+        }
 
-          this.frameTextCoordinate.x = coordinate.x + size.widht / 2 + Math.cos(rot);
-          this.frameTextCoordinate.y = coordinate.y + size.height / 2 + Math.cos(rot);
-          this.context.closePath();
-          break;
+        this.frameTextCoordinate.x = coordinate.x + size.width / 2 + Math.cos(rot);
+        this.frameTextCoordinate.y = coordinate.y + size.height / 2 + Math.cos(rot);
+        this.context.closePath();
+        break;
       }
     };
     this.context.stroke();
@@ -228,7 +227,7 @@ export default class NessBuilder {
 
   // Définition du background du cadre
   private setFrameBackground(image: CanvasImage) {
-    this.draw(image, {sx: this.frameCoordinate.x, sy: this.frameCoordinate.y, sWidht: this.frameCoordinate.w, sHeight: this.frameCoordinate.h});
+    this.setImage(image, {sx: this.frameCoordinate.x, sy: this.frameCoordinate.y, sWidth: this.frameCoordinate.w, sHeight: this.frameCoordinate.h});
 
     this.context.restore();
 

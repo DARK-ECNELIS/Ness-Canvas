@@ -15,7 +15,7 @@ export interface ImagelocationOption {
   /**
    * Width of the image drawn in the Canvas. This allows you to adjust the size of the image. If this argument is not specified, the image will take its normal width.
    */
-   sWidht?: number;
+   sWidth?: number;
    /**
     * Height of the image drawn in the Canvas. This allows you to adjust the size of the image. If this argument is not specified, the image will take its normal height.
     */
@@ -37,7 +37,7 @@ export interface DrawlocationOption {
   /**
    * Width of the image Modify (ImagelocationOption) to draw in the canvas.
    */
-   dWidht?: number;
+   dWidth?: number;
   /**
    * Height of the image Modify (ImagelocationOption) to draw in the canvas.
    */
@@ -65,7 +65,7 @@ export interface FrameSizeOption {
   /**
    * frame width
    */
-   widht: number;
+   width: number;
   /**
    * frame height
    */
