@@ -1,11 +1,11 @@
-import { writeFileSync } from "fs"
-import { Canvas, CanvasRenderingContext2D, registerFont } from "canvas"
+import { writeFileSync } from "fs";
+import { Canvas, CanvasRenderingContext2D, registerFont } from "canvas";
 import type { CanvasImage, CustomColor, ImageExtention, Shape, ImagelocationOption, DrawlocationOption, FramelocationOption, FrameSizeOption, ExpLocationOption, ExpSizeOption, FrameOption, TextOption, RegisterFont } from "..";
 
 export default class NessBuilder {
   
   protected canvas: Canvas;
-  private context: CanvasRenderingContext2D;
+  protected context: CanvasRenderingContext2D;
 
   private canvasSize = {
     width: 0,
@@ -65,7 +65,7 @@ export default class NessBuilder {
    * @param image The image to set (no link, use loadImage() from canvas)
    */
   public setBackground(image: CanvasImage) {
-    this.draw(image, { sx: 0, sy: 0, sWidht: this.canvas.width, sHeight: this.canvas.height })
+    this.setImage(image, { sx: 0, sy: 0, sWidth: this.canvas.width, sHeight: this.canvas.height })
     
     return this;
   };
@@ -77,13 +77,13 @@ export default class NessBuilder {
    * @param imageOption Source image coordinates to draw in the context of Canvas
    * @param locationOption Modify image coordinates to draw in the context of Canvas
    */
-  public draw(image: CanvasImage, imageOption: ImagelocationOption, locationOption?: DrawlocationOption) {
+  public setImage(image: CanvasImage, imageOption: ImagelocationOption, locationOption?: DrawlocationOption) {
 
     if (locationOption) {
-      this.context.drawImage(image, locationOption.dx, locationOption.dy, locationOption.dWidht, locationOption.dHeight, imageOption.sx, imageOption.sy, imageOption.sWidht, imageOption.sHeight)
+      this.context.drawImage(image, locationOption.dx, locationOption.dy, locationOption.dWidth, locationOption.dHeight, imageOption.sx, imageOption.sy, imageOption.sWidth, imageOption.sHeight)
     }
-    else if (imageOption.sWidht && imageOption.sHeight) {
-      this.context.drawImage(image, imageOption.sx, imageOption.sy, imageOption.sWidht, imageOption.sHeight);
+    else if (imageOption.sWidth && imageOption.sHeight) {
+      this.context.drawImage(image, imageOption.sx, imageOption.sy, imageOption.sWidth, imageOption.sHeight);
     }
     else this.context.drawImage(image, imageOption.sx, imageOption.sy);
 
@@ -109,6 +109,7 @@ export default class NessBuilder {
     this.context.save();
     this.context.beginPath();
 
+    const r = coordinate.x + size.width;
     const b = coordinate.y + size.height;
     this.context.strokeStyle = options.outline? options.outline.color : "#FF0000";
     this.context.lineWidth = options.outline?.lineWidth? options.outline.lineWidth : 3;
