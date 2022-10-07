@@ -1,7 +1,7 @@
 import { Image } from "canvas";
 import { writeFileSync } from "fs";
 import type { CanvasImage, Preset, Shape } from "..";
-import NessBuilder from "./NessBuilder";
+import NessBuilder from "../Managers/NessBuilder";
 
 export default class RankupBuilder extends NessBuilder {
 
@@ -35,7 +35,7 @@ export default class RankupBuilder extends NessBuilder {
   private init(background: CanvasImage, radius: number, avatar: CanvasImage | number, shape: Shape) {
     this.setCornerRadius(radius);
     this.setBackground(background);
-    this.setFrame(shape, {x: this.avatar[shape].x, y: this.avatar[shape].y}, {widht: this.avatar[shape].w, height: this.avatar[shape].h}, { radius: this.avatar[shape].radius, content: { imageOrText: avatar }, outline: { color: "#FF0000", lineWidth: 3 }});
+    this.setFrame(shape, {x: this.avatar[shape].x, y: this.avatar[shape].y}, {width: this.avatar[shape].w, height: this.avatar[shape].h}, { radius: this.avatar[shape].radius, content: { imageOrText: avatar }, outline: { color: "#FF0000", lineWidth: 3 }});
     
     return this;
   };

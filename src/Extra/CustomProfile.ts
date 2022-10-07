@@ -1,6 +1,6 @@
 import { writeFileSync } from "fs";
 import type { CanvasImage, Preset, Shape } from "..";
-import NessBuilder from "./NessBuilder";
+import NessBuilder from "../Managers/NessBuilder";
 
 export default class CustomProfile extends NessBuilder {
 
@@ -34,8 +34,8 @@ export default class CustomProfile extends NessBuilder {
   private init(background: CanvasImage, radius: number, avatar: CanvasImage, shape: Shape)  {
     this.setCornerRadius(radius);
     this.setBackground(background);
-    this.setFrame(shape, {x: this.avatar[shape].x, y: this.avatar[shape].y}, {widht: this.avatar[shape].w, height: this.avatar[shape].h}, {radius: this.avatar[shape].radius, content: {imageOrText: avatar }, outline: { color: "#FF0000", lineWidth: 8 }});
-    this.setExp({x: 45, y: 200}, {width: 655, height: 30}, 20, 65);
+    this.setFrame(shape, {x: this.avatar[shape].x, y: this.avatar[shape].y}, {width: this.avatar[shape].w, height: this.avatar[shape].h}, {radius: this.avatar[shape].radius, content: {imageOrText: avatar }, outline: { color: "#FF0000", lineWidth: 8 }});
+    this.setExp(false, {x: 45, y: 200}, {width: 655, height: 30}, 20, 65);
     
     return this;
   };
