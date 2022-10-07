@@ -12,6 +12,7 @@ declare type ImageExtention = "PNG" | "JPG" | "JPEG"
 export { Preset, Shape, CustomColor, CanvasImage, ImageExtention }
 
 export { default as NessBuilder } from './Managers/NessBuilder';
+export { default as FilterBuilder } from './Managers/FilterBuilder';
 export { default as CustomProfile } from './Extra/CustomProfile';
 export { default as RankupBuilder } from './Extra/RankupBuilder';
 
