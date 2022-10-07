@@ -284,43 +284,80 @@ export default class NessBuilder {
    * @param cloneWidth Size of the second progression bar
    * @param color Text color (a degrade can be applied with <createRadialGradient | createLinearGradient] of the Canvas module), White color is used by Default
    */
-  public setExp(location: ExpLocationOption, size: ExpSizeOption, radius: number, cloneWidth: number, color?: CustomColor) {
+  public setExp(horizontal: boolean, location: ExpLocationOption, size: ExpSizeOption, radius: number, cloneWidth: number, color?: CustomColor) {
     
-    // Barre N°1
     this.context.save();
     this.context.beginPath();
     this.context.strokeStyle = color? color : "#FF0000";
     this.context.lineWidth = 0.1;
-    
-    this.context.moveTo(location.x, location.y);
-    this.context.lineTo(size.width, location.y);
-    this.context.quadraticCurveTo(size.width + radius, location.y, size.width + radius, location.y + (size.height /2));
-    this.context.quadraticCurveTo(size.width + radius, size.height + location.y, size.width, size.height + location.y);
-    this.context.lineTo(location.x, size.height + location.y);
-    this.context.quadraticCurveTo(location.x - radius, size.height + location.y, location.x - radius, location.y + (size.height /2));
-    this.context.quadraticCurveTo(location.x - radius, location.y, location.x, location.y);
 
-    this.context.fillStyle = "#FFFFFF20"
-    this.context.fill()
-    this.context.stroke();
+    if (!horizontal) {
 
-    if ((cloneWidth * 100) / size.width < 6.8) {
-      this.context.clip()
-    }
+      // Barre N°1
+      this.context.moveTo(location.x, location.y);
+      this.context.lineTo(size.width, location.y);
+      this.context.quadraticCurveTo(size.width + radius, location.y, size.width + radius, location.y + (size.height /2));
+      this.context.quadraticCurveTo(size.width + radius, size.height + location.y, size.width, size.height + location.y);
+      this.context.lineTo(location.x, size.height + location.y);
+      this.context.quadraticCurveTo(location.x - radius, size.height + location.y, location.x - radius, location.y + (size.height /2));
+      this.context.quadraticCurveTo(location.x - radius, location.y, location.x, location.y);
+
+      this.context.fillStyle = "#FFFFFF20"
+      this.context.fill()
+      this.context.stroke();
+
+      if ((cloneWidth * 100) / size.width < 6.8) {
+        this.context.clip()
+      }
 
 
-    // Barre N°2
-    this.context.beginPath();
-    this.context.strokeStyle = color? color : "#000000";
-    this.context.lineWidth = 2;
-    
-    this.context.moveTo(location.x, location.y);
-    this.context.lineTo(cloneWidth, location.y);
-    this.context.quadraticCurveTo(cloneWidth + radius, location.y, cloneWidth + radius, location.y + (size.height /2));
-    this.context.quadraticCurveTo(cloneWidth + radius, location.y + size.height, cloneWidth, location.y + size.height);
-    this.context.lineTo(location.x, location.y + size.height);
-    this.context.quadraticCurveTo(location.x - radius, location.y + size.height, location.x - radius, location.y + (size.height /2));
-    this.context.quadraticCurveTo(location.x - radius, location.y, location.x, location.y);
+      // Barre N°2
+      this.context.beginPath();
+      this.context.strokeStyle = color? color : "#000000";
+      this.context.lineWidth = 2;
+      
+      this.context.moveTo(location.x, location.y);
+      this.context.lineTo(cloneWidth, location.y);
+      this.context.quadraticCurveTo(cloneWidth + radius, location.y, cloneWidth + radius, location.y + (size.height /2));
+      this.context.quadraticCurveTo(cloneWidth + radius, location.y + size.height, cloneWidth, location.y + size.height);
+      this.context.lineTo(location.x, location.y + size.height);
+      this.context.quadraticCurveTo(location.x - radius, location.y + size.height, location.x - radius, location.y + (size.height /2));
+      this.context.quadraticCurveTo(location.x - radius, location.y, location.x, location.y);
+
+    } else {
+
+      // Barre N°1
+      this.context.moveTo(location.x, location.y);
+      this.context.lineTo(location.x, size.height);
+      this.context.quadraticCurveTo(location.x, size.height + radius, location.x + (size.width /2), size.height + radius);
+      this.context.quadraticCurveTo(size.width + location.x, size.height + radius, size.width + location.x, size.height);
+      this.context.lineTo(size.width + location.x, location.y);
+      this.context.quadraticCurveTo(size.width + location.x, location.y - radius, location.x + (size.width / 2), location.y - radius);
+      this.context.quadraticCurveTo(location.x, location.y - radius, location.x, location.y);
+
+      this.context.fillStyle = "#FFFFFF20"
+      this.context.fill()
+      this.context.stroke();
+
+      if ((cloneWidth * 100) / size.width < 6.8) {
+        this.context.clip()
+      }
+
+
+      // Barre N°2
+      this.context.beginPath();
+      this.context.strokeStyle = color? color : "#000000";
+      this.context.lineWidth = 2;
+      
+      this.context.moveTo(location.x, location.y);
+      this.context.lineTo(location.x, cloneWidth);
+      this.context.quadraticCurveTo(location.x, cloneWidth + radius, location.x + (size.width/2), cloneWidth + radius);      
+      this.context.quadraticCurveTo(location.x + size.width, cloneWidth + radius, location.x + size.width, cloneWidth);
+      this.context.lineTo(location.x + size.width, location.y);
+      this.context.quadraticCurveTo(location.x + size.width, location.y - radius, location.x + (size.width/2), location.y - radius);
+      this.context.quadraticCurveTo(location.x, location.y - radius, location.x, location.y);
+
+    };
 
     this.context.fillStyle = "#BB00FF"
     this.context.fill()
