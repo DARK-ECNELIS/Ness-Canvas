@@ -11,10 +11,11 @@
     "declarationMap": true,
   },
   "include": [
-      "src"
+    "src"
     ],
   "exclude": [
     "node_modules",
-    "src/test"
+    "src/test",
+    "wow/gifGenerator.ts"
   ],
 }

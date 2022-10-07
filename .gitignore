@@ -4,5 +4,7 @@ package-lock.json
 dist
 npm
 src/test/assets
+wow
+.vscode
 .npmrc
 README copy.md
