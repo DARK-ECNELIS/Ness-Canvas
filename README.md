@@ -37,25 +37,47 @@ const avatar = await loadImage('https://media.discordapp.net/attachments/7580313
 const builder = new NessBuilder(700, 250) // Set Image format
   .setCornerRadius(15) // round the edges of the image
   .setBackground(background) // Add Background
-  .setFrame("Square", { x: 25, y:25 }, { widht: 150, height: 150 }, { radius: 15, content: {imageOrText: avatar}}) // Add image in a square frame
-  .setFrame("Polygones", { x: 550, y:25 }, { widht: 130, height: 130 }, {radius: 6, content: { imageOrText: 33, textOptions: { font: "sans-serif", size: 80, color: "#000000", textAlign: "center", textBaseline: "middle" }}}) // Write "33" in a polygones frame
-  .setExp({x: 45, y: 200}, {width: 655, height: 30}, 20, 65) // Draw an experience bar
+  .setFrame("Square", { x: 25, y:25 }, { width: 150, height: 150 }, { radius: 15, content: {imageOrText: avatar}}) // Add image in a square frame
+  .setFrame("Polygones", { x: 550, y:25 }, { width: 130, height: 130 }, {radius: 6, content: { imageOrText: 33, textOptions: { font: "sans-serif", size: 80, color: "#000000", textAlign: "center", textBaseline: "middle" }}}) // Write "33" in a polygones frame
+  .setExp(false, {x: 45, y: 200}, {width: 655, height: 30}, 20, 65) // Draw an experience bar
   .setText('Hello World!', {x:350, y:100}, {size: 40, font: 'Impact'}) // Write "Hello World!"
-
+  .generatedTo('src/test/', "test", "png");
 
   // Generate canvas in a specific file
   builder.generateTo('FileLocation', 'ImageName', "PNG | JPEG | JPG")
 
   // Recover the canvas buffer
   Builder.getBuffer()
+
+// Add a filter to an image
+
+const filter = new FilterBuilder(avatar);
+await filter.Invert();
+  
+new NessBuilder(avatar.width, avatar.height)
+  .setCornerRadius(15)
+  .setBackground(filter.getCanvas())
+  .generatedTo("src/test/", "testFilter", "png");
 ```
 ## Result
 
-![alt text](https://github.com/DARK-ECNELIS/Ness-Canvas/blob/main/src/test/test.png?raw=true)
+<div style="display:flex; text-align:center; justify-content:space-evenly">
+  <div style="display:inline-block">
+    <h3>NessBuilder</h3>
+    <img style="display:block" src="https://github.com/DARK-ECNELIS/Ness-Canvas/blob/main/Assets/test.png?raw=true" height=80/>
+  </div>
+  <div style="display:inline-block">
+    <h3>FilterBuilder && NessBuilder</h3>
+    <img src="https://github.com/DARK-ECNELIS/Ness-Canvas/blob/main/Assets/FilterImage/Invert.png?raw=true" height= 80/>
+  </div>
+</div>
+
 
 ## Documentation
 
-This project is an implementation of the Canvas module. For more on the latter visit the [Canvas Module Guide](). All utility methods are documented below.
+This project is an implementation of the Canvas module. For more on the latter visit the [Canvas Module Guide](https://github.com/Automattic/node-canvas). All utility methods are documented below.
+
+The filter builder has documentation specifying all filters you find [here](https://github.com/DARK-ECNELIS/Ness-Canvas/blob/main/FilterGuide.md).
 
 ## Builder
 
@@ -74,19 +96,6 @@ This project is an implementation of the Canvas module. For more on the latter v
   * [setExp()](#setexp)
   * [toBuffer()](#tobuffer)
   * [generatedTo()](#generatedto)
-
-### @Param
-  * #ImagelocationOption
-  * #DrawlocationOption
-  * #FramelocationOption
-  * #FrameSizeOption
-  * #ExpLocationOption
-  * #ExpSizeOption
-  * #FrameOption
-  * #CanvasImage
-  * #TextOption
-  * #CustomColor
-
 
 ### NessBuilder()
 
@@ -148,12 +157,12 @@ const builder = new NessBuilder(250, 300)
 const image = await loadImage('http://supremacy.wolf/image.png')
 
 // The coordinates x and y are the position of the upper left corner of the image on the canvas
-builder.draw(image, {sx: 25, sy: 25, sWidht: 100, sHeight: 75});
+builder.draw(image, {sx: 25, sy: 25, sWidth: 100, sHeight: 75});
 
 // or for more precision
 
 // The Drawlocationoption parameter has not yet been fully tested and it is not recommended to use it for the moment
-builder.draw(image, {sx: 25, sy: 25, sWidht: 100, sHeight: 75}, {dx: ?, dy: ?, dWidht: ?, dHeight: ?});
+builder.draw(image, {sx: 25, sy: 25, sWidth: 100, sHeight: 75}, {dx: ?, dy: ?, dWidth: ?, dHeight: ?});
 ```
 
 ### setFrame()
@@ -171,17 +180,17 @@ const builder = new NessBuilder(250, 300)
 const image = await loadImage('http://supremacy.wolf/image.png')
 
 // Draw a predefined frame
-builder.setFrame("Octogon", { x: 25, y:25 }, { widht: 150, height: 150 })
+builder.setFrame("Octogon", { x: 25, y:25 }, { width: 150, height: 150 })
 
 // Draw a predefined frame containing an image
-builder.setFrame("Square", { x: 25, y:25 }, { widht: 150, height: 150 }, { radius: 15, content: {imageOrText: image}})
+builder.setFrame("Square", { x: 25, y:25 }, { width: 150, height: 150 }, { radius: 15, content: {imageOrText: image}})
 
 
 // Draw a predefined frame containing an text
-builder.setFrame("Polygones", { x: 550, y:25 }, { widht: 130, height: 130 }, {radius: 6, content: { imageOrText: 'Hello'}});
+builder.setFrame("Polygones", { x: 550, y:25 }, { width: 130, height: 130 }, {radius: 6, content: { imageOrText: 'Hello'}});
 
 // Draw a predefined frame with custom text
-builder.setFrame("Pentagone", { x: 550, y:25 }, { widht: 130, height: 130 }, {content: { imageOrText: 'Hello', textOptions: { font: "sans-serif", size: 80, color: "#000000", textAlign: "center", textBaseline: "middle" }}});
+builder.setFrame("Pentagone", { x: 550, y:25 }, { width: 130, height: 130 }, {content: { imageOrText: 'Hello', textOptions: { font: "sans-serif", size: 80, color: "#000000", textAlign: "center", textBaseline: "middle" }}});
 
 ```
 ### setText()
@@ -210,7 +219,7 @@ Draws a bar that can act as an experience bar
 const { NessBuilder } = require('ness-canvas')
 const builder = new NessBuilder(250, 300)
 
-builder.setExp({x: 45, y: 200}, {width: 655, height: 30}, 20, 65)
+builder.setExp(false, {x: 45, y: 200}, {width: 655, height: 30}, 20, 65)
 ```
 
 ### toBuffer()
@@ -240,6 +249,6 @@ Generates an image of the canvas in a specific path
 const { NessBuilder } = require('ness-canvas')
 const builder = new NessBuilder(250, 300)
 
-builder.generatedTo('src/path/', "name", "PNG")
+builder.generatedTo('src/path/', "name", "png")
 ```
   
