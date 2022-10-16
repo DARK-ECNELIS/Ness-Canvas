@@ -41,7 +41,7 @@ export default class CustomProfile extends NessBuilder {
   };
 
   // this.generatedTo("asset/test/test.png");
-  public generatedTo(location: string, name: string, type: "PNG"): void {
+  public generatedTo(location: string, name: string, type: "png"): void {
     writeFileSync(`${location}/${name}.${type}`, this.toBuffer());
   };
 

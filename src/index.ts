@@ -6,10 +6,22 @@ declare type CanvasImage = Image | HTMLOrSVGImageElement | HTMLVideoElement | HT
 declare type Preset = 'classic';
 declare type Shape = "Square" | "Octogon" | "Pentagone" | "Circle" | "SymmetricalStar" | "Polygones";
 
-declare type ImageExtention = "PNG" | "JPG" | "JPEG"
+declare type ImageExtention = "png" | "jpg" | "jpeg"
+
+enum ImageChannels {
+  Red = 1,
+  Green = 2,
+  Bleu = 3
+};
+
+enum Edge {
+  Clamp = 1,
+  Wrap = 2,
+  Transparent = 0
+};
 
 
-export { Preset, Shape, CustomColor, CanvasImage, ImageExtention }
+export { Preset, Shape, CustomColor, CanvasImage, ImageExtention, ImageChannels, Edge }
 
 export { default as NessBuilder } from './Managers/NessBuilder';
 export { default as FilterBuilder } from './Managers/FilterBuilder';
