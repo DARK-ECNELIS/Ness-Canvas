@@ -72,7 +72,7 @@ filter2.generatedTo("src/test/", "testFilter", "png");
 
 ## Documentation
 
-FilterBuilder est une Class qui hérite de NessBuilder permettant d'ajouter des filtres sur un image pouvant être utilisé à sont tour par NessBuilder.
+FilterBuilder is a Class that allows to add filters on an image that can be used in turn by NessBuilder or be generated.
 
 ### Utility Methods
 * [Binarize()](#Binarize)
