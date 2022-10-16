@@ -1,12 +1,13 @@
 import { Canvas, CanvasRenderingContext2D, ImageData } from "canvas";
-import { CanvasImage } from "..";
-import NessBuilder from "./NessBuilder";
+import { writeFileSync } from "fs";
+import { CanvasImage, Edge, ImageChannels, ImageExtention } from "..";
 
-export default class FilterBuilder extends NessBuilder {
+export default class FilterBuilder {
   protected declare context: CanvasRenderingContext2D
   private dataDraft: ImageData;
   private dstImageData: ImageData;
   private draft2D: CanvasRenderingContext2D;
+  private canvas: Canvas;
 
   private srcPixels: Uint8ClampedArray;
   private srcWidth: number;
@@ -17,15 +18,13 @@ export default class FilterBuilder extends NessBuilder {
   private tmpPixels: Uint8ClampedArray;
 
   constructor(image: CanvasImage) {
-
-    super(<number>image.width, <number>image.height);
     
-    const draft = new Canvas(<number>image.width, <number>image.height);
-    this.draft2D = draft.getContext("2d");
+    this.canvas = new Canvas(<number>image.width, <number>image.height);
+    this.draft2D = this.canvas.getContext("2d");
 
     this.draft2D.drawImage(image, 0, 0, image.width, image.height);
 
-    this.dataDraft = this.draft2D.getImageData(0, 0, draft.width, draft.height);
+    this.dataDraft = this.draft2D.getImageData(0, 0, this.canvas.width, this.canvas.height);
     this.srcPixels = this.dataDraft.data;
     this.srcWidth = this.dataDraft.width;
     this.srcHeight = this.dataDraft.height;
@@ -65,7 +64,7 @@ export default class FilterBuilder extends NessBuilder {
     this.applyMap(path, dst, this.buildMap(func));
   };
 
-  private getPixelIndex(x: number, y: number, width: number, height: number, edge: any) {
+  private getPixelIndex(x: number, y: number, width: number, height: number, edge: Edge) {
     if (x < 0 || x >= width || y < 0 || y >= height) {
       switch (edge) {
         case 1: { // clamp
@@ -86,7 +85,7 @@ export default class FilterBuilder extends NessBuilder {
     return (y * width + x) << 2;
   };
 
-  private getPixel(path: number[], x: number, y: number, width: number, height: number, edge: any) {
+  private getPixel(path: Uint8ClampedArray | number[], x: number, y: number, width: number, height: number, edge: Edge) {
     if (x < 0 || x >= width || y < 0 || y >= height) {
       switch (edge) {
         case 1: { // clamp
@@ -115,7 +114,7 @@ export default class FilterBuilder extends NessBuilder {
     return path[i + 3] << 24 | path[i] << 16 | path[i + 1] << 8 | path[i + 2];
   };
 
-  private copyBilinear(path: number[], x: number, y: number, width: number, height: number, dst: { [x: string]: number; }, dstIndex: number, edge: any) {
+  private copyBilinear(path: Uint8ClampedArray | number[], x: number, y: number, width: number, height: number, dst: Uint8ClampedArray | number[], dstIndex: number, edge: Edge) {
     let fx = x < 0 ? x - 1 | 0 : x | 0, // Math.floor(x)
       fy = y < 0 ? y - 1 | 0 : y | 0, // Math.floor(y)
       wx = x - fx,
@@ -269,8 +268,7 @@ export default class FilterBuilder extends NessBuilder {
     return rgb;
   };
 
-  
-  private async ConvolutionFilter(matrixX: number, matrixY: number, matrix: any[], divisor: number, bias: number, preserveAlpha: boolean, clamp?: boolean, color?: number, alpha?: number) {
+  private async ConvolutionFilter(matrixX: number, matrixY: number, matrix: any[], divisor?: number, bias?: number, preserveAlpha?: boolean, clamp?: boolean, color?: number, alpha?: number) {
 
     divisor = divisor || 1;
     bias = bias || 0;
@@ -357,7 +355,7 @@ export default class FilterBuilder extends NessBuilder {
     return this.Copy(srcImageData, this.createImageData(srcImageData.width, srcImageData.height));
   };
 
-  private async Copy(srcImageData: ImageData, dstImageData) {
+  private async Copy(srcImageData: ImageData, dstImageData: ImageData) {
     let srcPixels = srcImageData.data, srcLength = srcPixels.length, dstPixels = dstImageData.data;
 
     while (srcLength--) {
@@ -365,6 +363,44 @@ export default class FilterBuilder extends NessBuilder {
     };
 
     return dstImageData;
+  };
+
+  private async ColorMatrixFilter(matrix: any[]) {
+    const m0  = matrix[0],
+    m1  = matrix[1],
+    m2  = matrix[2],
+    m3  = matrix[3],
+    m4  = matrix[4],
+    m5  = matrix[5],
+    m6  = matrix[6],
+    m7  = matrix[7],
+    m8  = matrix[8],
+    m9  = matrix[9],
+    m10 = matrix[10],
+    m11 = matrix[11],
+    m12 = matrix[12],
+    m13 = matrix[13],
+    m14 = matrix[14],
+    m15 = matrix[15],
+    m16 = matrix[16],
+    m17 = matrix[17],
+    m18 = matrix[18],
+    m19 = matrix[19];
+
+    let value: number, i: number, r: number, g: number, b: number, a: number;
+    for (i = 0; i < this.srcLength; i += 4) {
+      r = this.srcPixels[i];
+      g = this.srcPixels[i + 1];
+      b = this.srcPixels[i + 2];
+      a = this.srcPixels[i + 3];
+
+      this.dstPixels[i]     = (value = r *  m0 + g *  m1 + b *  m2 + a *  m3 +  m4) > 255 ? 255 : value < 0 ? 0 : value | 0;
+      this.dstPixels[i + 1] = (value = r *  m5 + g *  m6 + b *  m7 + a *  m8 +  m9) > 255 ? 255 : value < 0 ? 0 : value | 0;
+      this.dstPixels[i + 2] = (value = r * m10 + g * m11 + b * m12 + a * m13 + m14) > 255 ? 255 : value < 0 ? 0 : value | 0;
+      this.dstPixels[i + 3] = (value = r * m15 + g * m16 + b * m17 + a * m18 + m19) > 255 ? 255 : value < 0 ? 0 : value | 0;
+    }
+
+    return this.dstImageData;
   };
   // // // // // // // // // // // // // //
 
@@ -400,13 +436,13 @@ export default class FilterBuilder extends NessBuilder {
       radiusPlus1 = radius + 1,
       widthMinus1 = width - 1;
 
-      let r, g, b, a;
+      let r: number, g: number, b: number, a: number;
       
       let srcIndex = 0,
-      dstIndex,
-      p, next, prev,
-      i, l, x, y,
-      nextIndex, prevIndex;
+      dstIndex: number,
+      p: number, next: number, prev: number,
+      i: number, l: number, x: number, y: number,
+      nextIndex: number, prevIndex: number;
 
       const sumTable = [];
       
@@ -473,6 +509,76 @@ export default class FilterBuilder extends NessBuilder {
   };
 
   /**
+   * @ param strength 1 <= n <= 4
+   */
+  public async GaussianBlur(strength = 2) {
+    let size: number, matrix: number[], divisor: number;
+
+    switch (strength) {
+      case 2: {
+        size = 5;
+        matrix = [
+          1, 1, 2, 1, 1,
+          1, 2, 4, 2, 1,
+          2, 4, 8, 4, 2,
+          1, 2, 4, 2, 1,
+          1, 1, 2, 1, 1
+        ];
+        divisor = 52;
+        break;
+      }
+      case 3: {
+        size = 7;
+        matrix = [
+          1, 1, 2,  2, 2, 1, 1,
+          1, 2, 2,  4, 2, 2, 1,
+          2, 2, 4,  8, 4, 2, 2,
+          2, 4, 8, 16, 8, 4, 2,
+          2, 2, 4,  8, 4, 2, 2,
+          1, 2, 2,  4, 2, 2, 1,
+          1, 1, 2,  2, 2, 1, 1
+        ];
+        divisor = 140;
+        break;
+      }
+      case 4: {
+        size = 15;
+        matrix = [
+          2 ,2 , 3 , 4 , 5 , 5 , 6 , 6 , 6 , 5 , 5 , 4 , 3 ,2 ,2,
+          2 ,3 , 4 , 5 , 7 , 7 , 8 , 8 , 8 , 7 , 7 , 5 , 4 ,3 ,2,
+          3 ,4 , 6 , 7 , 9 ,10 ,10 ,11 ,10 ,10 , 9 , 7 , 6 ,4 ,3,
+          4 ,5 , 7 , 9 ,10 ,12 ,13 ,13 ,13 ,12 ,10 , 9 , 7 ,5 ,4,
+          5 ,7 , 9 ,11 ,13 ,14 ,15 ,16 ,15 ,14 ,13 ,11 , 9 ,7 ,5,
+          5 ,7 ,10 ,12 ,14 ,16 ,17 ,18 ,17 ,16 ,14 ,12 ,10 ,7 ,5,
+          6 ,8 ,10 ,13 ,15 ,17 ,19 ,19 ,19 ,17 ,15 ,13 ,10 ,8 ,6,
+          6 ,8 ,11 ,13 ,16 ,18 ,19 ,20 ,19 ,18 ,16 ,13 ,11 ,8 ,6,
+          6 ,8 ,10 ,13 ,15 ,17 ,19 ,19 ,19 ,17 ,15 ,13 ,10 ,8 ,6,
+          5 ,7 ,10 ,12 ,14 ,16 ,17 ,18 ,17 ,16 ,14 ,12 ,10 ,7 ,5,
+          5 ,7 , 9 ,11 ,13 ,14 ,15 ,16 ,15 ,14 ,13 ,11 , 9 ,7 ,5,
+          4 ,5 , 7 , 9 ,10 ,12 ,13 ,13 ,13 ,12 ,10 , 9 , 7 ,5 ,4,
+          3 ,4 , 6 , 7 , 9 ,10 ,10 ,11 ,10 ,10 , 9 , 7 , 6 ,4 ,3,
+          2 ,3 , 4 , 5 , 7 , 7 , 8 , 8 , 8 , 7 , 7 , 5 , 4 ,3 ,2,
+          2 ,2 , 3 , 4 , 5 , 5 , 6 , 6 , 6 , 5 , 5 , 4 , 3 ,2 ,2
+        ];
+        divisor = 2044;
+        break;
+      }
+      default: {
+        size = 3;
+        matrix = [
+          1, 2, 1,
+          2, 4, 2,
+          1, 2, 1
+        ];
+        divisor = 16;
+        break;
+      };
+    };
+
+    return await this.ConvolutionFilter(size, size, matrix, divisor, 0, false);
+  };
+
+  /**
    * @param radius 1 <= n <= 180
    */
   public async StackBlur(radius = 6) {
@@ -525,11 +631,11 @@ export default class FilterBuilder extends NessBuilder {
     this.dstImageData = await this.Clone(this.dataDraft);
     this.dstPixels = this.dstImageData.data;
 
-    let x, y, i, p, yp, yi, yw,
-    r_sum, g_sum, b_sum, a_sum, 
-    r_out_sum, g_out_sum, b_out_sum, a_out_sum,
-    r_in_sum, g_in_sum, b_in_sum, a_in_sum, 
-    pr, pg, pb, pa, rbs,
+    let x: number, y: number, i: number, p: number, yp: number, yi: number, yw: number,
+    r_sum: number, g_sum: number, b_sum: number, a_sum: number, 
+    r_out_sum: number, g_out_sum: number, b_out_sum: number, a_out_sum: number,
+    r_in_sum: number, g_in_sum: number, b_in_sum: number, a_in_sum: number, 
+    pr: number, pg: number, pb: number, pa: number, rbs: number,
     div = radius + radius + 1,
     w4 = this.srcWidth << 2,
     widthMinus1  = this.srcWidth - 1,
@@ -538,7 +644,7 @@ export default class FilterBuilder extends NessBuilder {
     sumFactor = radiusPlus1 * ( radiusPlus1 + 1 ) / 2,
     stackStart = new BlurStack(),
     stack = stackStart,
-    stackIn, stackOut, stackEnd,
+    stackIn: { r: number; g: number; b: number; a: number; next: any; }, stackOut: { r: any; g: any; b: any; a: any; next: any; }, stackEnd: any,
     mul_sum = mul_table[radius],
     shg_sum = shg_table[radius];
         
@@ -737,81 +843,557 @@ export default class FilterBuilder extends NessBuilder {
   };
 
   /**
-   * @ param strength 1 <= n <= 4
-   */
-  public async GaussianBlur(strength = 2) {
-    let size: number, matrix: number[], divisor: number;
+  * GIMP algorithm modified. pretty close to fireworks
+  * @param brightness -100 <= n <= 100
+  * @param contrast -100 <= n <= 100
+  */
+  public async BrightnessContrastGimp(brightness: number, contrast: number) {
+    
+    // fix to -1 <= n <= 1
+    brightness /= 100;
+    
+    // fix to -99 <= n <= 99
+    contrast *= 0.99;
+    // fix to -1 < n < 1
+    contrast /= 100;
+    // apply GIMP formula
+    contrast = Math.tan((contrast + 1) * (Math.PI / 4));
 
-    switch (strength) {
-      case 2: {
-        size = 5;
+    // get the average color
+    for (var avg = 0, i = 0; i < this.srcLength; i += 4) {
+      avg += (this.srcPixels[i] * 19595 + this.srcPixels[i + 1] * 38470 + this.srcPixels[i + 2] * 7471) >> 16;
+    };
+    avg = avg / (this.srcLength / 4);
+
+    this.mapRGB(this.srcPixels, this.dstPixels, function (value) {
+      if (brightness < 0) {
+        value = value * (1 + brightness);
+      } else if (brightness > 0) {
+        value = value + ((255 - value) * brightness);
+      };
+      //value += brightness;
+
+      if (contrast !== 0) {
+        value = (value - avg) * contrast + avg;
+      };
+      return value + 0.5 | 0;
+    });
+    return this.dstImageData;
+  };
+
+  /**
+   * more like the new photoshop algorithm
+   * @param brightness -100 <= n <= 100
+   * @param contrast -100 <= n <= 100
+   */
+  public async BrightnessContrastPhotoshop(brightness: number, contrast: number) {
+    // fix to 0 <= n <= 2;
+    brightness = (brightness + 100) / 100;
+    contrast = (contrast + 100) / 100;
+
+    this.mapRGB(this.srcPixels, this.dstPixels, function (value) {
+        value *= brightness;
+        value = (value - 127.5) * contrast + 127.5;
+        return value + 0.5 | 0;
+    });
+    return this.dstImageData;
+  };
+
+  /**
+   * @param channel enum ImageChannels { Red = 1, Green = 2, Bleu = 3 }
+   */
+  public async Channels(channel: ImageChannels) {
+    let matrix = [];
+
+    switch (channel) {
+      case 2: { // green
         matrix = [
-          1, 1, 2, 1, 1,
-          1, 2, 4, 2, 1,
-          2, 4, 8, 4, 2,
-          1, 2, 4, 2, 1,
-          1, 1, 2, 1, 1
+          0, 1, 0, 0, 0,
+          0, 1, 0, 0, 0,
+          0, 1, 0, 0, 0,
+          0, 0, 0, 1, 0
         ];
-        divisor = 52;
         break;
-      }
-      case 3: {
-        size = 7;
+      };
+      case 3: { // blue
         matrix = [
-          1, 1, 2,  2, 2, 1, 1,
-          1, 2, 2,  4, 2, 2, 1,
-          2, 2, 4,  8, 4, 2, 2,
-          2, 4, 8, 16, 8, 4, 2,
-          2, 2, 4,  8, 4, 2, 2,
-          1, 2, 2,  4, 2, 2, 1,
-          1, 1, 2,  2, 2, 1, 1
+          0, 0, 1, 0, 0,
+          0, 0, 1, 0, 0,
+          0, 0, 1, 0, 0,
+          0, 0, 0, 1, 0
         ];
-        divisor = 140;
         break;
-      }
-      case 4: {
-        size = 15;
+      };
+      default: { // red
         matrix = [
-          2 ,2 , 3 , 4 , 5 , 5 , 6 , 6 , 6 , 5 , 5 , 4 , 3 ,2 ,2,
-          2 ,3 , 4 , 5 , 7 , 7 , 8 , 8 , 8 , 7 , 7 , 5 , 4 ,3 ,2,
-          3 ,4 , 6 , 7 , 9 ,10 ,10 ,11 ,10 ,10 , 9 , 7 , 6 ,4 ,3,
-          4 ,5 , 7 , 9 ,10 ,12 ,13 ,13 ,13 ,12 ,10 , 9 , 7 ,5 ,4,
-          5 ,7 , 9 ,11 ,13 ,14 ,15 ,16 ,15 ,14 ,13 ,11 , 9 ,7 ,5,
-          5 ,7 ,10 ,12 ,14 ,16 ,17 ,18 ,17 ,16 ,14 ,12 ,10 ,7 ,5,
-          6 ,8 ,10 ,13 ,15 ,17 ,19 ,19 ,19 ,17 ,15 ,13 ,10 ,8 ,6,
-          6 ,8 ,11 ,13 ,16 ,18 ,19 ,20 ,19 ,18 ,16 ,13 ,11 ,8 ,6,
-          6 ,8 ,10 ,13 ,15 ,17 ,19 ,19 ,19 ,17 ,15 ,13 ,10 ,8 ,6,
-          5 ,7 ,10 ,12 ,14 ,16 ,17 ,18 ,17 ,16 ,14 ,12 ,10 ,7 ,5,
-          5 ,7 , 9 ,11 ,13 ,14 ,15 ,16 ,15 ,14 ,13 ,11 , 9 ,7 ,5,
-          4 ,5 , 7 , 9 ,10 ,12 ,13 ,13 ,13 ,12 ,10 , 9 , 7 ,5 ,4,
-          3 ,4 , 6 , 7 , 9 ,10 ,10 ,11 ,10 ,10 , 9 , 7 , 6 ,4 ,3,
-          2 ,3 , 4 , 5 , 7 , 7 , 8 , 8 , 8 , 7 , 7 , 5 , 4 ,3 ,2,
-          2 ,2 , 3 , 4 , 5 , 5 , 6 , 6 , 6 , 5 , 5 , 4 , 3 ,2 ,2
+          1, 0, 0, 0, 0,
+          1, 0, 0, 0, 0,
+          1, 0, 0, 0, 0,
+          0, 0, 0, 1, 0
         ];
-        divisor = 2044;
-        break;
-      }
-      default: {
-        size = 3;
-        matrix = [
-          1, 2, 1,
-          2, 4, 2,
-          1, 2, 1
-        ];
-        divisor = 16;
         break;
       };
     };
 
-    return await this.ConvolutionFilter(size, size, matrix, divisor, 0, false);
+    return await this.ColorMatrixFilter(matrix);
   };
 
+  /**
+   * sets to the average of the highest and lowest contrast
+   */
+  public async Desaturate() {
+    
+    for (var i = 0; i < this.srcLength; i += 4) {
+      const r = this.srcPixels[i],
+      g = this.srcPixels[i + 1],
+      b = this.srcPixels[i + 2],
+      max = (r > g) ? (r > b) ? r : b : (g > b) ? g : b,
+      min = (r < g) ? (r < b) ? r : b : (g < b) ? g : b,
+      avg = ((max + min) / 2) + 0.5 | 0;
+
+      this.dstPixels[i] = this.dstPixels[i + 1] = this.dstPixels[i + 2] = avg;
+      this.dstPixels[i + 3] = this.srcPixels[i + 3];
+    };
+
+    return this.dstImageData;
+  };
+
+  /**
+   * Floyd-Steinberg algorithm
+   * @param levels 2 <= n <= 255
+   */
+  public async Dither(levels: number) {
+    this.dstImageData = await this.Clone(this.dataDraft);
+    levels = levels < 2 ? 2 : levels > 255 ? 255 : levels;
+
+    // Build a color map using the same algorithm as the posterize filter.
+    let posterize: any[],
+    levelMap = [],
+    levelsMinus1 = levels - 1,
+    j = 0,
+    k = 0,
+    i: number;
+    
+    for (i = 0; i < levels; i += 1) {
+      levelMap[i] = (255 * i) / levelsMinus1;
+    };
+
+    posterize = this.buildMap(function (value) {
+      const ret = levelMap[j];
+
+      k += levels;
+
+      if (k > 255) {
+        k -= 255;
+        j += 1;
+      }
+
+      return ret;
+    });
+
+    // Apply the dithering algorithm to each pixel
+    let x: number, y: number,
+    index: number,
+    old_r: number, old_g: number, old_b: number,
+    new_r: number, new_g: number, new_b: number,
+    err_r: number, err_g: number, err_b: number,
+    nbr_r: number, nbr_g: number, nbr_b: number,
+    srcWidthMinus1 = this.srcWidth - 1,
+    srcHeightMinus1 = this.srcHeight - 1,
+    A = 7 / 16,
+    B = 3 / 16,
+    C = 5 / 16,
+    D = 1 / 16;
+    
+    for (y = 0; y < this.srcHeight; y += 1) {
+      for (x = 0; x < this.srcWidth; x += 1) {
+        // Get the current pixel.
+        index = (y * this.srcWidth + x) << 2;
+        
+        old_r = this.dstPixels[index];
+        old_g = this.dstPixels[index + 1];
+        old_b = this.dstPixels[index + 2];
+        
+        // Quantize using the color map
+        new_r = posterize[old_r];
+        new_g = posterize[old_g];
+        new_b = posterize[old_b];
+        
+        // Set the current pixel.
+        this.dstPixels[index]     = new_r;
+        this.dstPixels[index + 1] = new_g;
+        this.dstPixels[index + 2] = new_b;
+        
+        // Quantization errors
+        err_r = old_r - new_r;
+        err_g = old_g - new_g;
+        err_b = old_b - new_b;
+          
+        // Apply the matrix.
+        // x + 1, y
+        index += 1 << 2;
+        if (x < srcWidthMinus1) {
+          nbr_r = this.dstPixels[index]     + A * err_r;
+          nbr_g = this.dstPixels[index + 1] + A * err_g;
+          nbr_b = this.dstPixels[index + 2] + A * err_b;
+          
+          this.dstPixels[index]     = nbr_r > 255 ? 255 : nbr_r < 0 ? 0 : nbr_r | 0;
+          this.dstPixels[index + 1] = nbr_g > 255 ? 255 : nbr_g < 0 ? 0 : nbr_g | 0;
+          this.dstPixels[index + 2] = nbr_b > 255 ? 255 : nbr_b < 0 ? 0 : nbr_b | 0;
+        };
+        
+        // x - 1, y + 1
+        index += (this.srcWidth - 2) << 2;
+        if (x > 0 && y < srcHeightMinus1) {
+          nbr_r = this.dstPixels[index]     + B * err_r;
+          nbr_g = this.dstPixels[index + 1] + B * err_g;
+          nbr_b = this.dstPixels[index + 2] + B * err_b;
+          
+          this.dstPixels[index]     = nbr_r > 255 ? 255 : nbr_r < 0 ? 0 : nbr_r | 0;
+          this.dstPixels[index + 1] = nbr_g > 255 ? 255 : nbr_g < 0 ? 0 : nbr_g | 0;
+          this.dstPixels[index + 2] = nbr_b > 255 ? 255 : nbr_b < 0 ? 0 : nbr_b | 0;
+        };
+        
+        // x, y + 1
+        index += 1 << 2;
+        if (y < srcHeightMinus1) {
+          nbr_r = this.dstPixels[index]     + C * err_r;
+          nbr_g = this.dstPixels[index + 1] + C * err_g;
+          nbr_b = this.dstPixels[index + 2] + C * err_b;
+          
+          this.dstPixels[index]     = nbr_r > 255 ? 255 : nbr_r < 0 ? 0 : nbr_r | 0;
+          this.dstPixels[index + 1] = nbr_g > 255 ? 255 : nbr_g < 0 ? 0 : nbr_g | 0;
+          this.dstPixels[index + 2] = nbr_b > 255 ? 255 : nbr_b < 0 ? 0 : nbr_b | 0;
+        };
+        
+        // x + 1, y + 1
+        index += 1 << 2;
+        if (x < srcWidthMinus1 && y < srcHeightMinus1) {
+          nbr_r = this.dstPixels[index]     + D * err_r;
+          nbr_g = this.dstPixels[index + 1] + D * err_g;
+          nbr_b = this.dstPixels[index + 2] + D * err_b;
+          
+          this.dstPixels[index]     = nbr_r > 255 ? 255 : nbr_r < 0 ? 0 : nbr_r | 0;
+          this.dstPixels[index + 1] = nbr_g > 255 ? 255 : nbr_g < 0 ? 0 : nbr_g | 0;
+          this.dstPixels[index + 2] = nbr_b > 255 ? 255 : nbr_b < 0 ? 0 : nbr_b | 0;
+        };
+      };
+    };
+  
+    return this.dstImageData;
+  };
+
+  public async Edge() {
+    //pretty close to Fireworks 'Find Edges' effect
+    return this.ConvolutionFilter(3, 3, [
+      -1, -1, -1,
+      -1,  8, -1,
+      -1, -1, -1
+    ]);
+  };
+
+  public async Emboss() {
+    return this.ConvolutionFilter(3, 3, [
+      -2, -1, 0,
+      -1,  1, 1,
+      0,  1, 2
+    ]);
+  };
+
+  public async Enrich() {
+    return this.ConvolutionFilter(3, 3, [
+      0, -2,  0,
+      -2, 20, -2,
+      0, -2,  0
+    ], 10, -40);
+  };
+
+  public async Flip(vertical: boolean) {
+    let x: number, y: number, srcIndex: number, dstIndex: number;
+
+    for (y = 0; y < this.srcHeight; y += 1) {
+      for (x = 0; x < this.srcWidth; x += 1) {
+        srcIndex = (y * this.srcWidth + x) << 2;
+        if (vertical) {
+          dstIndex = ((this.srcHeight - y - 1) * this.srcWidth + x) << 2;
+        } else {
+          dstIndex = (y * this.srcWidth + (this.srcWidth - x - 1)) << 2;
+        };
+
+        this.dstPixels[dstIndex]     = this.srcPixels[srcIndex];
+        this.dstPixels[dstIndex + 1] = this.srcPixels[srcIndex + 1];
+        this.dstPixels[dstIndex + 2] = this.srcPixels[srcIndex + 2];
+        this.dstPixels[dstIndex + 3] = this.srcPixels[srcIndex + 3];
+      };
+    };
+
+    return this.dstImageData;
+  };
+
+  /**
+   * @param gamma 0 <= n <= 3 <= n
+   */
+  public async Gamma(gamma: number) {
+    
+    this.mapRGB(this.srcPixels, this.dstPixels, function (value) {
+      value = (255 * Math.pow(value / 255, 1 / gamma) + 0.5);
+      return value > 255 ? 255 : value + 0.5 | 0;
+    });
+
+    return this.dstImageData;
+  };
+
+  public async GreyScale() {
+    for (var i = 0; i < this.srcLength; i += 4) {
+      var intensity = (this.srcPixels[i] * 19595 + this.srcPixels[i + 1] * 38470 + this.srcPixels[i + 2] * 7471) >> 16;
+      //var intensity = (this.srcPixels[i] * 0.3086 + this.srcPixels[i + 1] * 0.6094 + this.srcPixels[i + 2] * 0.0820) | 0;
+      this.dstPixels[i] = this.dstPixels[i + 1] = this.dstPixels[i + 2] = intensity;
+      this.dstPixels[i + 3] = this.srcPixels[i + 3];
+    };
+
+    return this.dstImageData;
+  };
+
+  /**
+   * @param hueDelta  -180 <= n <= 180
+   * @param satDelta  -100 <= n <= 100
+   * @param lightness -100 <= n <= 100
+   */
+  public async HSLAdjustment(hueDelta: number, satDelta: number, lightness: number) {
+
+    hueDelta /= 360;
+    satDelta /= 100;
+    lightness /= 100;
+
+    const rgbToHsl = this.rgbToHsl;
+    const hslToRgb = this.hslToRgb;
+    let h: number, s: number, l: number, hsl: any[], rgb: any[], i: number;
+
+    for (i = 0; i < this.srcLength; i += 4) {
+      // convert to HSL
+      hsl = rgbToHsl(this.srcPixels[i], this.srcPixels[i + 1], this.srcPixels[i + 2]);
+
+      // hue
+      h = hsl[0] + hueDelta;
+      while (h < 0) {
+        h += 1;
+      };
+      while (h > 1) {
+        h -= 1;
+      };
+
+      // saturation
+      s = hsl[1] + hsl[1] * satDelta;
+      if (s < 0) {
+        s = 0;
+      } else if (s > 1) {
+        s = 1;
+      };
+
+      // lightness
+      l = hsl[2];
+      if (lightness > 0) {
+        l += (1 - l) * lightness;
+      }
+      else if (lightness < 0) {
+        l += l * lightness;
+      };
+
+      // convert back to rgb
+      rgb = hslToRgb(h, s, l);
+
+      this.dstPixels[i]     = rgb[0];
+      this.dstPixels[i + 1] = rgb[1];
+      this.dstPixels[i + 2] = rgb[2];
+      this.dstPixels[i + 3] = this.srcPixels[i + 3];
+    };
+
+    return this.dstImageData;
+  };
+  
   public async Invert() {
 
     this.mapRGB(this.srcPixels, this.dstPixels, function (value) {
       return 255 - value;
     });
   
+    return this.dstImageData;
+  };
+
+  /**
+   * @param blockSize  1 <= n <= 100
+   */
+  public async Mosaic(blockSize: number) {
+    
+    let cols = Math.ceil(this.srcWidth / blockSize),
+    rows = Math.ceil(this.srcHeight / blockSize),
+    row: number, col: number,
+    x_start: number, x_end: number, y_start: number, y_end: number,
+    x: number, y: number, yIndex: number, index: number, size: number,
+    r: number, g: number, b: number, a: number;
+
+    for (row = 0; row < rows; row += 1) {
+      y_start = row * blockSize;
+      y_end   = y_start + blockSize;
+      
+      if (y_end > this.srcHeight) {
+        y_end = this.srcHeight;
+      };
+      
+      for (col = 0; col < cols; col += 1) {
+        x_start = col * blockSize;
+        x_end   = x_start + blockSize;
+          
+        if (x_end > this.srcWidth) {
+          x_end = this.srcWidth;
+        };
+
+        // get the average color from the src
+        r = g = b = a = 0;
+        size = (x_end - x_start) * (y_end - y_start);
+
+        for (y = y_start; y < y_end; y += 1) {
+          yIndex = y * this.srcWidth;
+          
+          for (x = x_start; x < x_end; x += 1) {
+            index = (yIndex + x) << 2;
+            r += this.srcPixels[index];
+            g += this.srcPixels[index + 1];
+            b += this.srcPixels[index + 2];
+            a += this.srcPixels[index + 3];
+          };
+        };
+
+        r = (r / size) + 0.5 | 0;
+        g = (g / size) + 0.5 | 0;
+        b = (b / size) + 0.5 | 0;
+        a = (a / size) + 0.5 | 0;
+
+        // fill the dst with that color
+        for (y = y_start; y < y_end; y += 1) {
+          yIndex = y * this.srcWidth;
+          
+          for (x = x_start; x < x_end; x += 1) {
+            index = (yIndex + x) << 2;
+            this.dstPixels[index]     = r;
+            this.dstPixels[index + 1] = g;
+            this.dstPixels[index + 2] = b;
+            this.dstPixels[index + 3] = a;
+          };
+        };
+      };
+    };
+
+    return this.dstImageData;
+  };
+
+  /**
+   * @param range  1 <= n <= 5
+   * @param levels 1 <= n <= 256
+   */
+  public async Oil(range: number, levels: number) {
+    let index = 0,
+    rh = [],
+    gh = [],
+    bh = [],
+    rt = [],
+    gt = [],
+    bt = [],
+    x: number, y: number, i: number, row: number, col: number,
+    rowIndex: number, colIndex: number, offset: number, srcIndex: number,
+    sr: number, sg: number, sb: number, ri: number, gi: number, bi: number,
+    r: number, g: number, b: number;
+    
+    for (y = 0; y < this.srcHeight; y += 1) {
+      for (x = 0; x < this.srcWidth; x += 1) {
+        for (i = 0; i < levels; i += 1) {
+          rh[i] = gh[i] = bh[i] = rt[i] = gt[i] = bt[i] = 0;
+        };
+        
+        for (row = -range; row <= range; row += 1) {
+          rowIndex = y + row;
+          
+          if (rowIndex < 0 || rowIndex >= this.srcHeight) {
+            continue;
+          }
+          
+          offset = rowIndex * this.srcWidth;
+            
+          for (col = -range; col <= range; col += 1) {
+            colIndex = x + col;
+            if (colIndex < 0 || colIndex >= this.srcWidth) {
+              continue;
+            };
+              
+            srcIndex = (offset + colIndex) << 2;
+            sr = this.srcPixels[srcIndex];
+            sg = this.srcPixels[srcIndex + 1];
+            sb = this.srcPixels[srcIndex + 2];
+            ri = (sr * levels) >> 8;
+            gi = (sg * levels) >> 8;
+            bi = (sb * levels) >> 8;
+            rt[ri] += sr;
+            gt[gi] += sg;
+            bt[bi] += sb;
+            rh[ri] += 1;
+            gh[gi] += 1;
+            bh[bi] += 1;
+          };
+        };
+
+        r = g = b = 0;
+        for (i = 1; i < levels; i += 1) {
+          if(rh[i] > rh[r]) {
+            r = i;
+          };
+          if(gh[i] > gh[g]) {
+            g = i;
+          };
+          if(bh[i] > bh[b]) {
+            b = i;
+          };
+        };
+
+        this.dstPixels[index]     = rt[r] / rh[r] | 0;
+        this.dstPixels[index + 1] = gt[g] / gh[g] | 0;
+        this.dstPixels[index + 2] = bt[b] / bh[b] | 0;
+        this.dstPixels[index + 3] = this.srcPixels[index + 3];
+        index += 4;
+      };
+    };
+
+    return this.dstImageData;
+  };
+
+  /**
+   * @param levels 2 <= n <= 255
+   */
+  public async Posterize(levels: number) {
+    levels = levels < 2 ? 2 : levels > 255 ? 255 : levels;
+
+    let levelMap = [],
+    levelsMinus1 = levels - 1,
+    j = 0,
+    k = 0,
+    i: number;
+
+    for (i = 0; i < levels; i += 1) {
+      levelMap[i] = (255 * i) / levelsMinus1;
+    };
+
+    this.mapRGB(this.srcPixels, this.dstPixels, function (value) {
+      const ret = levelMap[j];
+
+      k += levels;
+
+      if (k > 255) {
+        k -= 255;
+        j += 1;
+      };
+
+      return ret;
+    });
+
     return this.dstImageData;
   };
 
@@ -833,66 +1415,125 @@ export default class FilterBuilder extends NessBuilder {
     return this.dstImageData;
   };
 
+  /**
+   * @param factor 1 <= n
+   */
+  public async Sharpen(factor: number) {
+    //Convolution formula from VIGRA
+    return this.ConvolutionFilter(3, 3, [
+      -factor/16,     -factor/8,      -factor/16,
+      -factor/8,       factor*0.75+1, -factor/8,
+      -factor/16,     -factor/8,      -factor/16
+    ]);
+  };
+
+  public async Solarize() {
+    this.mapRGB(this.srcPixels, this.dstPixels, function (value) {
+      return value > 127 ? (value - 127.5) * 2 : (127.5 - value) * 2;
+    });
+
+    return this.dstImageData;
+  };
+
+  public async Transpose() {
+    let srcIndex: number, dstIndex: number;
+    
+    for (let y = 0; y < this.srcHeight; y += 1) {
+      for (let x = 0; x < this.srcWidth; x += 1) {
+        srcIndex = (y * this.srcWidth + x) << 2;
+        dstIndex = (x * this.srcHeight + y) << 2;
+
+        this.dstPixels[dstIndex]     = this.srcPixels[srcIndex];
+        this.dstPixels[dstIndex + 1] = this.srcPixels[srcIndex + 1];
+        this.dstPixels[dstIndex + 2] = this.srcPixels[srcIndex + 2];
+        this.dstPixels[dstIndex + 3] = this.srcPixels[srcIndex + 3];
+      };
+    };
+    
+    return this.dstImageData;
+  };
+
+  /**
+   * @param centerX 0.0 <= n <= 1.0
+   * @param centerY 0.0 <= n <= 1.0
+   * @param radius
+   * @param angle(degree)
+   * @param edge enum Edge { Clamp = 1, Wrap = 2, Transparent = 0 }
+   * @param smooth
+   */
+  public async Twril(centerX: number, centerY: number, radius: number, angle: number, edge: Edge, smooth: boolean) {
+    //convert position to px
+    centerX = this.srcWidth  * centerX;
+    centerY = this.srcHeight * centerY;
+
+    // degree to radian
+    angle *= (Math.PI / 180);
+
+    let radius2 = radius * radius,
+    max_y = this.srcHeight - 1,
+    max_x = this.srcWidth - 1,
+    dstIndex = 0,
+    x: number, y: number, dx: number, dy: number, distance: number, a: number, tx: number, ty: number, srcIndex: number, pixel: any, i: any;
+
+    for (y = 0; y < this.srcHeight; y += 1) {
+      for (x = 0; x < this.srcWidth; x += 1) {
+        dx = x - centerX;
+        dy = y - centerY;
+        distance = dx * dx + dy * dy;
+
+        if (distance > radius2) {
+          // out of the effected area. just copy the pixel
+          this.dstPixels[dstIndex]     = this.srcPixels[dstIndex];
+          this.dstPixels[dstIndex + 1] = this.srcPixels[dstIndex + 1];
+          this.dstPixels[dstIndex + 2] = this.srcPixels[dstIndex + 2];
+          this.dstPixels[dstIndex + 3] = this.srcPixels[dstIndex + 3];
+        } else {
+          // main formula
+          distance = Math.sqrt(distance);
+          a  = Math.atan2(dy, dx) + (angle * (radius - distance)) / radius;
+          tx = centerX + distance * Math.cos(a);
+          ty = centerY + distance * Math.sin(a);
+
+          // copy target pixel
+          if (smooth) {
+            // bilinear
+            this.copyBilinear(this.srcPixels, tx, ty, this.srcWidth, this.srcHeight, this.dstPixels, dstIndex, edge);
+          } else {
+            // nearest neighbor
+            // round tx, ty
+            // TODO edge actions!!
+            srcIndex = ((ty + 0.5 | 0) * this.srcWidth + (tx + 0.5 | 0)) << 2;
+            this.dstPixels[dstIndex]     = this.srcPixels[srcIndex];
+            this.dstPixels[dstIndex + 1] = this.srcPixels[srcIndex + 1];
+            this.dstPixels[dstIndex + 2] = this.srcPixels[srcIndex + 2];
+            this.dstPixels[dstIndex + 3] = this.srcPixels[srcIndex + 3];
+          };
+        };
+        
+        dstIndex += 4;
+      };
+    };
+
+    return this.dstImageData;
+  };
+
   public getCanvas() {
     console.log(this.dstImageData)
     this.draft2D.putImageData(this.dstImageData, 0, 0)
     return this.draft2D.canvas;
-  }
+  };
+
+  public generatedTo(location: string, name: string, type: ImageExtention): void {
+    this.draft2D.putImageData(this.dstImageData, 0,0)
+    const canvas = <Canvas><unknown>this.draft2D.canvas;
+
+    return writeFileSync(`${location}/${name}.${type}`, canvas.toBuffer());
+  };
+
+  public toBuffer(): Buffer {    
+    this.draft2D.putImageData(this.dstImageData, 0,0)
+    const canvas = <Canvas><unknown>this.draft2D.canvas;
+
+    return canvas.toBuffer();
+  };
 }
-
-
-
-
-
-
-
-// this.setImage(image, { sx: 0, sy: 0, sWidht: this.canvas.width, sHeight: this.canvas.height })
-// const ImageData = this.context.getImageData(0, 0, this.canvas.width, this.canvas.height)
-
- 
-// // function createImageData (w, h) {
-// //   return this.context.createImageData(w, h);
-// // }
-
-// function mapRGB(src, dst, func) {
-//   applyMap(src, dst, buildMap(func));
-// }
-
-// function applyMap(src, dst, map) {
-//   for (var i = 0, l = src.length; i < l; i += 4) {
-//     dst[i]     = map[src[i]];
-//     dst[i + 1] = map[src[i + 1]];
-//     dst[i + 2] = map[src[i + 2]];
-//     dst[i + 3] = src[i + 3];
-//   }
-// }
-
-// function buildMap(f) {
-//   for (var m = [], k = 0, v; k < 256; k += 1) {
-//       m[k] = (v = f(k)) > 255 ? 255 : v < 0 ? 0 : v | 0;
-//   }
-//   return m;
-// }
-
-
-// const srcPixels    = ImageData.data,
-// srcWidth     = ImageData.width,
-// srcHeight    = ImageData.height,
-// srcLength    = srcPixels.length,
-// dstImageData = this.context.createImageData(srcWidth, srcHeight),
-// dstPixels    = dstImageData.data;
-
-// mapRGB(srcPixels, dstPixels, function (value) {
-//   return 255 - value;
-// });
-
-// this.context.putImageData(dstImageData, 0, 0);
-
-// // this.utils.mapRGB(srcPixels, dstPixels, function (value) {
-//   // return 255 - value;
-// // });
-// // // // // // // // // // // // // // // // //  
-
-// // this.setImage(image, { sx: 0, sy: 0, sWidht: this.canvas.width, sHeight: this.canvas.height })
-
-// return this;
