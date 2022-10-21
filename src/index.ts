@@ -25,6 +25,7 @@ export { Preset, Shape, CustomColor, CanvasImage, ImageExtention, ImageChannels,
 
 export { default as NessBuilder } from './Managers/NessBuilder';
 export { default as FilterBuilder } from './Managers/FilterBuilder';
+export { default as GifBuilder } from './Managers/GifBuilder';
 export { default as CustomProfile } from './Extra/CustomProfile';
 export { default as RankupBuilder } from './Extra/RankupBuilder';
 

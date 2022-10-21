@@ -5,7 +5,7 @@ import type { CanvasImage, CustomColor, ImageExtention, Shape, ImagelocationOpti
 export default class NessBuilder {
   
   protected canvas: Canvas;
-  protected context: CanvasRenderingContext2D;
+  public context: CanvasRenderingContext2D;
 
   private canvasSize = {
     width: 0,
@@ -293,7 +293,7 @@ export default class NessBuilder {
     this.context.lineWidth = 0.1;
 
     if (!horizontal) {
-
+      
       // Barre N°1
       this.context.moveTo(location.x, location.y);
       this.context.lineTo(size.width, location.y);
@@ -328,13 +328,15 @@ export default class NessBuilder {
     } else {
 
       // Barre N°1
-      this.context.moveTo(location.x, location.y);
-      this.context.lineTo(location.x, size.height);
-      this.context.quadraticCurveTo(location.x, size.height + radius, location.x + (size.width /2), size.height + radius);
-      this.context.quadraticCurveTo(size.width + location.x, size.height + radius, size.width + location.x, size.height);
-      this.context.lineTo(size.width + location.x, location.y);
-      this.context.quadraticCurveTo(size.width + location.x, location.y - radius, location.x + (size.width / 2), location.y - radius);
-      this.context.quadraticCurveTo(location.x, location.y - radius, location.x, location.y);
+
+      this.context.moveTo(location.x + size.height, location.y);
+      this.context.lineTo(location.x + size.height, size.width);
+      this.context.quadraticCurveTo(location.x + size.height, size.width + radius, location.x + (size.height/2), size.width + radius);
+      this.context.quadraticCurveTo(location.x, size.width + radius, location.x, size.width);
+      this.context.lineTo(location.x, location.y);
+
+      this.context.quadraticCurveTo(location.x, location.y - radius, location.x + (size.height/2), location.y - radius);
+      this.context.quadraticCurveTo(location.x + size.height, location.y - radius, location.x + size.height, location.y);
 
       this.context.fillStyle = "#FFFFFF20"
       this.context.fill()
@@ -350,14 +352,14 @@ export default class NessBuilder {
       this.context.strokeStyle = color? color : "#000000";
       this.context.lineWidth = 2;
       
-      this.context.moveTo(location.x, location.y);
-      this.context.lineTo(location.x, cloneWidth);
-      this.context.quadraticCurveTo(location.x, cloneWidth + radius, location.x + (size.width/2), cloneWidth + radius);      
-      this.context.quadraticCurveTo(location.x + size.width, cloneWidth + radius, location.x + size.width, cloneWidth);
-      this.context.lineTo(location.x + size.width, location.y);
-      this.context.quadraticCurveTo(location.x + size.width, location.y - radius, location.x + (size.width/2), location.y - radius);
-      this.context.quadraticCurveTo(location.x, location.y - radius, location.x, location.y);
+      this.context.moveTo(location.x + size.height, location.y);
+      this.context.lineTo(location.x + size.height, cloneWidth);
+      this.context.quadraticCurveTo(location.x + size.height, cloneWidth + radius, location.x + (size.height/2), cloneWidth + radius);
+      this.context.quadraticCurveTo(location.x, cloneWidth + radius, location.x, cloneWidth);
+      this.context.lineTo(location.x, location.y);
 
+      this.context.quadraticCurveTo(location.x, location.y - radius, location.x + (size.height/2), location.y - radius);
+      this.context.quadraticCurveTo(location.x + size.height, location.y - radius, location.x + size.height, location.y);
     };
 
     this.context.fillStyle = "#BB00FF"
@@ -368,9 +370,9 @@ export default class NessBuilder {
     return this;
   };
 
-    /**
-     * No more information, wait next update
-     */
+  /**
+   * No more information, wait next update
+   */
   toBuffer() {
     return this.canvas.toBuffer();
   };

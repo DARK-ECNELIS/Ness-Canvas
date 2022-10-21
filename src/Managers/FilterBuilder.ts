@@ -3,10 +3,9 @@ import { writeFileSync } from "fs";
 import { CanvasImage, Edge, ImageChannels, ImageExtention } from "..";
 
 export default class FilterBuilder {
-  protected declare context: CanvasRenderingContext2D
   private dataDraft: ImageData;
   private dstImageData: ImageData;
-  private draft2D: CanvasRenderingContext2D;
+  private context: CanvasRenderingContext2D;
   private canvas: Canvas;
 
   private srcPixels: Uint8ClampedArray;
@@ -20,11 +19,11 @@ export default class FilterBuilder {
   constructor(image: CanvasImage) {
     
     this.canvas = new Canvas(<number>image.width, <number>image.height);
-    this.draft2D = this.canvas.getContext("2d");
+    this.context = this.canvas.getContext("2d");
 
-    this.draft2D.drawImage(image, 0, 0, image.width, image.height);
+    this.context.drawImage(image, 0, 0, image.width, image.height);
 
-    this.dataDraft = this.draft2D.getImageData(0, 0, this.canvas.width, this.canvas.height);
+    this.dataDraft = this.context.getImageData(0, 0, this.canvas.width, this.canvas.height);
     this.srcPixels = this.dataDraft.data;
     this.srcWidth = this.dataDraft.width;
     this.srcHeight = this.dataDraft.height;
@@ -1519,20 +1518,20 @@ export default class FilterBuilder {
 
   public getCanvas() {
     console.log(this.dstImageData)
-    this.draft2D.putImageData(this.dstImageData, 0, 0)
-    return this.draft2D.canvas;
+    this.context.putImageData(this.dstImageData, 0, 0)
+    return this.context.canvas;
   };
 
   public generatedTo(location: string, name: string, type: ImageExtention): void {
-    this.draft2D.putImageData(this.dstImageData, 0,0)
-    const canvas = <Canvas><unknown>this.draft2D.canvas;
+    this.context.putImageData(this.dstImageData, 0,0)
+    const canvas = <Canvas><unknown>this.context.canvas;
 
     return writeFileSync(`${location}/${name}.${type}`, canvas.toBuffer());
   };
 
   public toBuffer(): Buffer {    
-    this.draft2D.putImageData(this.dstImageData, 0,0)
-    const canvas = <Canvas><unknown>this.draft2D.canvas;
+    this.context.putImageData(this.dstImageData, 0,0)
+    const canvas = <Canvas><unknown>this.context.canvas;
 
     return canvas.toBuffer();
   };
