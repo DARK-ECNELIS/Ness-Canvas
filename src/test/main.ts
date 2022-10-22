@@ -1,41 +1,51 @@
 import { loadImage } from "canvas";
-import { CustomProfile, FilterBuilder, NessBuilder } from "..";
+import { CustomProfile, Edge, FilterBuilder, GifBuilder, ImageChannels, NessBuilder } from "..";
 // import RankupBuilder from "../Managers/RankupBuilder";
 
 
 // import {canvasGif} from '../Managers/test';
-const fs = require('fs');
-const path = require('path');
+// const fs = require('fs');
+// const path = require('path');
 
 async function test() {
   const background = await loadImage('https://media.discordapp.net/attachments/1006600590408818810/1006600665298116728/background-3147808.jpg');
   
   const avatar = await loadImage('https://media.discordapp.net/attachments/758031322244710601/1000153437813616650/perso_anime_U565bW7EhY2InkF.png');
 
-  const rank = await loadImage('https://cdn.discordapp.com/attachments/1006600590408818810/1006600664929030255/background-2412739.jpg?size=4096')
-
+  // const rank = await loadImage('https://cdn.discordapp.com/attachments/1006600590408818810/1006600664929030255/background-2412739.jpg?size=4096')
 
   const filter = new FilterBuilder(avatar)
-  await filter.BoxBlur(15, 5, 1);
+  await filter.Invert();
   
-  const back = new FilterBuilder(background)
-  await back.StackBlur(180);
+  const builder = new GifBuilder(700, 250)
+  .setCornerRadius(15)
+  .setBackground(background)
+  .setFrame("Square", { x: 25, y:25 }, { width: 150, height: 150 }, { radius: 15, content: {imageOrText: filter.getCanvas()}})
+  .setFrame("Polygones", { x: 550, y:25 }, { width: 130, height: 130 }, {radius: 6, content: { imageOrText: 33, textOptions: { font: "sans-serif", size: 80, color: "#000000", textAlign: "center", textBaseline: "middle" }}})
+  .setExp(false, {x: 45, y: 200}, {width: 655, height: 30}, 20, 65)
+  .setText('Hello World!', {x:350, y:100}, {size: 40, font: 'Impact'})
 
-  new NessBuilder(700, 250)
-  // .test("https://thumbs.gfycat.com/GaseousHandmadeBurro-max-1mb.gif", avatar)
-  .setCornerRadius(15) // round the edges of the image
-  .setBackground(back.getCanvas()) // Add Background
-  .setFrame("Square", { x: 25, y:25 }, { width: 150, height: 150 }, { radius: 15, content: {imageOrText: filter.getCanvas()}}) // Add image in a square frame
-  .setFrame("Polygones", { x: 550, y:25 }, { width: 130, height: 130 }, {radius: 6, content: { imageOrText: 33, textOptions: { font: "sans-serif", size: 80, color: "#000000", textAlign: "center", textBaseline: "middle" }}}) // Write "33" in a polygones frame
-  .setExp(false, {x: 45, y: 200}, {width: 655, height: 30}, 20, 65) // Draw an experience bar
-  .setExp(true, {x: 500, y: 150}, {width: 30, height: 50}, -20, 130) // Draw an experience bar
-  .setExp(true, {x: 200, y: 50}, {width: 30, height: 160}, 20, 65) // Draw an experience bar
-  .setText('Hello World!', {x:350, y:100}, {size: 40, font: 'Impact'}) // Write "Hello World!"
-  .generatedTo('src/test/', "test", "PNG");
+  await builder.test("https://thumbs.gfycat.com/GaseousHandmadeBurro-max-1mb.gif", avatar)
 
-  // // // new CustomProfile('classic', background, avatar, 'Octogon').generatedTo('src/test/', "test", "PNG")
 
-  // // // new RankupBuilder("classic", rank, 33, "Square").generatedTo('src/test', "rank", "PNG")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
