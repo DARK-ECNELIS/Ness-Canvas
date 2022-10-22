@@ -8,7 +8,7 @@
     "outDir": "npm/lib",
     "typeRoots": ["./node_modules/@types"],
     "declarationDir": "npm",
-    "declarationMap": true,
+    "declarationMap": true
   },
   "include": [
     "src"

@@ -3,8 +3,7 @@ node_modules
 package-lock.json
 dist
 npm
-src/test/assets
+src/test/
 wow
-.vscode
 .npmrc
 README copy.md
