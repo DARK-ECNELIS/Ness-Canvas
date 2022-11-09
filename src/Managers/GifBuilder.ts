@@ -4,9 +4,10 @@ import { CanvasImage, CustomColor, ImageExtention, Shape, ImagelocationOption, D
 
 import { readFileSync } from "fs";
 import Filter from "./FilterBuilder";
+import { gifFrames } from "../gif-frames-update/gif-frames";
+
 const GIFEncoder = require('gif-encoder-2')
 
-const gifFrames = require('gif-frames');
 
 
 export default class GifBuilder {
@@ -105,7 +106,11 @@ export default class GifBuilder {
   public async test(gifUrl: `https://${string}.gif`, imageUrl: Image) {
       
     // I used gifFrames to get the image buffer array
-    const imageBufferArray = await gifFrames({ url: gifUrl, frames: "all", cumulative: true});
+    const imageBufferArray = await gifFrames({
+      url: gifUrl, frames: "all", cumulative: true,
+      outputType: "jpg",
+      quality: 100
+    });
     const data = imageBufferArray.map(data => data.getImage()._obj)
     const encoder = new GIFEncoder(this.canvas.width, this.canvas.height, 'neuquant', true);
     // const encoder = new GIFEncoder(this.canvas.width, this.canvas.height, 'neuquant', true);

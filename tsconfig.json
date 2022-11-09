@@ -12,10 +12,10 @@
   },
   "include": [
     "src"
-    ],
+  ],
   "exclude": [
     "node_modules",
     "src/test",
-    "wow/gifGenerator.ts"
-  ],
+    "wow"
+  ]
 }
