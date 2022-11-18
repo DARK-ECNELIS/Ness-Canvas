@@ -2,7 +2,6 @@ import { loadImage } from "canvas";
 import { CustomProfile, Edge, FilterBuilder, GifBuilder, ImageChannels, NessBuilder } from "..";
 // import RankupBuilder from "../Managers/RankupBuilder";
 
-
 // import {canvasGif} from '../Managers/test';
 // const fs = require('fs');
 // const path = require('path');
