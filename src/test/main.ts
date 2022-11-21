@@ -5,7 +5,6 @@ import { CustomProfile, Edge, FilterBuilder, GifBuilder, ImageChannels, NessBuil
 // const fs = require('fs');
 // const path = require('path');
 
-
 async function test() {
   const background = await loadImage('https://media.discordapp.net/attachments/1006600590408818810/1006600665298116728/background-3147808.jpg');
   
@@ -19,8 +18,8 @@ async function test() {
   const builder = new GifBuilder(700, 250)
   .setCornerRadius(15)
   .setBackground(background)
-  .setFrame("Square", { x: 25, y:25 }, { width: 150, height: 150 }, { radius: 15, content: {imageOrText: filter.getCanvas()}})
-  .setFrame("Polygones", { x: 550, y:25 }, { width: 130, height: 130 }, {radius: 6, content: { imageOrText: 33, textOptions: { font: "sans-serif", size: 80, color: "#000000", textAlign: "center", textBaseline: "middle" }}})
+  .setFrame("Square", { x: 25, y:25 }, { width: 150, height: 150 }, { content: {imageOrText: filter.getCanvas()}})
+  .setFrame("Polygones", { x: 550, y:25 }, { width: 130, height: 130 }, {radPik: 6, content: { imageOrText: 33, textOptions: { font: "sans-serif", size: 80, color: "#000000", textAlign: "center", textBaseline: "middle" }}})
   .setExp(false, {x: 45, y: 200}, {width: 655, height: 30}, 20, 65)
   .setText('Hello World!', {x:350, y:100}, {size: 40, font: 'Impact'})
 

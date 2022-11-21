@@ -100,6 +100,8 @@ export default class NessBuilder {
    */
   public setFrame(typeShape: Shape, coordinate: FramelocationOption, size: FrameSizeOption, options?: FrameOption): this {
 
+    typeShape.includes("Square") && !options.radPik ? options.radPik = 15 : ["SymmetricalStar", "Polygones"].includes(typeShape) && !options.radPik? options.radPik = 5 : "";
+
     // Sauvegarde de la position et taille du frame
     this.frameCoordinate.x = coordinate.x
     this.frameCoordinate.y = coordinate.y
@@ -116,15 +118,15 @@ export default class NessBuilder {
 
     switch (typeShape) {
       case "Square": {
-        this.context.moveTo(coordinate.x + options.radius, coordinate.y);
-        this.context.lineTo(r - options.radius, coordinate.y);
-        this.context.quadraticCurveTo(r, coordinate.y, r, coordinate.y + options.radius);
-        this.context.lineTo(r, coordinate.y + size.height - options.radius);
-        this.context.quadraticCurveTo(r, b, r - options.radius, b);
-        this.context.lineTo(coordinate.x + options.radius, b);
-        this.context.quadraticCurveTo(coordinate.x, b, coordinate.x, b - options.radius);
-        this.context.lineTo(coordinate.x, coordinate.y + options.radius);
-        this.context.quadraticCurveTo(coordinate.x, coordinate.y, coordinate.x + options.radius, coordinate.y);
+        this.context.moveTo(coordinate.x + options.radPik, coordinate.y);
+        this.context.lineTo(r - options.radPik, coordinate.y);
+        this.context.quadraticCurveTo(r, coordinate.y, r, coordinate.y + options.radPik);
+        this.context.lineTo(r, coordinate.y + size.height - options.radPik);
+        this.context.quadraticCurveTo(r, b, r - options.radPik, b);
+        this.context.lineTo(coordinate.x + options.radPik, b);
+        this.context.quadraticCurveTo(coordinate.x, b, coordinate.x, b - options.radPik);
+        this.context.lineTo(coordinate.x, coordinate.y + options.radPik);
+        this.context.quadraticCurveTo(coordinate.x, coordinate.y, coordinate.x + options.radPik, coordinate.y);
 
         this.frameTextCoordinate.x = coordinate.x + size.width/2;
         this.frameTextCoordinate.y = coordinate.y + size.height/2;
@@ -166,7 +168,7 @@ export default class NessBuilder {
       };
       case "SymmetricalStar": {
         let rot = Math.PI / 2 * 3;
-        const spikes = options.radius;
+        const spikes = options.radPik;
         const step = Math.PI / spikes;
         this.context.beginPath();
 
@@ -189,7 +191,7 @@ export default class NessBuilder {
       };
       case "Polygones": {
         let rot = Math.PI / 2 * 3;
-        const spikes = options.radius;
+        const spikes = options.radPik;
         const step = Math.PI / spikes;
         this.context.beginPath();
 

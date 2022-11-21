@@ -16,6 +16,8 @@ export default class FilterBuilder {
   private tmpImageData: ImageData;
   private tmpPixels: Uint8ClampedArray;
 
+  private filter: string;
+
   constructor(image: CanvasImage) {
     
     this.canvas = new Canvas(<number>image.width, <number>image.height);
@@ -421,6 +423,7 @@ export default class FilterBuilder {
       this.dstPixels[i + 3] = 255;
     }
 
+    this.filter = "Binarize";
     return this.dstImageData;
   };
 
@@ -504,6 +507,7 @@ export default class FilterBuilder {
       Blur( this.tmpPixels, this.dstPixels,  this.srcHeight,  this.srcWidth, vRadius);
     };
 
+    this.filter = "BoxBlur";
     return  this.dstImageData;
   };
 
@@ -574,6 +578,7 @@ export default class FilterBuilder {
       };
     };
 
+    this.filter = "GaussianBlur";
     return await this.ConvolutionFilter(size, size, matrix, divisor, 0, false);
   };
 
@@ -838,6 +843,7 @@ export default class FilterBuilder {
       };
     };
 
+    this.filter = "StackBlur";
     return this.dstImageData;
   };
 
@@ -877,6 +883,8 @@ export default class FilterBuilder {
       };
       return value + 0.5 | 0;
     });
+
+    this.filter = "BrightnessContrastGimp";
     return this.dstImageData;
   };
 
@@ -895,6 +903,8 @@ export default class FilterBuilder {
         value = (value - 127.5) * contrast + 127.5;
         return value + 0.5 | 0;
     });
+
+    this.filter = "BrightnessContrastPhotoshop";
     return this.dstImageData;
   };
 
@@ -934,6 +944,7 @@ export default class FilterBuilder {
       };
     };
 
+    this.filter = "Channels";
     return await this.ColorMatrixFilter(matrix);
   };
 
@@ -954,6 +965,7 @@ export default class FilterBuilder {
       this.dstPixels[i + 3] = this.srcPixels[i + 3];
     };
 
+    this.filter = "Desaturate";
     return this.dstImageData;
   };
 
@@ -1079,11 +1091,14 @@ export default class FilterBuilder {
       };
     };
   
+    this.filter = "Dither";
     return this.dstImageData;
   };
 
   public async Edge() {
     //pretty close to Fireworks 'Find Edges' effect
+
+    this.filter = "Edge";
     return this.ConvolutionFilter(3, 3, [
       -1, -1, -1,
       -1,  8, -1,
@@ -1092,6 +1107,8 @@ export default class FilterBuilder {
   };
 
   public async Emboss() {
+    
+    this.filter = "Emboss";
     return this.ConvolutionFilter(3, 3, [
       -2, -1, 0,
       -1,  1, 1,
@@ -1100,6 +1117,8 @@ export default class FilterBuilder {
   };
 
   public async Enrich() {
+
+    this.filter = "Enrich";
     return this.ConvolutionFilter(3, 3, [
       0, -2,  0,
       -2, 20, -2,
@@ -1126,6 +1145,7 @@ export default class FilterBuilder {
       };
     };
 
+    this.filter = "Flip";
     return this.dstImageData;
   };
 
@@ -1139,6 +1159,7 @@ export default class FilterBuilder {
       return value > 255 ? 255 : value + 0.5 | 0;
     });
 
+    this.filter = "Gamma";
     return this.dstImageData;
   };
 
@@ -1150,6 +1171,7 @@ export default class FilterBuilder {
       this.dstPixels[i + 3] = this.srcPixels[i + 3];
     };
 
+    this.filter = "GreyScale";
     return this.dstImageData;
   };
 
@@ -1207,6 +1229,7 @@ export default class FilterBuilder {
       this.dstPixels[i + 3] = this.srcPixels[i + 3];
     };
 
+    this.filter = "HSLAdjustment";
     return this.dstImageData;
   };
   
@@ -1216,6 +1239,7 @@ export default class FilterBuilder {
       return 255 - value;
     });
   
+    this.filter = "Invert";
     return this.dstImageData;
   };
 
@@ -1283,6 +1307,7 @@ export default class FilterBuilder {
       };
     };
 
+    this.filter = "Mosaic";
     return this.dstImageData;
   };
 
@@ -1361,6 +1386,7 @@ export default class FilterBuilder {
       };
     };
 
+    this.filter = "Oil";
     return this.dstImageData;
   };
 
@@ -1393,6 +1419,7 @@ export default class FilterBuilder {
       return ret;
     });
 
+    this.filter = "Posterize";
     return this.dstImageData;
   };
 
@@ -1411,6 +1438,7 @@ export default class FilterBuilder {
       this.dstPixels[i + 3] = this.srcPixels[i + 3];
     };
 
+    this.filter = "Sepia";
     return this.dstImageData;
   };
 
@@ -1419,6 +1447,8 @@ export default class FilterBuilder {
    */
   public async Sharpen(factor: number) {
     //Convolution formula from VIGRA
+
+    this.filter = "Sharpen";
     return this.ConvolutionFilter(3, 3, [
       -factor/16,     -factor/8,      -factor/16,
       -factor/8,       factor*0.75+1, -factor/8,
@@ -1431,6 +1461,7 @@ export default class FilterBuilder {
       return value > 127 ? (value - 127.5) * 2 : (127.5 - value) * 2;
     });
 
+    this.filter = "Solarize";
     return this.dstImageData;
   };
 
@@ -1449,6 +1480,7 @@ export default class FilterBuilder {
       };
     };
     
+    this.filter = "Transpose";
     return this.dstImageData;
   };
 
@@ -1513,12 +1545,13 @@ export default class FilterBuilder {
       };
     };
 
+    this.filter = "Twril";
     return this.dstImageData;
   };
 
   public getCanvas() {
-    console.log(this.dstImageData)
     this.context.putImageData(this.dstImageData, 0, 0)
+    console.log(`\x1b[34mFilter Apply: \x1b[33m${this.filter}\x1b[0m`)
     return this.context.canvas;
   };
 

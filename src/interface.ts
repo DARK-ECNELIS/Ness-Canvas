@@ -105,9 +105,13 @@ export interface ExpSizeOption {
  */
 export interface FrameOption {
    /**
-    * Frame outline radius (is ignored if the frame does not have this functionality)
+    * Dépend du shape utiliser
+    * - Square => Outline radius
+    * - SymmetricalStar => Number of summits
+    * - Polygones => Number of sides
+    * ignored for others frames
     */
-   radius?: number,
+   radPik?: number,
    /**
     * Frame content configuration
     */

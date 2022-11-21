@@ -156,7 +156,7 @@ export default class GifBuilder {
     }
     encoder.finish();
     const gifBuffer = encoder.out.getData();
-    return writeFile('src/test/test4.gif', gifBuffer, (err) => { console.log(err) });
+    return writeFile('src/test/test4.gif', gifBuffer, (err) => { if (err) console.log(err)});
 
     // writeFile('src/test/test3.gif', encoder.out.getData(), error => {
     //   console.log(error)

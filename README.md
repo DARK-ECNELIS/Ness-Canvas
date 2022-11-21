@@ -37,8 +37,8 @@ const avatar = await loadImage('https://media.discordapp.net/attachments/7580313
 const builder = new NessBuilder(700, 250) // Set Image format
   .setCornerRadius(15) // round the edges of the image
   .setBackground(background) // Add Background
-  .setFrame("Square", { x: 25, y:25 }, { width: 150, height: 150 }, { radius: 15, content: {imageOrText: avatar}}) // Add image in a square frame
-  .setFrame("Polygones", { x: 550, y:25 }, { width: 130, height: 130 }, {radius: 6, content: { imageOrText: 33, textOptions: { font: "sans-serif", size: 80, color: "#000000", textAlign: "center", textBaseline: "middle" }}}) // Write "33" in a polygones frame
+  .setFrame("Square", { x: 25, y:25 }, { width: 150, height: 150 }, { radPik: 15, content: {imageOrText: avatar}}) // Add image in a square frame
+  .setFrame("Polygones", { x: 550, y:25 }, { width: 130, height: 130 }, {radPik: 6, content: { imageOrText: 33, textOptions: { font: "sans-serif", size: 80, color: "#000000", textAlign: "center", textBaseline: "middle" }}}) // Write "33" in a polygones frame
   .setExp(false, {x: 45, y: 200}, {width: 655, height: 30}, 20, 65) // Draw an experience bar
   .setText('Hello World!', {x:350, y:100}, {size: 40, font: 'Impact'}) // Write "Hello World!"
   .generatedTo('src/test/', "test", "png");
@@ -113,7 +113,7 @@ const builder = new NessBuilder(250, 300)
 ### setCornerRadius()
 
 > ```ts
-> setCornerRadius(raduis: number) => this
+> setCornerRadius(radius: number) => this
 > ```
 
 Round the edges of the canvas
@@ -183,11 +183,11 @@ const image = await loadImage('http://supremacy.wolf/image.png')
 builder.setFrame("Octogon", { x: 25, y:25 }, { width: 150, height: 150 })
 
 // Draw a predefined frame containing an image
-builder.setFrame("Square", { x: 25, y:25 }, { width: 150, height: 150 }, { radius: 15, content: {imageOrText: image}})
+builder.setFrame("Square", { x: 25, y:25 }, { width: 150, height: 150 }, { radPik: 15, content: {imageOrText: image}})
 
 
 // Draw a predefined frame containing an text
-builder.setFrame("Polygones", { x: 550, y:25 }, { width: 130, height: 130 }, {radius: 6, content: { imageOrText: 'Hello'}});
+builder.setFrame("Polygones", { x: 550, y:25 }, { width: 130, height: 130 }, {radPik: 6, content: { imageOrText: 'Hello'}});
 
 // Draw a predefined frame with custom text
 builder.setFrame("Pentagone", { x: 550, y:25 }, { width: 130, height: 130 }, {content: { imageOrText: 'Hello', textOptions: { font: "sans-serif", size: 80, color: "#000000", textAlign: "center", textBaseline: "middle" }}});
