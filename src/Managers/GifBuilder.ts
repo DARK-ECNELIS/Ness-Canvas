@@ -1,10 +1,11 @@
 import { writeFile, writeFileSync } from "fs";
-import { Canvas, CanvasRenderingContext2D, loadImage, registerFont, Image } from "canvas";
+import { Canvas, CanvasRenderingContext2D, loadImage, Image } from "canvas";
 import { CanvasImage, CustomColor, ImageExtention, Shape, ImagelocationOption, DrawlocationOption, FramelocationOption, FrameSizeOption, ExpLocationOption, ExpSizeOption, FrameOption, TextOption, RegisterFont, NessBuilder } from "..";
 
 import { readFileSync } from "fs";
 import Filter from "./FilterBuilder";
 import { gifFrames } from "../gif-frames-update/gif-frames";
+import { gifExtractor } from "../function";
 
 const GIFEncoder = require('gif-encoder-2')
 
@@ -34,7 +35,7 @@ export default class GifBuilder {
    * Sets the canvas background.
    * @param image The image to set (no link, use loadImage() from canvas)
    */
-  public setBackground(image: CanvasImage) {
+  public setBackground(image: CanvasImage | `${string}.gif`) {
     this.framePlacement.push({id: 1, image})
     return this;
   };
@@ -45,7 +46,7 @@ export default class GifBuilder {
    * @param imageOption Source image coordinates to draw in the context of Canvas
    * @param locationOption Modify image coordinates to draw in the context of Canvas
    */
-  public setImage(image: CanvasImage, imageOption: ImagelocationOption, locationOption?: DrawlocationOption) {
+  public setImage(image: CanvasImage | `${string}.gif`, imageOption: ImagelocationOption, locationOption?: DrawlocationOption) {
     this.framePlacement.push({id: 2, image, imageOption, locationOption})
     return this;
   };
@@ -103,63 +104,125 @@ export default class GifBuilder {
     writeFileSync(`${location}/${name}.${type}`, this.toBuffer());
   };
 
-  public async test(gifUrl: `https://${string}.gif`, imageUrl: Image) {
-      
-    // I used gifFrames to get the image buffer array
-    const imageBufferArray = await gifFrames({
-      url: gifUrl, frames: "all", cumulative: true,
-      outputType: "jpg",
-      quality: 100
-    });
-    const data = imageBufferArray.map(data => data.getImage()._obj)
+  public async test() {
+
     const encoder = new GIFEncoder(this.canvas.width, this.canvas.height, 'neuquant', true);
-    // const encoder = new GIFEncoder(this.canvas.width, this.canvas.height, 'neuquant', true);
+    // const encoder = new GIFEncoder(this.canvas.width, this.canvas.height, 'octree', true);
     encoder.setTransparent(false)
     encoder.start();
 
-    const width = this.canvas.width, height = this.canvas.height;
-    
-    for (let i = 0; i < data.length; i += 1) {
-      const image = await loadImage(data[i]);
-      const builder = new NessBuilder(width, height);
 
-      this.framePlacement.forEach(e => {
-        switch (e.id) {
-          case 0: {
-            builder.setCornerRadius(e.radius);
-            break;
-          };
-          case 1: {
-            builder.setBackground(image);
-            break;
-          };
-          case 2: {
-            builder.setImage(e.image, e.imageOption, e.locationOption);
-            break;
-          };
-          case 3: {
-            builder.setFrame(e.typeShape, e.coordinate, e.size, e.options);
-            break;
-          };
-          case 4: {
-            builder.setText(e.text, e.coordinate, e.option)
-            break;
-          };
-          case 5: {
-            builder.setExp(e.horizontal, e.location, e.size, e.radius, e.cloneWidth, e.color)
-            break;
-          };
-        }
-      });
+    const data = {setImage: [], setBackground: [], setFrame: [], length: 0};
 
-      encoder.addFrame(builder.context);
+    for (let e of this.framePlacement) {
+
+
+      if (!e.image && !e.options?.content?.imageOrText) continue;
+      // console.log(typeof e.options?.content?.imageOrText)
+
+      let imageData = { data: undefined, image: undefined };
+
+      if (/.gif$/.test(e.image || e.options?.content?.imageOrText )) {
+        imageData = await gifExtractor(e.image || e.options?.content?.imageOrText)
+      } else {
+        imageData.data = e.image || e.options?.content?.imageOrText;
+      }
+
+      // console.log(e.image)
+      data.length < imageData.data.length && data.length !== 0 && typeof data == "object"? "" : data.length = imageData.data.length
+
+      switch (e.id) {
+        case 1: {
+          data.setBackground.push(imageData.data);
+          break;
+        };
+        case 2: {
+          data.setImage.push(imageData.data);
+          break;
+        };
+        case 3: {
+          data.setFrame.push(imageData.data);
+          break;
+        };
+      }
     }
-    encoder.finish();
-    const gifBuffer = encoder.out.getData();
-    return writeFile('src/test/test4.gif', gifBuffer, (err) => { if (err) console.log(err)});
 
-    // writeFile('src/test/test3.gif', encoder.out.getData(), error => {
-    //   console.log(error)
-    // })
+    
+    const builder = new NessBuilder(this.canvas.width, this.canvas.height);
+
+    for (let i = 0; i < data.length; i += 1/*, x = 0, y = 0, z = 0*/) {
+
+        let x = 0;
+        let y = 0;
+        let z = 0;
+      
+        const loadImagePromises = [];
+      
+        for (const e of this.framePlacement) {
+          switch (e.id) {
+            case 0: {
+              builder.setCornerRadius(e.radius);
+              break;
+            };
+            case 1: {
+              if (typeof data.setBackground[0] == "object") {
+                loadImagePromises.push(loadImage(data.setBackground[0][i]).then(image => builder.setBackground(image)));
+              } else {
+                loadImagePromises.push(loadImage(data.setBackground[0]).then(image => builder.setBackground(image)));
+              }
+              break;
+            };
+            case 2: {
+              if (typeof data.setImage[y] == 'object') {
+                loadImagePromises.push(loadImage(data.setImage[y][i]).then(image => {
+                  builder.setImage(image, e.imageOption, e.locationOption);
+                }));
+              } else {
+                loadImagePromises.push(loadImage(data.setImage[y]).then(image => {
+                  builder.setImage(image, e.imageOption, e.locationOption);
+                }));
+              }
+              y++;
+              break;
+            };
+            case 3: {
+              if (typeof data.setFrame[z] == 'object') {
+                loadImagePromises.push(loadImage(data.setFrame[z][i]).then(image => {
+                  e.options.content.imageOrText = image;
+                  builder.setFrame(e.typeShape, e.coordinate, e.size, e.options);
+                }));
+              } else {
+                loadImagePromises.push(loadImage(data.setFrame[z]).then(image => {
+                  e.options.content.imageOrText = image;
+                  builder.setFrame(e.typeShape, e.coordinate, e.size, e.options);
+                }));
+              }
+              z++;
+              break;
+            };
+            
+            case 4: {
+              builder.setText(e.text, e.coordinate, e.option)
+              break;
+            };
+            case 5: {
+              builder.setExp(e.horizontal, e.location, e.size, e.radius, e.cloneWidth, e.color)
+              break;
+            };
+          }
+        }
+      
+        await Promise.all(loadImagePromises);
+        console.log("Test")
+        await encoder.addFrame(builder.context);
+        console.log("Test End")
+      }
+    encoder.finish();
+    // const gifBuffer = await encoder.out.getData();
+    // return writeFile('test.gif', gifBuffer, (err) => { if (err) console.log(err)});
+
+    writeFile('test.gif', encoder.out.getData(), error => {
+      console.log(error)
+    })
   }
 }
