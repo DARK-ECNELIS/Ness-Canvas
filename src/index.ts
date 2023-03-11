@@ -1,7 +1,7 @@
-import { Image } from "canvas";
+import { Canvas, Image } from "canvas";
 
 declare type CustomColor = `#${string}` | CanvasGradient | CanvasPattern;
-declare type CanvasImage = Image | HTMLOrSVGImageElement | HTMLVideoElement | HTMLCanvasElement | ImageBitmap
+declare type CanvasImage = Image | Canvas
 
 declare type Preset = 'classic';
 declare type Shape = "Square" | "Octogon" | "Pentagone" | "Circle" | "SymmetricalStar" | "Polygones";

@@ -119,7 +119,7 @@ export interface FrameOption {
       /**
        * Image or text to be placed in the frame
        */
-      imageOrText: CanvasImage | number | string,
+      imageOrText: CanvasImage | number | string /* | `${string}.gif`*/,
       /**
        * Text configuration (not used if imageOrText is a CanvasImage)
        */
