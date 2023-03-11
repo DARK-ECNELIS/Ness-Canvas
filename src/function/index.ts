@@ -1,0 +1,1 @@
+export { gifExtractor } from "./gifExtractor"
