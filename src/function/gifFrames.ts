@@ -29,7 +29,7 @@ import savePixels = require("save-pixels");
  * @param options.quality 1-100
  * @param callback
  */
-function gifFrames (options: {url: string, frames: Initializer, cumulative: any, outputType: "jpeg" | "jpg", quality: number}): Promise<any> {
+export function gifFrames (options: {url: string, frames: Initializer, cumulative: any, outputType: "jpeg" | "jpg", quality: number}): Promise<any> {
   
   var reject: (err: any) => void;
   var resolve: (res: unknown) => void;
@@ -59,32 +59,26 @@ function gifFrames (options: {url: string, frames: Initializer, cumulative: any,
   const acceptedFrames = options.frames === 'all' ? 'all' : new MultiRange(options.frames);
 
   getPixels(options.url, function(err, pixels) {
-    if (err) {
-      reject(err);
-      return;
-    };
-    if (pixels.shape.length < 4) {
-      reject(new Error('"url" input should be multi-frame GIF.'));
-      return;
-    };
+    if (err) throw err;
+    if (pixels.shape.length < 4) return new Error('"url" input should be multi-frame GIF.');
 
-    const frameData = [];let maxAccumulatedFrame = 0;
+    const frameData = [];
+    let maxAccumulatedFrame = 0;
 
     for (let i = 0; i < pixels.shape[0]; i++) {
-      if (acceptedFrames !== 'all' && ! acceptedFrames.has(i)) {
-        continue;
-      };
+      if (acceptedFrames !== 'all' && ! acceptedFrames.has(i)) continue;
+      
       (function (frameIndex) {
         frameData.push({
           getImage: function() {
             if (options.cumulative && frameIndex > maxAccumulatedFrame) {
               let lastFrame = pixels.pick(maxAccumulatedFrame);
 
-              for (var f = maxAccumulatedFrame + 1; f <= frameIndex; f++) {
-                var frame = pixels.pick(f);
+              for (let f = maxAccumulatedFrame + 1; f <= frameIndex; f++) {
+                const frame = pixels.pick(f);
 
-                for (var x = 0; x < frame.shape[0]; x++) {
-                  for (var y = 0; y < frame.shape[1]; y++) {
+                for (let x = 0; x < frame.shape[0]; x++) {
+                  for (let y = 0; y < frame.shape[1]; y++) {
                     if (frame.get(x, y, 3) === 0) {
                       // if alpha is fully transparent, use the pixel
                       // from the last frame
@@ -92,16 +86,15 @@ function gifFrames (options: {url: string, frames: Initializer, cumulative: any,
                       frame.set(x, y, 1, lastFrame.get(x, y, 1));
                       frame.set(x, y, 2, lastFrame.get(x, y, 2));
                       frame.set(x, y, 3, lastFrame.get(x, y, 3));
-                    }
-                  }
-                }
+                    };
+                  };
+                };
                 lastFrame = frame;
-              }
+              };
               maxAccumulatedFrame = frameIndex;
             };
-            return savePixels(pixels.pick(frameIndex), options.outputType, {
-              quality: options.quality
-            });
+
+            return savePixels(pixels.pick(frameIndex), options.outputType, { quality: options.quality });
           },
           frameIndex: frameIndex
         });
@@ -112,5 +105,3 @@ function gifFrames (options: {url: string, frames: Initializer, cumulative: any,
   
   return promise;
 }
-
-export { gifFrames }
