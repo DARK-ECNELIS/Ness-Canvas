@@ -28,15 +28,16 @@
     "image",
     "images",
     "filter",
-    "gif generator"
+    "gif generator",
+    "gif"
   ],
   "devDependencies": {
     "@types/node": "^18.15.0",
-    "typescript": "^4.7.4"
+    "typescript": "^4.7.4",
+    "@types/get-pixels": "^3.3.2",
+    "@types/save-pixels": "^2.3.2"
   },
   "dependencies": {
-    "@types/get-pixels": "^3.3.2",
-    "@types/save-pixels": "^2.3.2",
     "canvas": "^2.10.2",
     "get-pixels": "^3.3.3",
     "gif-encoder-2": "^1.0.5",
