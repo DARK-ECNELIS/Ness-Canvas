@@ -1,5 +1,5 @@
-import { loadImage } from "canvas";
-import { gifFrames } from "../gif-frames-update/gif-frames";
+import { Image, loadImage } from "canvas";
+import { gifFrames } from "./gifFrames";
 
 export async function gifExtractor(gif: `${string}.gif`) {
     
@@ -10,9 +10,9 @@ export async function gifExtractor(gif: `${string}.gif`) {
         quality: 100
     });
 
-    const data = imageBufferArray.map(data => data.getImage()._obj);
-    const image = await loadImage(data[0]);
-    
-    console.log(`\x1b[34mGif extractor: \x1b[33m${data.length} Image[${image.height}x${image.width}] \x1b[32mComplete\x1b[0m`);
-    return { data, image };
+    const promises = imageBufferArray.map(async data => loadImage(data.getImage()._obj));
+    const data: Array<Image> = await Promise.all(promises);
+
+    console.log(`\x1b[34mGif extractor: \x1b[33m${data.length} Image[${(await data[0]).height}x${(await data[0]).width}] \x1b[32mComplete\x1b[0m`);
+    return data;
 }
