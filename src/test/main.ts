@@ -7,9 +7,9 @@ import { gifExtractor } from "../function"
 // const path = require('path');
 
 async function test() {
-  // const background = await loadImage('https://media.discordapp.net/attachments/1006600590408818810/1006600665298116728/background-3147808.jpg');
+  const background = await loadImage('https://media.discordapp.net/attachments/1006600590408818810/1006600665298116728/background-3147808.jpg');
   
-  // const avatar = await loadImage('https://media.discordapp.net/attachments/758031322244710601/1000153437813616650/perso_anime_U565bW7EhY2InkF.png');
+  const avatar = await loadImage('https://media.discordapp.net/attachments/758031322244710601/1000153437813616650/perso_anime_U565bW7EhY2InkF.png');
 
   // const rank = await loadImage('https://cdn.discordapp.com/attachments/1006600590408818810/1006600664929030255/background-2412739.jpg?size=4096')
 
@@ -20,21 +20,22 @@ async function test() {
   // const web = await loadImage("./assets/image/background/web-3876081.jpg")
   const gif = "./assets/image/gif/stickMan.gif"
   const gif2 = "./assets/image/gif/tvHS.gif"
-  const image = 'https://upload.wikimedia.org/wikipedia/commons/9/9a/Gull_portrait_ca_usa.jpg'
+  const image = await loadImage('https://upload.wikimedia.org/wikipedia/commons/9/9a/Gull_portrait_ca_usa.jpg');
 
-  
   const builder = new GifBuilder(700, 250)
   .setCornerRadius(15)
-  .setBackground(gif)
-  .setImage(gif2, {sx: 250, sy: 25, sWidth: 250, sHeight: 150})
-  .setFrame("Square", { x: 25, y: 25 }, { width: 150, height: 150 }, { content: {imageOrText: image}})
-  .setFrame("Circle", { x: 500, y: 50 }, { width: 150, height: 150 }, { content: {imageOrText: gif}})
+  .setBackground(background) // Add Background
+  .setImage(gif, {sx: 250, sy: 25, sWidth: 250, sHeight: 150})
+  .setFrame("Square", { x: 25, y:25 }, { width: 150, height: 150 }, { content: {imageOrText: avatar}})
+  .setFrame("Circle", { x: 500, y: 50 }, { width: 150, height: 150 }, { content: {imageOrText: image}})
   .setFrame("Pentagone", { x: 300, y: 100 }, { width: 150, height: 150 }, { content: {imageOrText: gif2}})
   // .setFrame("Polygones", { x: 550, y:25 }, { width: 130, height: 130 }, {radPik: 6, content: { imageOrText: 33, textOptions: { font: "sans-serif", size: 80, color: "#000000", textAlign: "center", textBaseline: "middle" }}})
   // .setExp(false, {x: 45, y: 200}, {width: 655, height: 30}, 20, 65)
   // .setText('Hello World!', {x:350, y:100}, {size: 40, font: 'Impact'})
 
-  await builder.test()
+  await builder.generatedTo(".", "test")
+  // console.log(await builder.toDataURL())
+  // console.log(await builder.toBuffer())
 
   // const background = await loadImage('https://media.discordapp.net/attachments/1006600590408818810/1006600665298116728/background-3147808.jpg');
   // const avatar = await loadImage('https://media.discordapp.net/attachments/758031322244710601/1000153437813616650/perso_anime_U565bW7EhY2InkF.png');
@@ -97,7 +98,7 @@ async function test() {
 // );
 }
 
-test()
+test();
 
 
 // https://thumbs.gfycat.com/GaseousHandmadeBurro-max-1mb.gif
