@@ -1568,4 +1568,8 @@ export default class FilterBuilder {
 
     return canvas.toBuffer();
   };
+
+  public toDataURL() {
+    return this.canvas.toDataURL();
+  }
 }

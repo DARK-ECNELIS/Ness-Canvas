@@ -390,4 +390,8 @@ export default class NessBuilder {
     writeFileSync(`${location}/${name}.${type}`, this.toBuffer());
   };
 
+  public toDataURL() {
+    return this.canvas.toDataURL();
+  };
+
 }

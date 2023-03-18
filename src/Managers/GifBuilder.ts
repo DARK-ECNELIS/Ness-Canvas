@@ -225,4 +225,9 @@ export default class GifBuilder {
       console.log(error)
     })
   }
+  public async toDataURL() {
+    const base64String = Buffer.from(await this.toBuffer()).toString('base64');
+
+    return base64String;
+  };
 }
