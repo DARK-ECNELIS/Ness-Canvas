@@ -171,7 +171,6 @@ export interface TextOption {
    textBaseline?: "top" | "hanging" | "middle" | "alphabetic" | "ideographic" | "bottom"
 }
 
-
 export interface RegisterFont {
 
    /**
