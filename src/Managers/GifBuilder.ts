@@ -1,6 +1,6 @@
-import { writeFile, writeFileSync } from "fs";
-import { Canvas, CanvasRenderingContext2D, loadImage, Image } from "canvas";
-import { CanvasImage, CustomColor, ImageExtention, Shape, ImagelocationOption, DrawlocationOption, FramelocationOption, FrameSizeOption, ExpLocationOption, ExpSizeOption, FrameOption, TextOption, NessBuilder } from "..";
+import { writeFileSync } from "fs";
+import { Canvas, CanvasRenderingContext2D, Image } from "canvas";
+import { CanvasImage, CustomColor, Shape, ImagelocationOption, DrawlocationOption, FramelocationOption, FrameSizeOption, ExpLocationOption, ExpSizeOption, FrameOption, TextOption, NessBuilder } from "..";
 import { gifExtractor, progressBar } from "../function";
 
 const GIFEncoder = require('gif-encoder-2')
@@ -82,9 +82,9 @@ export default class GifBuilder {
   };
 
   /**
-   * No more information, wait next update
+   * Return canvas Buffer
    */
-  async toBuffer() {
+  public async toBuffer() {
 
     const data = {setImage: [], setBackground: [], setFrame: [], length: 0};
     const encoder = new GIFEncoder(this.canvas.width, this.canvas.height, 'neuquant', true);
@@ -182,7 +182,7 @@ export default class GifBuilder {
   };
 
   /**
-   * Transforms the embed to a plain object
+   * Generated image from canvas
    * @param location Image Generation Path
    * @param name Image name
    */
@@ -190,10 +190,11 @@ export default class GifBuilder {
     writeFileSync(`${location}/${name}.gif`, await this.toBuffer());
   };
 
+  /**
+   * Returns a base64 encoded string
+   */
   public async toDataURL() {
-    const base64String = Buffer.from(await this.toBuffer()).toString('base64');
-
-    return base64String;
+    return Buffer.from(await this.toBuffer()).toString('base64');
   };
   
 }

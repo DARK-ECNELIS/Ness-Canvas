@@ -1549,12 +1549,22 @@ export default class FilterBuilder {
     return this.dstImageData;
   };
 
+  /**
+   * Return the canvas after applying the effects
+   */
   public getCanvas() {
     this.context.putImageData(this.dstImageData, 0, 0)
     console.log(`\x1b[34mFilter Apply: \x1b[33m${this.filter}\x1b[0m`)
     return this.context.canvas;
   };
 
+
+  /**
+   * Generated image from canvas
+   * @param location Image Generation Path
+   * @param name Image name
+   * @param type Image extention
+   */
   public generatedTo(location: string, name: string, type: ImageExtention): void {
     this.context.putImageData(this.dstImageData, 0,0)
     const canvas = <Canvas><unknown>this.context.canvas;
@@ -1562,6 +1572,9 @@ export default class FilterBuilder {
     return writeFileSync(`${location}/${name}.${type}`, canvas.toBuffer());
   };
 
+  /**
+   * Return canvas Buffer
+   */
   public toBuffer(): Buffer {    
     this.context.putImageData(this.dstImageData, 0,0)
     const canvas = <Canvas><unknown>this.context.canvas;
@@ -1569,7 +1582,10 @@ export default class FilterBuilder {
     return canvas.toBuffer();
   };
 
+  /**
+   * Returns a base64 encoded string
+   */
   public toDataURL() {
     return this.canvas.toDataURL();
-  }
+  };
 }

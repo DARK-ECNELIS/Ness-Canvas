@@ -373,14 +373,14 @@ export default class NessBuilder {
   };
 
   /**
-   * No more information, wait next update
+   * Return canvas Buffer
    */
-  toBuffer() {
+  public toBuffer() {
     return this.canvas.toBuffer();
   };
 
   /**
-   * Transforms the embed to a plain object
+   * Generated image from canvas
    * 
    * @param location Image Generation Path
    * @param name Image name
@@ -390,7 +390,10 @@ export default class NessBuilder {
     writeFileSync(`${location}/${name}.${type}`, this.toBuffer());
   };
 
-  public toDataURL() {
+  /**
+   * Returns a base64 encoded string
+   */
+  public toDataURL(): string {
     return this.canvas.toDataURL();
   };
 
