@@ -78,6 +78,15 @@ new NessBuilder(avatar.width, avatar.height)
 This project is an implementation of the Canvas module. For more on the latter visit the [Canvas Module Guide](https://github.com/Automattic/node-canvas). All utility methods are documented below.
 
 The filter builder has documentation specifying all filters you find [here](https://github.com/DARK-ECNELIS/Ness-Canvas/blob/main/FilterGuide.md).
+> ⚠️ You can find an example of using the Gif Builder [here](https://github.com/DARK-ECNELIS/Ness-Canvas/blob/main/GifGuide.md)
+
+
+<div style="display:flex; text-align:center; justify-content:space-evenly">
+  <div style="display:inline-block">
+    <h3>GifBuilder</h3>
+    <img style="display:block" src="https://github.com/DARK-ECNELIS/Ness-Canvas/blob/main/Assets/test.gif?raw=true" height=80/>
+  </div>
+</div>
 
 ## Builder
 
