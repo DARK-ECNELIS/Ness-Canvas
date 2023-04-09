@@ -29,4 +29,4 @@ export { default as GifBuilder } from './Managers/GifBuilder';
 export { default as CustomProfile } from './Extra/CustomProfile';
 export { default as RankupBuilder } from './Extra/RankupBuilder';
 
-export { ImagelocationOption, DrawlocationOption, FramelocationOption, FrameSizeOption, ExpLocationOption, ExpSizeOption, FrameOption, TextOption, RegisterFont } from './Interface'
+export { ImagelocationOption, DrawlocationOption, FramelocationOption, FrameSizeOption, ExpLocationOption, ExpSizeOption, FrameOption, TextOption, RegisterFont } from './Interfaces';
