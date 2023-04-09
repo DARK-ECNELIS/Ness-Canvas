@@ -48,6 +48,8 @@ filter.generatedTo("src/test/", "testFilter", "png"); // Generate the image in a
 
 filter.getBuffer() // Get Buffer
 
+filter.toDataURL() // Base64 encoded string
+
 // Using multiple filters
 
 const filter = new FilterBuilder(avatar);

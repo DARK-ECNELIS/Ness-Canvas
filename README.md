@@ -105,6 +105,7 @@ The filter builder has documentation specifying all filters you find [here](http
   * [setExp()](#setexp)
   * [toBuffer()](#tobuffer)
   * [generatedTo()](#generatedto)
+  * [toDataURL()](#toDataURL)
 
 ### NessBuilder()
 
@@ -234,7 +235,7 @@ builder.setExp(false, {x: 45, y: 200}, {width: 655, height: 30}, 20, 65)
 ### toBuffer()
 
 > ```ts
-> toBuffer() => this
+> toBuffer() => Promise<void>
 > ```
 
 Returns a Buffer of the image contained in the canvas
@@ -249,7 +250,7 @@ builder.toBuffer()
 ### generatedTo()
 
 > ```ts
-> generatedTo(location: string, name: string, type: ImageExtention) => this
+> generatedTo(location: string, name: string, type: ImageExtention) => Promise<void>
 > ```
 
 Generates an image of the canvas in a specific path
@@ -259,5 +260,20 @@ const { NessBuilder } = require('ness-canvas')
 const builder = new NessBuilder(250, 300)
 
 builder.generatedTo('src/path/', "name", "png")
+```
+
+### toDataURL()
+
+> ```ts
+> toDataURL() => string
+> ```
+
+Returns canvas to base64 encoded string
+
+```js
+const { NessBuilder } = require('ness-canvas')
+const builder = new NessBuilder(250, 300)
+
+builder.toDataURL()
 ```
   
