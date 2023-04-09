@@ -1,4 +1,4 @@
-import getPixels = require("get-pixels");
+import { getPixels } from "./index"
 import { Initializer, MultiRange } from "multi-integer-range";
 import savePixels = require("save-pixels");
 
