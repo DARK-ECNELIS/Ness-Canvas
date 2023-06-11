@@ -12,8 +12,8 @@ export default class NessBuilder {
     height: 0
   };
 
-  private frameCoordinate = { x: 0, y: 0, w: 0, h: 0 };
   private axis: Axis;
+  private frameCoordinate: FrameOption<Shape>;
   private frameTextCoordinate = { x: 0, y: 0};
 
   constructor(width: number, height: number) {
@@ -21,6 +21,13 @@ export default class NessBuilder {
     this.setCanvas(width, height);
     this.context = this.canvas.getContext('2d');
   };
+
+  // private async initialize(dataPath: `${string}.ttf`, dataFont: FontOption): Promise<void> {
+  //   if (registerFont) {
+  //     await this.registerFont(dataPath, dataFont);
+  //   }
+  //   // Continuer avec l'initialisation du reste de votre objet ici
+  // }
 
   /**
    * New Canvas Dimension
@@ -99,119 +106,20 @@ export default class NessBuilder {
    * @param size Frame size
    * @param options Frame configuration
    */
-  public setFrame(typeShape: Shape, coordinate: FramelocationOption, size: FrameSizeOption, options?: FrameOption): this {
+  public setFrame<T extends FrameType, S extends Shape>(shape: S, frame: FrameOption<S>, options: FrameContent<T>): this {
 
-    typeShape.includes("Square") && !options.radPik ? options.radPik = 15 : ["SymmetricalStar", "Polygones"].includes(typeShape) && !options.radPik? options.radPik = 5 : "";
-
+    // ["Square", "Rectangle"].includes(shape)? frame.QuadrilateralOprion? "" : frame.QuadrilateralOprion.radius = 15 : "";
+    
     // Sauvegarde de la position et taille du frame
-    this.frameCoordinate.x = coordinate.x
-    this.frameCoordinate.y = coordinate.y
-    this.frameCoordinate.w = size.width
-    this.frameCoordinate.h = size.height
-
+    // this.frameCoordinate = frame;
     this.context.save();
-    this.context.beginPath();
 
-    const r = coordinate.x + size.width;
-    const b = coordinate.y + size.height;
-    this.context.lineWidth = options.outline?.lineWidth? options.outline.lineWidth : 3;
     this.context.strokeStyle = options.color? colorCheck(options.color) : "#FF0000";
+    this.context.lineWidth = options.lineWidth? options.lineWidth : 3;
+   
+    this.setShape(shape, frame);
 
-    switch (typeShape) {
-      case "Square": {
-        this.context.moveTo(coordinate.x + options.radPik, coordinate.y);
-        this.context.lineTo(r - options.radPik, coordinate.y);
-        this.context.quadraticCurveTo(r, coordinate.y, r, coordinate.y + options.radPik);
-        this.context.lineTo(r, coordinate.y + size.height - options.radPik);
-        this.context.quadraticCurveTo(r, b, r - options.radPik, b);
-        this.context.lineTo(coordinate.x + options.radPik, b);
-        this.context.quadraticCurveTo(coordinate.x, b, coordinate.x, b - options.radPik);
-        this.context.lineTo(coordinate.x, coordinate.y + options.radPik);
-        this.context.quadraticCurveTo(coordinate.x, coordinate.y, coordinate.x + options.radPik, coordinate.y);
-
-        this.frameTextCoordinate.x = coordinate.x + size.width/2;
-        this.frameTextCoordinate.y = coordinate.y + size.height/2;
-        break;
-      };
-      case "Octogon": {
-        this.context.moveTo(coordinate.x, coordinate.y + (size.height/4));
-        this.context.lineTo(coordinate.x + (size.width/4), coordinate.y);
-        this.context.lineTo(coordinate.x + (size.width/1.7), coordinate.y);
-        this.context.lineTo(coordinate.x + (size.width/1.2), coordinate.y + (size.height/4));
-        this.context.lineTo(coordinate.x + (size.width/1.2), coordinate.y + (size.height/1.7));
-        this.context.lineTo(coordinate.x + (size.width/1.7), coordinate.y + (size.width/1.2));
-        this.context.lineTo(coordinate.x + (size.width/4), coordinate.y + (size.height/1.2));
-        this.context.lineTo(coordinate.x, coordinate.y + (size.height/1.7));
-        this.context.lineTo(coordinate.x, coordinate.y + (size.height/4));
-        this.context.lineTo(coordinate.x + (size.width/4), coordinate.y);
-        
-        this.frameTextCoordinate.x = coordinate.x + (size.width/1.2)/2;
-        this.frameTextCoordinate.y = coordinate.y + (size.height/1.2)/2;
-        break;
-      };
-      case "Pentagone": {
-        this.context.moveTo(coordinate.x, coordinate.y + size.height*0.35);
-        this.context.lineTo(coordinate.x + size.width/2, coordinate.y);
-        this.context.lineTo(coordinate.x + size.width, coordinate.y + size.height*0.35);
-        this.context.lineTo(coordinate.x + size.width*0.85, coordinate.y + size.height / 1.08);
-        this.context.lineTo(coordinate.x + size.width*0.15, coordinate.y + size.height / 1.08);
-        this.context.lineTo(coordinate.x, coordinate.y + size.height*0.35);
-        
-        this.frameTextCoordinate.x = coordinate.x + size.width/2;
-        this.frameTextCoordinate.y = coordinate.y + size.height/2;
-        break;
-      };
-      case "Circle": {
-        this.context.arc(coordinate.x + size.width / 2, coordinate.y + size.height / 2, size.width / 2, 0, 2 * Math.PI);
-        this.frameTextCoordinate.x = coordinate.x + size.width / 2;
-        this.frameTextCoordinate.y = coordinate.y + size.height / 2;
-        break;
-      };
-      case "SymmetricalStar": {
-        let rot = Math.PI / 2 * 3;
-        const spikes = options.radPik;
-        const step = Math.PI / spikes;
-        this.context.beginPath();
-
-        for (let i = 0; i < spikes; i++) {
-          let x = coordinate.x + size.width / 2 + Math.cos(rot) * size.width / 4;
-          let y = coordinate.y + size.height / 2 + Math.sin(rot) * size.height / 4;
-          this.context.lineTo(x, y);
-          rot += step;
-
-          x = coordinate.x + size.width / 2 + Math.cos(rot) * size.width / 2;
-          y = coordinate.y + size.height / 2 + Math.sin(rot) * size.height / 2;
-          this.context.lineTo(x, y);
-          rot += step;
-        }
-
-        this.frameTextCoordinate.x = coordinate.x + size.width / 2 + Math.cos(rot);
-        this.frameTextCoordinate.y = coordinate.y + size.height / 2 + Math.cos(rot);
-        this.context.closePath();
-        break;
-      };
-      case "Polygones": {
-        let rot = Math.PI / 2 * 3;
-        const spikes = options.radPik;
-        const step = Math.PI / spikes;
-        this.context.beginPath();
-
-        for (let i = 0; i < spikes; i++) {
-          let x = coordinate.x + size.width / 2 + Math.cos(rot) * size.width / 2;
-          let y = coordinate.y + size.height / 2 + Math.sin(rot) * size.height / 2;
-
-          this.context.lineTo(x, y);
-          rot += step;
-          this.context.lineTo(x, y);
-          rot += step;
-        }
-
-        this.frameTextCoordinate.x = coordinate.x + size.width / 2 + Math.cos(rot);
-        this.frameTextCoordinate.y = coordinate.y + size.height / 2 + Math.cos(rot);
-        this.context.closePath();
-        break;
-      }
-    };
+    // this.context.closePath();
     this.context.stroke();
     this.context.clip();
 
@@ -228,6 +136,103 @@ export default class NessBuilder {
       return this;
     }
   };
+  
+  private setShape<S extends Shape>(shape: S, frame: FrameOption<S>): this {
+
+    const axis = this.getAxis(frame);
+    frame.x = axis.x, frame.y = axis.y;
+    this.frameCoordinate = frame;
+
+
+    this.context.beginPath();
+
+    const radius = (["Square", "Rectangle"].includes(shape) && frame.QuadrilateralOprion)? frame.QuadrilateralOprion.radius : 15;
+    const sizeX = frame.QuadrilateralOprion?.width? frame.QuadrilateralOprion.width : frame.size;
+    const sizeY = frame.QuadrilateralOprion?.height? frame.QuadrilateralOprion.height : frame.size;
+
+    const r = frame.x + sizeX;
+    const b = frame.y + sizeY;
+
+    switch (shape) {
+      case "Square": {
+        this.context.moveTo(frame.x + radius - frame.size, frame.y - frame.size);
+        this.context.lineTo(r - radius, frame.y - frame.size);
+        this.context.quadraticCurveTo(r, frame.y - frame.size, r, frame.y + radius - frame.size);
+        this.context.lineTo(r, frame.y + frame.size - radius);
+        this.context.quadraticCurveTo(r, b, r - radius, b);
+        this.context.lineTo(frame.x + radius - frame.size, b);
+        this.context.quadraticCurveTo(frame.x - frame.size, b, frame.x - frame.size, b - radius);
+        this.context.lineTo(frame.x - frame.size, frame.y + radius - frame.size);
+        this.context.quadraticCurveTo(frame.x - frame.size, frame.y - frame.size, frame.x + radius - frame.size, frame.y - frame.size);
+
+        this.frameTextCoordinate = { x: frame.x, y: frame.y };
+        break;
+      }
+      case "Rectangle": {
+        const sizeX = frame.QuadrilateralOprion?.width? frame.QuadrilateralOprion.width : frame.x;
+        const r = frame.x + sizeX;
+
+        this.context.moveTo(frame.x + radius - sizeX, frame.y - sizeY);
+        this.context.lineTo(r - radius, frame.y - sizeY);
+        this.context.quadraticCurveTo(r, frame.y - sizeY, r, frame.y + radius - sizeY);
+        this.context.lineTo(r, frame.y + sizeY - radius);
+        this.context.quadraticCurveTo(r, b, r - radius, b);
+        this.context.lineTo(frame.x + radius - sizeX, b);
+        this.context.quadraticCurveTo(frame.x - sizeX, b, frame.x - sizeX, b - radius);
+        this.context.lineTo(frame.x - sizeX, frame.y + radius - sizeY);
+        this.context.quadraticCurveTo(frame.x - sizeX, frame.y - sizeY, frame.x + radius - sizeX, frame.y - sizeY);
+
+        this.frameTextCoordinate = { x: frame.x, y: frame.y };
+        break;
+      }
+      case "Circle": {
+        this.context.arc(frame.x, frame.y, frame.size , 0, 2 * Math.PI);
+        this.frameTextCoordinate = { x: frame.x, y: frame.y };
+        break;
+      }
+      default: {
+        const angle = (Math.PI * 2) / ShapeEnum[shape as keyof typeof ShapeEnum];
+
+        for (let i = 0; i <= ShapeEnum[shape as keyof typeof ShapeEnum]; i++) {
+          const x = frame.x + frame.size * Math.cos(angle * i);
+          const y = frame.y + frame.size * Math.sin(angle * i);
+        
+          if (i === 0) this.context.moveTo(x, y);
+          else this.context.lineTo(x, y);
+        };
+        this.frameTextCoordinate = { x: frame.x, y: frame.y };
+        break;
+      };
+      
+      // case "SymmetricalStar": {
+      //   let rot = Math.PI / 2 * 3;
+      //   const spikes = options.radPik;
+      //   const step = Math.PI / spikes;
+      //   this.context.beginPath();
+
+      //   for (let i = 0; i < spikes; i++) {
+      //     let x = frame.x + frame.size / 2 + Math.cos(rot) * frame.size / 4;
+      //     let y = frame.y + frame.size / 2 + Math.sin(rot) * frame.size / 4;
+      //     this.context.lineTo(x, y);
+      //     rot += step;
+
+      //     x = frame.x + frame.size / 2 + Math.cos(rot) * frame.size / 2;
+      //     y = frame.y + frame.size / 2 + Math.sin(rot) * frame.size / 2;
+      //     this.context.lineTo(x, y);
+      //     rot += step;
+      //   }
+
+      //   this.frameTextCoordinate.x = frame.x + frame.size / 2 + Math.cos(rot);
+      //   this.frameTextCoordinate.y = frame.y + frame.size / 2 + Math.cos(rot);
+      //   this.context.closePath();
+      //   break;
+      // };
+    };
+    
+    // this.context.closePath();
+    return this;
+  };
+
 
   // Définition du background du cadre
   private setFrameBackground(image: CanvasImage) {
