@@ -1,6 +1,6 @@
 import { writeFileSync } from "fs";
 import { Canvas, CanvasRenderingContext2D, Image } from "canvas";
-import { CanvasImage, CustomColor, Shape, ImagelocationOption, DrawlocationOption, FramelocationOption, FrameSizeOption, ExpLocationOption, ExpSizeOption, FrameOption, TextOption, NessBuilder } from "..";
+import { CanvasImage, CustomColor, Shape, ImagelocationOption, DrawlocationOption, FrameOption, ExpLocationOption, ExpSizeOption, FrameContent, TextOption, NessBuilder, FrameType } from "..";
 import { gifExtractor, progressBar } from "../function";
 
 const GIFEncoder = require('gif-encoder-2')
@@ -19,18 +19,20 @@ export default class GifBuilder {
   /**
    * canvas outline radius
    * @param radius The radius to set
+   * @param outline Line size (default 3)
+   * @param color Line color (default #FFFFFF)
    */
-  public setCornerRadius(radius: number): this {
-    this.framePlacement.push({id: 0, radius})
+  public setCornerRadius(radius: number, outline: number = 3, color: CustomColor = "#FFFFFF"): this {
+    this.framePlacement.push({id: 0, radius, outline, color})
     return this;
   };
 
   /**
    * Sets the canvas background.
-   * @param image The image to set (no link, use loadImage() from canvas)
+   * @param imageColor The image to set (no link, use loadImage() from canvas) or a custom color (Valid syntaxes: #hex | rgb | rgba | colorName | CanvasGradient | CanvasPattern)
    */
-  public setBackground(image: CanvasImage | `${string}`/*.gif*/) {
-    this.framePlacement.push({id: 1, image})
+  public setBackground(imageColor: CanvasImage | `${string}`/*.gif*/ | CustomColor): this {
+    this.framePlacement.push({id: 1, imageColor})
     return this;
   };
 
@@ -40,7 +42,7 @@ export default class GifBuilder {
    * @param imageOption Source image coordinates to draw in the context of Canvas
    * @param locationOption Modify image coordinates to draw in the context of Canvas
    */
-  public setImage(image: CanvasImage | `${string}`/*.gif*/, imageOption: ImagelocationOption, locationOption?: DrawlocationOption) {
+  public setImage(image: CanvasImage | `${string}`/*.gif*/, imageOption: ImagelocationOption, locationOption?: DrawlocationOption): this {
     this.framePlacement.push({id: 2, image, imageOption, locationOption})
     return this;
   };
@@ -52,8 +54,8 @@ export default class GifBuilder {
    * @param size Frame size
    * @param options Frame configuration
    */
-  public setFrame(typeShape: Shape, coordinate: FramelocationOption, size: FrameSizeOption, options?: FrameOption): this {
-    this.framePlacement.push({id: 3, typeShape, coordinate, size, options})
+  public setFrame<T extends FrameType, S extends Shape>(typeShape: Shape, coordinate: FrameOption<S>, options?: FrameContent<T>): this {
+    this.framePlacement.push({id: 3, typeShape, coordinate, options})
     return this;
   };
 
@@ -63,7 +65,7 @@ export default class GifBuilder {
    * @param coordinate Text location
    * @param option Text option
    */
-  public setText(text: string, coordinate: {x: number, y: number}, option: TextOption) {
+  public setText(text: string, coordinate: {x: number, y: number}, option: TextOption): this {
     this.framePlacement.push({id: 4, text, coordinate, option})
     return this;
   };
@@ -76,7 +78,7 @@ export default class GifBuilder {
    * @param cloneWidth Size of the second progression bar
    * @param color Text color (a degrade can be applied with <createRadialGradient | createLinearGradient] of the Canvas module), White color is used by Default
    */
-  public setExp(horizontal: boolean, location: ExpLocationOption, size: ExpSizeOption, radius: number, cloneWidth: number, color?: CustomColor) {
+  public setExp(horizontal: boolean, location: ExpLocationOption, size: ExpSizeOption, radius: number, cloneWidth: number, color?: CustomColor): this {
     this.framePlacement.push({id: 5, horizontal, location, size, radius, cloneWidth, color})
     return this;
   };
@@ -97,14 +99,16 @@ export default class GifBuilder {
 
       let imageData: Array<Image>;
 
-      if (!e.image && !e.options?.content?.imageOrText) continue;
-      if (/.gif$/.test(e.image || e.options?.content?.imageOrText)) {
-        imageData = await gifExtractor(e.image || e.options?.content?.imageOrText)
+      if (!e.image && !e.options?.content?.imageOrText && e.imageColor) continue;
+      if (/.gif$/.test(e.image || e.options?.content?.imageOrText || e.imageColor)) {
+        imageData = await gifExtractor(e.image || e.options?.content?.imageOrText || e.imageColor)
+      } else if (e.imageColor && typeof e.imageColor !== "object") {
+        continue;
       } else {
-        imageData = e.image || e.options?.content?.imageOrText;
+        imageData = e.image || e.options?.content?.imageOrText || e.imageColor
       };
 
-      data.length < imageData.length && data.length !== 0 && typeof data == "object" && (typeof e.image?.length !== undefined || typeof e.options?.content?.imageOrText?.length !== 'undefined')? "" : data.length = imageData.length;
+      data.length < imageData.length && data.length !== 0 && typeof data == "object" && (typeof e.image?.length !== undefined || typeof e.imageColor?.length !== undefined || typeof e.options?.content?.imageOrText?.length !== 'undefined')? "" : data.length = imageData.length;
 
       switch (e.id) {
         case 1: {
@@ -131,11 +135,13 @@ export default class GifBuilder {
       for (const e of this.framePlacement) {
         switch (e.id) {
           case 0: {
-            builder.setCornerRadius(e.radius);
+            builder.setCornerRadius(e.radius, e.outline, e.color);
             break;
           };
           case 1: {
-            if (!data.setBackground[0].complete) {
+            if (!data.setBackground[0].complete && !data.setBackground[0][i]) {
+              builder.setBackground(e.imageColor);
+            } else if (!data.setBackground[0].complete) {
               builder.setBackground(data.setBackground[0][i]);
             } else {
               builder.setBackground(data.setBackground[0]);
@@ -154,10 +160,10 @@ export default class GifBuilder {
           case 3: {
             if (!data.setFrame[z].complete) {
               e.options.content.imageOrText = data.setFrame[z][i];
-              builder.setFrame(e.typeShape, e.coordinate, e.size, e.options);
+              builder.setFrame(e.typeShape, e.coordinate, e.size);
             } else {
               e.options.content.imageOrText = data.setFrame[z];
-              builder.setFrame(e.typeShape, e.coordinate, e.size, e.options);
+              builder.setFrame(e.typeShape, e.coordinate, e.size);
             };
             z++;
             break;

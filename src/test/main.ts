@@ -1,101 +1,77 @@
-import { gifVersion, loadImage } from "canvas";
-import { CustomProfile, Edge, FilterBuilder, GifBuilder, ImageChannels, NessBuilder } from "..";
-import { gifExtractor } from "../function"
+import { Canvas, CanvasGradient, gifVersion, loadImage, registerFont } from "canvas";
+import { Axis, CustomProfile, Edge, FilterBuilder, ImageChannels, NessBuilder, Progress } from "..";
+import { colorCheck, gifExtractor } from "../function"
+import { writeFileSync } from "fs";
 // import RankupBuilder from "../Managers/RankupBuilder";
 // import {canvasGif} from '../Managers/test';
 // const fs = require('fs');
 // const path = require('path');
 
 async function test() {
-  const background = await loadImage('https://media.discordapp.net/attachments/1006600590408818810/1006600665298116728/background-3147808.jpg');
-  
+  // const canvas = new Canvas(400, 400);
+    
+  // const ctx = canvas.getContext('2d');
+
+  // // Coordonnées du centre du cercle et rayon
+  // const centerX = 200;
+  // const centerY = 200
+  // const angle = Math.PI/5;
+
+  // ctx.strokeStyle = "white"
+  // ctx.lineWidth = 3;
+
+  // ctx.moveTo(centerX, centerY);
+  // ctx.lineTo(200 + (100/2) * Math.cos(angle * 4) , 200);
+  // ctx.stroke()
+
+  // writeFileSync("./test.png", ctx.canvas.toBuffer());
+
+
+
+
+
   const avatar = await loadImage('https://media.discordapp.net/attachments/758031322244710601/1000153437813616650/perso_anime_U565bW7EhY2InkF.png');
+  // const canvas = new Canvas(400, 400);
 
-  // const rank = await loadImage('https://cdn.discordapp.com/attachments/1006600590408818810/1006600664929030255/background-2412739.jpg?size=4096')
+  // const centerX = 200;
+  // const centerY = 200;
+  // const radius = 100;
+  const builder = new NessBuilder(400, 400)
+  // // .setLoading("Circle", { x: 200, y:200, size: 100, outline: { color: "#00FF00", width: 15 }, progress: 50, color: "#8b4513"})
+  // .setAxis("TopLeft")
+  // .setFrame("Rectangle", { x: 200, y: 200, size: 50 }, { type: "Text", color: "Brown", content: "TL", textOptions: { size: 50 } })
+  // .setAxis("TopRight")
+  // .setFrame("Rectangle", { x: 200, y: 200, size: 50 }, { type: "Text", color: "Brown", content: "TR", textOptions: { size: 50 } })
+  // .setAxis("TopCenter")
+  // .setFrame("Rectangle", { x: 200, y: 200, size: 50 }, { type: "Text", color: "Brown", content: "T", textOptions: { size: 50 } })
+  // .setAxis("BottomLeft")
+  // .setFrame("Rectangle", { x: 200, y: 200, size: 50 }, { type: "Text", color: "Brown", content: "BL", textOptions: { size: 50 } })
+  // .setAxis("BottomRight")
+  // .setFrame("Rectangle", { x: 200, y: 200, size: 50 }, { type: "Text", color: "Brown", content: "BR", textOptions: { size: 50 } })
+  // .setAxis("BottomCenter")
+  // .setFrame("Rectangle", { x: 200, y: 200, size: 50 }, { type: "Text", color: "Brown", content: "B", textOptions: { size: 50 } })
+  // .setAxis("Left")
+  // .setFrame("Rectangle", { x: 200, y: 200, size: 50 }, { type: "Text", color: "Brown", content: "L", textOptions: { size: 50 } })
+  // .setAxis("Right")
+  // .setFrame("Rectangle", { x: 200, y: 200, size: 50 }, { type: "Text", color: "Brown", content: "R", textOptions: { size: 50 } })
+  .setAxis("Center")
+  .setFrame("Square", { x: 200, y: 200, size: 100, rotate: 100 }, { type: "Image", color: "Gray", content: avatar })
+  .setFrame("Heptagon", { x: 200, y: 200, size: 100 }, { type: "Text", color: "Green", content: "O", textOptions: { size: 50 } })
+// .setAxis(Axis.Center)
 
-  // const filter = new FilterBuilder(avatar)
-  // await filter.Invert();
+  // const builder = new NessBuilder(250, 110);
+  // const gradient = builder.context.createLinearGradient(55, 5, 105, 55);
+  // gradient.addColorStop(0, "magenta");
+  // gradient.addColorStop(0.5, "yellow");
+  // gradient.addColorStop(1.0, "red");
 
-  
-  // const web = await loadImage("./assets/image/background/web-3876081.jpg")
-  const gif = "./assets/image/gif/stickMan.gif"
-  const gif2 = "./assets/image/gif/tvHS.gif"
-  const image = await loadImage('https://upload.wikimedia.org/wikipedia/commons/9/9a/Gull_portrait_ca_usa.jpg');
+  // builder.setFrame("Octagon", { x: 5, y: 5, size: 50 }, { type: "Color", color: "Aquamarine", content: "Coral" })
+  // .setFrame("Square", { x: 65, y: 5, size: 50, QuadrilateralOprion: { radius: 15 } }, { type: "Empty", color: gradient, content: "Empty" })
+  // .setFrame("Circle", { x: 125, y: 5, size: 50 }, { type: "Text", color: "#A52A2A", content: "HI", textOptions: { size: 20, color: "rgb(0,230,100)" }})
+  // .setFrame("Nonagon", { x: 185, y: 5, size: 50 }, { type: "Text", color: "Blue", content: "YO", textOptions: { size: 20, color: "rgba(255,230,255,1)", backgroundColor: "HotPink" }})
+  // .setFrame("Triangle", { x: 5, y: 55, size: 50 }, { type: "Image", color: "rgb(0,230,100)", content: avatar })
+  .generatedTo(".", "test", "png")
 
-  const builder = new GifBuilder(700, 250)
-  .setCornerRadius(15)
-  .setBackground(background) // Add Background
-  .setImage(gif, {sx: 250, sy: 25, sWidth: 250, sHeight: 150})
-  .setFrame("Square", { x: 25, y:25 }, { width: 150, height: 150 }, { content: {imageOrText: avatar}})
-  .setFrame("Circle", { x: 500, y: 50 }, { width: 150, height: 150 }, { content: {imageOrText: image}})
-  .setFrame("Pentagone", { x: 300, y: 100 }, { width: 150, height: 150 }, { content: {imageOrText: gif2}})
-  // .setFrame("Polygones", { x: 550, y:25 }, { width: 130, height: 130 }, {radPik: 6, content: { imageOrText: 33, textOptions: { font: "sans-serif", size: 80, color: "#000000", textAlign: "center", textBaseline: "middle" }}})
-  // .setExp(false, {x: 45, y: 200}, {width: 655, height: 30}, 20, 65)
-  // .setText('Hello World!', {x:350, y:100}, {size: 40, font: 'Impact'})
-
-  await builder.generatedTo(".", "test")
-  // console.log(await builder.toDataURL())
-  // console.log(await builder.toBuffer())
-
-  // const background = await loadImage('https://media.discordapp.net/attachments/1006600590408818810/1006600665298116728/background-3147808.jpg');
-  // const avatar = await loadImage('https://media.discordapp.net/attachments/758031322244710601/1000153437813616650/perso_anime_U565bW7EhY2InkF.png');
-  
-
-  // const ness = new NessBuilder(700, 250) // Set Image format
-  // .setCornerRadius(15) // round the edges of the image
-  // .setBackground(background) // Add Background
-  // .setFrame("Square", { x: 25, y:25 }, { width: 150, height: 150 }, { radPik: 15, content: {imageOrText: avatar}}) // Add image in a square frame
-  // .setFrame("Polygones", { x: 550, y:25 }, { width: 130, height: 130 }, {radPik: 6, content: { imageOrText: image }}) // Write "33" in a polygones frame
-  // .setExp(false, {x: 45, y: 200}, {width: 655, height: 30}, 20, 65) // Draw an experience bar
-  // .setText('Hello World!', {x:350, y:100}, {size: 40, font: 'Impact'}) // Write "Hello World!"
-  // .generatedTo('.', "test", "png");
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// const file = fs.readFileSync(path.resolve(__dirname, 'TalkativeBigBunting-size_restricted.gif'));
-
-// canvasGif(
-// 	file,
-// 	(ctx, width, height, totalFrames, currentFrame) => {
-// 		console.log(`Rendered frame ${currentFrame}`);
-// 	},
-// 	{
-// 		coalesce: false, // whether the gif should be coalesced first (requires graphicsmagick), default: false
-// 		delay: 0, // le délai entre chaque trame en ms, default: 0
-// 		repeat: 0, // how many times the GIF should repeat, default: 0 (runs forever)
-// 		algorithm: "neuquant", // the algorithm the encoder should use, default: 'neuquant',
-// 		optimiser: true, // whether the encoder should use the in-built optimiser, default: false,
-// 		fps: 30, // the amount of frames to render per second, default: 60
-// 		quality: 100, // the quality of the gif, a value between 1 and 100, default: 100
-// 	}
-// ).then((buffer) =>
-// 	fs.writeFileSync(path.resolve(__dirname, 'output2.gif'), buffer)
-// );
 }
 
 test();
