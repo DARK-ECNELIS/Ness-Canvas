@@ -143,6 +143,7 @@ export default class NessBuilder {
     frame.x = axis.x, frame.y = axis.y;
     this.frameCoordinate = frame;
 
+    if (frame.rotate) this.setRotation(frame.x , frame.y , frame.rotate);
 
     this.context.beginPath();
 
@@ -233,6 +234,11 @@ export default class NessBuilder {
     return this;
   };
 
+  private setRotation(centerX: number, centerY: number, angle: number) {
+    this.context.translate(centerX, centerY);
+    this.context.rotate((angle * Math.PI)/180)
+    this.context.translate(-centerX, -centerY);
+  };
 
   // Définition du background du cadre
   private setFrameBackground(image: CanvasImage) {
