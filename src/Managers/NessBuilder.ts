@@ -130,13 +130,25 @@ export default class NessBuilder {
     this.context.stroke();
     this.context.clip();
 
-    if (typeof options?.content?.imageOrText == "object") {
-      return this.setFrameBackground(options.content.imageOrText);
-    } else if (typeof options?.content?.imageOrText == "string" || typeof options?.content?.imageOrText == "number") {
+    if (options.type == "Image") {
+      return this.setFrameBackground(<CanvasImage>options.content);
+    } else if (options.type == "Text") {
+      const textOptions = options.textOptions;
+
+      if (textOptions?.backgroundColor) {
+        this.context.fillStyle = colorCheck(textOptions.backgroundColor);
+        this.context.fill();
+      };
       this.restore();
+
+      this.setText(options.content.toString(), { x: this.frameTextCoordinate.x, y: this.frameTextCoordinate.y }, { size: textOptions.size, font: textOptions.font? textOptions.font : "*Arial" , color: textOptions.color? colorCheck(textOptions.color) : "#FFFFFF", textAlign: textOptions.textAlign? textOptions.textAlign : "center", textBaseline: textOptions.textBaseline? textOptions.textBaseline : "middle" });
       
-      this.setText(options.content.imageOrText.toString(), { x: this.frameTextCoordinate.x, y: this.frameTextCoordinate.y }, { size: options.content?.textOptions?.size, font: 'sans-serif', color: options.content.textOptions.color, textAlign: options.content?.textOptions?.textAlign, textBaseline: options.content?.textOptions?.textBaseline });
-      
+      return this;
+    } else if (options.type == "Color") {
+      this.context.fillStyle = colorCheck(<CustomColor>options.content);
+
+      this.context.fill();
+      this.restore();
       return this;
     } else {
       this.restore();
