@@ -1,6 +1,7 @@
 import { writeFileSync } from "fs";
 import { Canvas, CanvasRenderingContext2D, registerFont } from "canvas";
-import type { CanvasImage, CustomColor, ImageExtention, Shape, ImagelocationOption, DrawlocationOption, FramelocationOption, FrameSizeOption, ExpLocationOption, ExpSizeOption, FrameOption, TextOption, RegisterFont } from "..";
+import { CanvasImage, CustomColor, ImageExtention, Shape, ImagelocationOption, DrawlocationOption, ExpLocationOption, ExpSizeOption, FrameOption, TextOption, FontOption, CustomFont, FrameContent, FrameType, ShapeEnum, LoadingOption, ShapeLoad, Axis } from "..";
+import { colorCheck } from "../function";
 
 export default class NessBuilder {
   
@@ -15,9 +16,9 @@ export default class NessBuilder {
   private axis: Axis;
   private frameCoordinate: FrameOption<Shape>;
   private frameTextCoordinate = { x: 0, y: 0};
+  private fontData: CustomFont = [];
 
   constructor(width: number, height: number) {
-    
     this.setCanvas(width, height);
     this.context = this.canvas.getContext('2d');
   };
@@ -47,9 +48,11 @@ export default class NessBuilder {
    * canvas outline radius
    *
    * @param radius The radius to set
+   * @param outline Line size (default 3)
+   * @param color Line color (default #FFFFFF)
    */
-  public setCornerRadius(radius: number): this {
-    this.context.lineWidth = 3;
+  public setCornerRadius(radius: number, outline: number = 3, color: CustomColor = "#FFFFFF"): this {
+    this.context.lineWidth = outline;
     this.context.strokeStyle = colorCheck(color)
     
     this.context.moveTo(2 + radius, 2);
@@ -70,11 +73,15 @@ export default class NessBuilder {
 
   /**
    * Sets the canvas background.
-   * @param image The image to set (no link, use loadImage() from canvas)
+   * @param imageColor The image to set (no link, use loadImage() from canvas) or a custom color (Valid syntaxes: #hex | rgb | rgba | colorName | CanvasGradient | CanvasPattern)
    */
-  public setBackground(image: CanvasImage) {
-    this.setImage(image, { sx: 0, sy: 0, sWidth: this.canvas.width, sHeight: this.canvas.height })
-    
+  public setBackground(imageColor: CanvasImage | CustomColor): this {
+    if (typeof imageColor == "object") {
+      this.setImage(<CanvasImage>imageColor, { sx: 0, sy: 0, sWidth: this.canvas.width, sHeight: this.canvas.height })
+    } else {
+      this.context.fillStyle = colorCheck(imageColor)
+      this.context.fillRect(0, 0, this.canvas.width, this.canvas.height)
+    }
     return this;
   };
 
@@ -85,7 +92,7 @@ export default class NessBuilder {
    * @param imageOption Source image coordinates to draw in the context of Canvas
    * @param locationOption Modify image coordinates to draw in the context of Canvas
    */
-  public setImage(image: CanvasImage, imageOption: ImagelocationOption, locationOption?: DrawlocationOption) {
+  public setImage(image: CanvasImage, imageOption: ImagelocationOption, locationOption?: DrawlocationOption): this {
 
     if (locationOption) {
       this.context.drawImage(image, locationOption.dx, locationOption.dy, locationOption.dWidth, locationOption.dHeight, imageOption.sx, imageOption.sy, imageOption.sWidth, imageOption.sHeight)
@@ -241,8 +248,20 @@ export default class NessBuilder {
   };
 
   // Définition du background du cadre
-  private setFrameBackground(image: CanvasImage) {
-    this.setImage(image, {sx: this.frameCoordinate.x, sy: this.frameCoordinate.y, sWidth: this.frameCoordinate.w, sHeight: this.frameCoordinate.h});
+  private setFrameBackground(image: CanvasImage): this {
+
+    this.setRotation(this.frameCoordinate.x , this.frameCoordinate.y , -this.frameCoordinate.rotate);
+
+    while (this.frameCoordinate.rotate > 45 || this.frameCoordinate.rotate < -45) {
+      if (this.frameCoordinate.rotate > 0) this.frameCoordinate.rotate -= 45;
+      else this.frameCoordinate.rotate = -this.frameCoordinate.rotate;
+    }
+
+    const size = this.frameCoordinate.rotate? 0.009 * this.frameCoordinate.rotate : 0;
+    const size2 = this.frameCoordinate.rotate? 0.018 * this.frameCoordinate.rotate : 0;
+
+    
+    this.setImage(image, {sx: this.frameCoordinate.x - this.frameCoordinate.size*(1 + size), sy: this.frameCoordinate.y - this.frameCoordinate.size*(1 + size), sWidth: this.frameCoordinate.size*(2 + size2), sHeight: this.frameCoordinate.size*(2 + size2) });
 
     this.context.restore();
 
@@ -297,9 +316,9 @@ export default class NessBuilder {
    * @param size Size of the first progression bar
    * @param radius Radius to set
    * @param cloneWidth Size of the second progression bar
-   * @param color Text color (a degrade can be applied with <createRadialGradient | createLinearGradient] of the Canvas module), White color is used by Default
+   * @param color Text color. White color is used by Default
    */
-  public setExp(horizontal: boolean, location: ExpLocationOption, size: ExpSizeOption, radius: number, cloneWidth: number, color?: CustomColor) {
+  public setExp(horizontal: boolean, location: ExpLocationOption, size: ExpSizeOption, radius: number, cloneWidth: number, color?: CustomColor): this {
     
     this.context.save();
     this.context.beginPath();
@@ -363,7 +382,7 @@ export default class NessBuilder {
 
       // Barre N°2
       this.context.beginPath();
-      this.context.strokeStyle = color? color : "#000000";
+      this.context.strokeStyle = color? colorCheck(color) : "#000000";
       this.context.lineWidth = 2;
       
       this.context.moveTo(location.x + size.height, location.y);
@@ -405,7 +424,7 @@ export default class NessBuilder {
   /**
    * Return canvas Buffer
    */
-  public toBuffer() {
+  public toBuffer(): Buffer {
     return this.canvas.toBuffer();
   };
 
