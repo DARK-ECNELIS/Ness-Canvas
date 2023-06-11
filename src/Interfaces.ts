@@ -1,4 +1,4 @@
-import { CanvasImage, CustomColor } from ".";
+import { CanvasImage, CustomColor, FrameType, Progress, Shape } from ".";
 
 /**
  * Source image coordinates to draw in the context of Canvas.
@@ -47,7 +47,7 @@ export interface DrawlocationOption {
 /**
  * Coordinates to draw frame in Canvas.
  */
-export interface FramelocationOption {
+export interface FrameOption <S extends Shape> {
   /**
    * Coordinate X from the upper left corner of the frame to draw in the canvas.
    */
@@ -56,20 +56,70 @@ export interface FramelocationOption {
    * Coordinate Y from the upper left corner of the frame to draw in the canvas.
    */
    y: number;
+   /**
+    * Frame size
+    */
+   size: number;
+   /**
+    * Pivot the frame of a certain degree
+    */
+   rotate?: number;
+   /**
+    * Additional parameter for the square and Rectangle
+    */
+   QuadrilateralOprion?: S extends "Square" | "Rectangle" ? {
+      /**
+       * Corner Radius
+       */
+      radius: number,
+      /**
+       * Replace Size parameter for axis x (only for the Rectangular Shape)
+       */
+      width?: S extends "Rectangle"? number : never;
+      /**
+       * Replace Size parameter for axis y (only for the Rectangular Shape)
+       */
+      height?: S extends "Rectangle"? number : never;
+   } : never
 }
 
 /**
- * Coordinates to draw frame in Canvas.
+ * Frame configuration
  */
-export interface FrameSizeOption {
-  /**
-   * frame width
-   */
-   width: number;
-  /**
-   * frame height
-   */
-   height: number;
+export interface FrameContent <T extends FrameType> {
+   /**
+    * Type of frame content to use
+    */
+   type: T,
+   /**
+    * Image, text or color to be placed in the frame
+    */
+   content: T extends "Image"? CanvasImage : T extends "Text"? string | number : T extends "Color"? CustomColor : "Empty",
+   /**
+    * Text configuration (not used if imageOrText is a CanvasImage)
+    */
+   textOptions?: T extends "Text" ? TextOption : never;
+   /**
+    * Frame line color (a degrade can be applied with [createRadialGradient | createLinearGradient] of canvas module)
+    */
+   color: CustomColor,
+   /**
+    * Frame line size
+    */
+   lineWidth?: number
+}
+
+export interface LoadingOption {
+   x: number;
+   y: number;
+   size: number;
+   rotate?: number;
+   color: CustomColor;
+   progress: Progress;
+   outline: {
+      width: number;
+      color: CustomColor;
+   }
 }
 
 /**
@@ -101,46 +151,6 @@ export interface ExpSizeOption {
 }
 
 /**
- * Frame configuration
- */
-export interface FrameOption {
-   /**
-    * Dépend du shape utiliser
-    * - Square => Outline radius
-    * - SymmetricalStar => Number of summits
-    * - Polygones => Number of sides
-    * ignored for others frames
-    */
-   radPik?: number,
-   /**
-    * Frame content configuration
-    */
-   content?: {
-      /**
-       * Image or text to be placed in the frame
-       */
-      imageOrText: CanvasImage | number | string /* | `${string}.gif`*/,
-      /**
-       * Text configuration (not used if imageOrText is a CanvasImage)
-       */
-      textOptions?: TextOption
-   },
-   /**
-    * Frame outline configuration
-    */
-   outline?: {
-      /**
-       * Frame color (a degrade can be applied with [createRadialGradient | createLinearGradient] of canvas module)
-       */
-      color: CustomColor,
-      /**
-       * Frame line size
-       */
-      lineWidth?: number
-   }
-}
-
-/**
  * Text configuration
  */
 export interface TextOption {
@@ -149,14 +159,17 @@ export interface TextOption {
     */
    size: number,
    /**
-    *  system font name | register font name
+    *  change font to use (add * for use font system) example: *Arial or 
     */
-   font: string | RegisterFont,
+   font?: string,
    /**
     * Text color (a degrade can be applied with <createRadialGradient | createLinearGradient] of the Canvas module), White color is used by Default
     */
    color?: CustomColor,
-
+   /**
+    * Background of text color (a degrade can be applied with <createRadialGradient | createLinearGradient] of the Canvas module), White color is used by Default
+    */
+   backgroundColor?: CustomColor,
    /**
     * write text with no fill (Color change for white and not compatible with number)
     */
@@ -171,27 +184,17 @@ export interface TextOption {
    textBaseline?: "top" | "hanging" | "middle" | "alphabetic" | "ideographic" | "bottom"
 }
 
-export interface RegisterFont {
-
+export interface FontOption {
    /**
-    * Path to font file (file.ttf)
+    * Default name to use
     */
-   path: string,
+   family: string,
    /**
-    * Default option
+    * Default font size
     */
-   option: {
-      /**
-       * Default name to use
-       */
-      family: string,
-      /**
-       * Default font size
-       */
-      weight?: string,
-      /**
-       * Default police style
-       */
-      style?: "italic" | "normal" | "oblique" | "inherit" | "initial" | "unset"
-   }
+   size?: string,
+   /**
+    * Default police style
+    */
+   style?: "italic" | "normal" | "oblique" | "inherit" | "initial" | "unset"
 }
