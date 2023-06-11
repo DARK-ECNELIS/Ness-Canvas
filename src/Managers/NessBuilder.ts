@@ -13,6 +13,7 @@ export default class NessBuilder {
   };
 
   private frameCoordinate = { x: 0, y: 0, w: 0, h: 0 };
+  private axis: Axis;
   private frameTextCoordinate = { x: 0, y: 0};
 
   constructor(width: number, height: number) {
@@ -370,6 +371,24 @@ export default class NessBuilder {
 
     this.context.restore();
     return this;
+  };
+
+  public setAxis(axis: Axis): this {
+    this.axis = axis;
+    return this;
+  };
+
+  private getAxis<S extends Shape>(frame: FrameOption<S>) {
+    // Problème avec le rectangle
+    if (this.axis == "TopLeft") return { x: frame.x - frame.size, y: frame.y - frame.size };
+    else if (this.axis == "TopCenter") return { x: frame.x, y: frame.y - frame.size };
+    else if (this.axis == "TopRight") return { x: frame.x + frame.size, y: frame.y - frame.size };
+    else if (this.axis == "BottomLeft") return { x: frame.x - frame.size, y: frame.y + frame.size };
+    else if (this.axis == "BottomCenter") return { x: frame.x, y: frame.y + frame.size };
+    else if (this.axis == "BottomRight") return { x: frame.x + frame.size, y: frame.y + frame.size };
+    else if (this.axis == "Left") return { x: frame.x - frame.size, y: frame.y };
+    else if (this.axis == "Right") return { x: frame.x + frame.size, y: frame.y };
+    else return { x: frame.x, y: frame.y };
   };
 
   /**
