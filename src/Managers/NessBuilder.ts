@@ -456,6 +456,64 @@ export default class NessBuilder {
     return this;
   };
 
+  public setLoading(shape: ShapeLoad, option: LoadingOption): this {
+    this.context.save();
+
+    const progress = option.progress/100;
+    const endAngle = progress * 2 * Math.PI;
+    const width = option.outline.width? option.outline.width : 5;
+
+    this.context.beginPath();
+    this.context.lineWidth = width
+
+    switch (shape) {
+      case "Circle": {
+        this.context.arc(option.x, option.y, option.size, 0, 2*Math.PI);
+        // this.context.fill();
+        // this.context.stroke();
+        break;
+      };
+    };
+
+    this.context.closePath()
+
+
+    // this.context.restore();
+    this.context.clip();
+    this.context.beginPath();
+  
+    // this.context.stroke()
+    this.context.strokeStyle = option.color? colorCheck(option.color): "#FF0000";
+
+ 
+    this.context.moveTo(option.x, option.y);
+    // this.context.lineTo(option.x + radius, option.y);
+  
+  
+    this.context.fillStyle = option.color? colorCheck(option.color) : "#FF0000";
+    this.context.arc(option.x, option.y, option.size/*-width/2*/*1.5, 0, endAngle);
+    this.context.fill()
+    
+    this.context.closePath()
+
+    this.context.beginPath();
+    this.context.strokeStyle = option.outline.color? colorCheck(option.outline.color) : "#FF0000";
+    this.context.fillStyle = option.color? colorCheck(option.color)+"60" : "#FF000060";
+    switch (shape) {
+      case "Circle": {
+        this.context.arc(option.x, option.y, option.size, 0, 2*Math.PI);
+        this.context.fill();
+        this.context.stroke();
+        break;
+      };
+    };
+
+    this.context.closePath()
+    this.context.restore();
+    return this;
+  };
+
+
   public setAxis(axis: Axis): this {
     this.axis = axis;
     return this;
