@@ -1,6 +1,6 @@
 import { writeFileSync } from "fs";
 import { Canvas, CanvasRenderingContext2D, registerFont } from "canvas";
-import { CanvasImage, CustomColor, ImageExtention, Shape, ImagelocationOption, DrawlocationOption, ExpLocationOption, ExpSizeOption, FrameOption, TextOption, FontOption, CustomFont, FrameContent, FrameType, ShapeEnum, LoadingOption, ShapeLoad, Axis } from "..";
+import { CanvasImage, CustomColor, ImageExtention, Shape, ImagelocationOption, DrawlocationOption, ExpLocationOption, ExpSizeOption, FrameOption, TextOption, CustomFont, FrameContent, FrameType, ShapeEnum, LoadingOption, ShapeLoad, Axis } from "..";
 import { colorCheck } from "../function";
 
 export default class NessBuilder {
@@ -115,12 +115,7 @@ export default class NessBuilder {
    */
   public setFrame<T extends FrameType, S extends Shape>(shape: S, frame: FrameOption<S>, options: FrameContent<T>): this {
 
-    // ["Square", "Rectangle"].includes(shape)? frame.QuadrilateralOprion? "" : frame.QuadrilateralOprion.radius = 15 : "";
-    
-    // Sauvegarde de la position et taille du frame
-    // this.frameCoordinate = frame;
     this.context.save();
-
     this.context.strokeStyle = options.color? colorCheck(options.color) : "#FF0000";
     this.context.lineWidth = options.lineWidth? options.lineWidth : 3;
    
@@ -156,6 +151,7 @@ export default class NessBuilder {
     }
   };
   
+  // Mise en palce d'un cadre
   private setShape<S extends Shape>(shape: S, frame: FrameOption<S>): this {
 
     const axis = this.getAxis(frame);
@@ -253,6 +249,7 @@ export default class NessBuilder {
     return this;
   };
 
+  // Tourner l'élément
   private setRotation(centerX: number, centerY: number, angle: number) {
     this.context.translate(centerX, centerY);
     this.context.rotate((angle * Math.PI)/180)
@@ -311,6 +308,7 @@ export default class NessBuilder {
     return this;
   };
 
+  // Récupère une police enregistrer hormis celle du système
   private getFont(name: string, option?: { path?: `${string}.ttf` }): boolean {
     const dataF = this.fontData.find(x => x.font.family === name)
     if (option?.path) {
@@ -509,7 +507,7 @@ export default class NessBuilder {
     };
 
     this.context.closePath()
-    this.context.restore();
+    this.restore();
     return this;
   };
 
@@ -519,8 +517,9 @@ export default class NessBuilder {
     return this;
   };
 
+  // Change l'axe par default du cadre donné
   private getAxis<S extends Shape>(frame: FrameOption<S>) {
-    // Problème avec le rectangle
+    
     if (this.axis == "TopLeft") return { x: frame.x - frame.size, y: frame.y - frame.size };
     else if (this.axis == "TopCenter") return { x: frame.x, y: frame.y - frame.size };
     else if (this.axis == "TopRight") return { x: frame.x + frame.size, y: frame.y - frame.size };
