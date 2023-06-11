@@ -42,7 +42,7 @@ export default class NessBuilder {
    */
   public setCornerRadius(radius: number): this {
     this.context.lineWidth = 3;
-    this.context.strokeStyle = "#FFFFFF"
+    this.context.strokeStyle = colorCheck(color)
     
     this.context.moveTo(2 + radius, 2);
     this.context.lineTo((this.canvasSize.width - 2) - radius, 2);
@@ -113,8 +113,8 @@ export default class NessBuilder {
 
     const r = coordinate.x + size.width;
     const b = coordinate.y + size.height;
-    this.context.strokeStyle = options.outline? options.outline.color : "#FF0000";
     this.context.lineWidth = options.outline?.lineWidth? options.outline.lineWidth : 3;
+    this.context.strokeStyle = options.color? colorCheck(options.color) : "#FF0000";
 
     switch (typeShape) {
       case "Square": {
@@ -251,7 +251,7 @@ export default class NessBuilder {
     };
 
     this.context.font = `${option.size}px ${option.font}`;
-    this.context.fillStyle = option.color ? option.color : "#FFF";
+    this.context.fillStyle = option.color ? colorCheck(option.color) : "#FFF";
     this.context.textAlign = option.textAlign;
     this.context.textBaseline = option.textBaseline;
     option.stroke ? this.context.strokeText(text, coordinate.x, coordinate.y) : this.context.fillText(text, coordinate.x, coordinate.y);
@@ -291,7 +291,7 @@ export default class NessBuilder {
     
     this.context.save();
     this.context.beginPath();
-    this.context.strokeStyle = color? color : "#FF0000";
+    this.context.strokeStyle = color? colorCheck(color) : "#FF0000";
     this.context.lineWidth = 0.1;
 
     if (!horizontal) {
@@ -316,7 +316,7 @@ export default class NessBuilder {
 
       // Barre N°2
       this.context.beginPath();
-      this.context.strokeStyle = color? color : "#000000";
+      this.context.strokeStyle = color? colorCheck(color) : "#000000";
       this.context.lineWidth = 2;
       
       this.context.moveTo(location.x, location.y);
