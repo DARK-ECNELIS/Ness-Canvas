@@ -275,13 +275,9 @@ export default class NessBuilder {
    * @param coordinate Text location
    * @param option Text option
    */
-  public setText(text: string, coordinate: {x: number, y: number}, option: TextOption) {
+  public setText(text: string, coordinate: {x: number, y: number}, option: TextOption): this {
+    this.setFont(option.font, option.size);
 
-    if (typeof option.font !== "string") {
-      this.setFont(option.font.path, option.font.option)
-    };
-
-    this.context.font = `${option.size}px ${option.font}`;
     this.context.fillStyle = option.color ? colorCheck(option.color) : "#FFF";
     this.context.textAlign = option.textAlign;
     this.context.textBaseline = option.textBaseline;
@@ -289,17 +285,62 @@ export default class NessBuilder {
 
     return this;
   };
+  
+  /**
+   * Change font to use
+   * 
+   * @param name Add * to use the system font (*Arial) or CustomFont (RegisterFont)
+   * @param size Font size
+   */
+  public setFont(name: string, size?: number): this {
+    if (this.getFont(name)) {
+      this.context.font = `${size}px ${name.replace("*", "")}`;
+    };
+    return this;
+  };
+
+  private getFont(name: string, option?: { path?: `${string}.ttf` }): boolean {
+    const dataF = this.fontData.find(x => x.font.family === name)
+    if (option?.path) {
+      const dataP = this.fontData.find(x => x.file === option.path)
+  
+      if (dataP) {
+        console.error(`\x1b[33mRegisterFont: \x1b[32mThis file (\x1b[31m${option.path.replace(/^.*[\\/]/, "")}\x1b[32m) has already been register for \x1b[35m${dataP.font.family}\x1b[0m`);
+        return false;
+      } else if (dataF) {
+        console.error(`\x1b[33mRegisterFont: \x1b[32mThis name (\x1b[31m${dataF.font.family}\x1b[32m) has already been register for \x1b[35m${dataF.file.replace(/^.*[\\/]/, "")}\x1b[0m`);
+        return false;
+      }
+
+      return true;
+    } else {
+      if (!dataF && !name.startsWith('*')) {
+        console.error(`\x1b[33mRegisterFont: \x1b[31m${name} \x1b[32mis not part of the police register\x1b[0m`);
+        return false;
+      }
+
+      return true;
+    }
+  }
 
   /**
-   * Set new font
+   * register a new font
    * 
    * @param path Path to font file (file.ttf)
-   * @param option Font settings
+   * @param option Font default settings
    */
-  private setFont(path: string, option: RegisterFont["option"]) {
-    registerFont(path, { family: option.family, weight: option.weight, style: option.style});
-    
-    return this;
+  public registerFont(font: CustomFont) {
+
+    font.forEach(e => {
+      if (this.getFont(e.font.family, { path: e.file })) {
+        registerFont(e.file, e.font);
+        this.fontData.push({ file: e.file, font: e.font });
+        console.log(`\x1b[33mRegisterFont: \x1b[35m${e.font.family} \x1b[30m| \x1b[32msize - \x1b[35m${e.font.size? e.font.size + "px" : "Default"} \x1b[30m| \x1b[32mStyle - \x1b[35m${e.font.style}\x1b[0m`);
+      };
+    });
+
+
+    // return this;
   };
 
   // Restore la sélection
