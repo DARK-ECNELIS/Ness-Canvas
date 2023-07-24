@@ -26,6 +26,6 @@ export function colorCheck(color: CustomColor): CustomColor {
     }
 
     if (!isHexColorCode(<string>color) && !isRGBColorCode(<string>color) && !isRGBAColorCode(<string>color) && !isPredefinedColorName(<string>color) && !(color instanceof CanvasGradient) && !(color instanceof CanvasPattern) ) {
-        console.error(new Error(`\x1b[33mColor Cheker: \x1b[31m${color} \x1b[32mIs not valid\n\x1b[36mValid syntaxes: \x1b[32m#hex \x1b[36m| \x1b[32mrgb \x1b[36m| \x1b[32mrgba \x1b[36m| \x1b[32mcolorName \x1b[36m| \x1b[32mCanvasGradient \x1b[36m| \x1b[32mCanvasPattern\x1b[0m`))
+        console.error(new Error(`\x1b[33mColor Checker: \x1b[31m${color} \x1b[32mIs not valid\n\x1b[36mValid syntaxes: \x1b[32m#hex \x1b[36m| \x1b[32mrgb \x1b[36m| \x1b[32mrgba \x1b[36m| \x1b[32mcolorName \x1b[36m| \x1b[32mCanvasGradient \x1b[36m| \x1b[32mCanvasPattern\x1b[0m`))
     } else return color
 }
