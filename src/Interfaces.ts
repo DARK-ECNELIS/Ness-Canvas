@@ -1,4 +1,4 @@
-import { CanvasImage, CustomColor, FrameType, Progress, Shape } from ".";
+import { CanvasImage, CustomColor, FrameType, LoadingDirection, Progress, Shape, ShapeLoad, Hourly } from ".";
 
 /**
  * Source image coordinates to draw in the context of Canvas.
@@ -67,19 +67,24 @@ export interface FrameOption <S extends Shape> {
    /**
     * Additional parameter for the square and Rectangle
     */
-   QuadrilateralOprion?: S extends "Square" | "Rectangle" ? {
+   QuadrilateralOption?: S extends "Rectangle" ? {
       /**
        * Corner Radius
        */
       radius: number,
       /**
-       * Replace Size parameter for axis x (only for the Rectangular Shape)
+       * Replace Size parameter for axis x
        */
-      width?: S extends "Rectangle"? number : never;
+      width: number;
       /**
-       * Replace Size parameter for axis y (only for the Rectangular Shape)
+       * Replace Size parameter for axis y
        */
-      height?: S extends "Rectangle"? number : never;
+      height: number;
+   } : S extends "Square" ? {
+      /**
+       * Corner Radius
+       */
+      radius: number,
    } : never
 }
 
@@ -109,17 +114,40 @@ export interface FrameContent <T extends FrameType> {
    lineWidth?: number
 }
 
-export interface LoadingOption {
+export interface LoadingOption <D extends ShapeLoad, S extends Shape> {
    x: number;
    y: number;
    size: number;
+   fill: {
+      type: D;
+      start?: D extends "Circle" ? Hourly : LoadingDirection;
+   }
    rotate?: number;
    color: CustomColor;
    progress: Progress;
    outline: {
       width: number;
       color: CustomColor;
-   }
+   },
+   QuadrilateralOption?: S extends "Rectangle" ? {
+      /**
+       * Corner Radius
+       */
+      radius: number,
+      /**
+       * Replace Size parameter for axis x
+       */
+      width: number;
+      /**
+       * Replace Size parameter for axis y
+       */
+      height: number;
+   } : S extends "Square" ? {
+      /**
+       * Corner Radius
+       */
+      radius: number,
+   } : never
 }
 
 /**
