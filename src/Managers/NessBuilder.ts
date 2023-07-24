@@ -1,7 +1,7 @@
 import { writeFileSync } from "fs";
 import { Canvas, CanvasRenderingContext2D, registerFont } from "canvas";
-import { CanvasImage, CustomColor, ImageExtention, Shape, ImagelocationOption, DrawlocationOption, ExpLocationOption, ExpSizeOption, FrameOption, TextOption, CustomFont, FrameContent, FrameType, ShapeEnum, LoadingOption, ShapeLoad, Axis } from "..";
-import { colorCheck } from "../function";
+import { CanvasImage, CustomColor, ImageExtention, Shape, ImagelocationOption, DrawlocationOption, ExpLocationOption, ExpSizeOption, FrameOption, TextOption, CustomFont, FrameContent, FrameType, ShapeEnum, LoadingOption, ShapeLoad, Axis, LoadingDirection, Hourly } from "..";
+import { colorCheck, convertRGBtoRGBA } from "../function";
 
 export default class NessBuilder {
   
@@ -17,6 +17,7 @@ export default class NessBuilder {
   private frameCoordinate: FrameOption<Shape>;
   private frameTextCoordinate = { x: 0, y: 0};
   private fontData: CustomFont = [];
+  private loadingDirection: number;
 
   constructor(width: number, height: number) {
     this.setCanvas(width, height);
@@ -157,14 +158,15 @@ export default class NessBuilder {
     const axis = this.getAxis(frame);
     frame.x = axis.x, frame.y = axis.y;
     this.frameCoordinate = frame;
-
-    if (frame.rotate) this.setRotation(frame.x , frame.y , frame.rotate);
+    
+    if (frame.rotate) this.setRotation(frame.x, frame.y, frame.rotate);
 
     this.context.beginPath();
 
-    const radius = (["Square", "Rectangle"].includes(shape) && frame.QuadrilateralOprion)? frame.QuadrilateralOprion.radius : 15;
-    const sizeX = frame.QuadrilateralOprion?.width? frame.QuadrilateralOprion.width : frame.size;
-    const sizeY = frame.QuadrilateralOprion?.height? frame.QuadrilateralOprion.height : frame.size;
+    const radius = (["Square", "Rectangle"].includes(shape) && frame.QuadrilateralOption)? frame.QuadrilateralOption.radius : 15;
+
+    const sizeX = (frame.QuadrilateralOption as any)?.width? (frame.QuadrilateralOption as any).width : frame.size;
+    const sizeY = (frame.QuadrilateralOption as any)?.height? (frame.QuadrilateralOption as any).height : frame.size;
 
     const r = frame.x + sizeX;
     const b = frame.y + sizeY;
@@ -185,7 +187,7 @@ export default class NessBuilder {
         break;
       }
       case "Rectangle": {
-        const sizeX = frame.QuadrilateralOprion?.width? frame.QuadrilateralOprion.width : frame.x;
+        const sizeX = (frame.QuadrilateralOption as any)?.width? (frame.QuadrilateralOption as any).width : frame.x;
         const r = frame.x + sizeX;
 
         this.context.moveTo(frame.x + radius - sizeX, frame.y - sizeY);
@@ -454,63 +456,155 @@ export default class NessBuilder {
     return this;
   };
 
-  public setLoading(shape: ShapeLoad, option: LoadingOption): this {
-    this.context.save();
+  public setLoading<D extends ShapeLoad, S extends Shape>(shape: Shape, option: LoadingOption<D, S>): this {
 
     const progress = option.progress/100;
-    const endAngle = progress * 2 * Math.PI;
-    const width = option.outline.width? option.outline.width : 5;
+    // const endAngle = progress * 2 * Math.PI;
+    
+    // -1.57 < 0 > 1.57
+    // const startAngle = 3.14
+    // const startAngle = 0
+    // const startHour = 8.24
 
-    this.context.beginPath();
-    this.context.lineWidth = width
-
-    switch (shape) {
-      case "Circle": {
-        this.context.arc(option.x, option.y, option.size, 0, 2*Math.PI);
-        // this.context.fill();
-        // this.context.stroke();
-        break;
-      };
+    
+    const regex = /^(\d{1,2})h(\d{1})(?!\d)$/;
+    const match = option.fill.start?.match(regex)
+    
+    if (match) {
+      option.fill.start = <D extends "Circle"? Hourly : never>`${match[1]}h0${match[2]}`
     };
 
+    const startAngle = ((parseFloat(option.fill.start?.replace("h", ".")) - 3) / 12) * 2 * Math.PI;
+    const endAngle = (startAngle + progress * 2 * Math.PI) % (2 * Math.PI);
+    let rotate = 0;
+
+    if (option.fill.start) {
+      this.setLoadingDirection(<LoadingDirection>option.fill.start);
+    };
+
+    this.context.save();
+    this.context.beginPath();
+    this.context.lineWidth = option.outline.width? option.outline.width : 5;
+
+    this.setShape(shape, option);
+    rotate = option.rotate;
+    option.rotate = undefined;
+    this.context.globalAlpha = 0.38
+    this.context.fillStyle = option.color
+
+    this.setRotation(option.x, option.y, this.loadingDirection + -rotate);
+    this.context.fill()
+    this.setRotation(option.x, option.y, rotate + -this.loadingDirection);
+
     this.context.closePath()
-
-
-    // this.context.restore();
     this.context.clip();
     this.context.beginPath();
   
-    // this.context.stroke()
     this.context.strokeStyle = option.color? colorCheck(option.color): "#FF0000";
-
- 
-    this.context.moveTo(option.x, option.y);
-    // this.context.lineTo(option.x + radius, option.y);
-  
-  
     this.context.fillStyle = option.color? colorCheck(option.color) : "#FF0000";
-    this.context.arc(option.x, option.y, option.size/*-width/2*/*1.5, 0, endAngle);
-    this.context.fill()
-    
-    this.context.closePath()
+    this.context.globalAlpha = 1
 
-    this.context.beginPath();
-    this.context.strokeStyle = option.outline.color? colorCheck(option.outline.color) : "#FF0000";
-    this.context.fillStyle = option.color? colorCheck(option.color)+"60" : "#FF000060";
-    switch (shape) {
-      case "Circle": {
-        this.context.arc(option.x, option.y, option.size, 0, 2*Math.PI);
-        this.context.fill();
-        this.context.stroke();
-        break;
+    if (option.fill.type == "Circle") {
+      this.context.moveTo(option.x, option.y);
+      shape.includes("Rectangle")? option.size = (option.QuadrilateralOption as any).width >= (option.QuadrilateralOption as any).height? (option.QuadrilateralOption as any).width : (option.QuadrilateralOption as any).height : undefined
+      this.context.arc(option.x, option.y, option.size*1.5, startAngle, endAngle);
+    } else {
+      let axis = this.getAxis(option);
+      const radius = ["Square", "Rectangle"].includes(shape)? 15 : 0;
+
+      while (rotate > 45 || rotate < -45) {
+        if (rotate > 0) rotate -= 45;
+        else rotate = -rotate;
       };
-    };
 
+      // D = C √2
+      // D = (option.size + radius) √2
+      // D <=> max
+      // if rotate => D = ((rotate * (option.size + radius)) /45) √2
+
+
+      const size = rotate? 0.45 * rotate+radius : 0;
+      const size2 = rotate? 0.45 * rotate+radius : 0;
+
+      // const max = (option.progress * (option.size*2 + size))/100;
+      let max = ((option.progress * (option.size + radius)) /60) * Math.sqrt(2);
+
+      // console.log(max)
+      let x,y;
+
+      if (shape.includes("Square")) {
+        x = axis.x - option.size - size;
+        y = axis.y - option.size - size2;
+
+        // this.setRotation(axis.x, axis.y, -rotate);
+        this.setRotation(axis.x, axis.y, this.loadingDirection + -rotate);
+        // console.log(this.loadingDirection)
+
+        this.context.moveTo(x - size, y - size2);
+        this.context.lineTo(x + max, y - size2);
+        this.context.lineTo(x + max, axis.y + option.size + size2);
+        this.context.lineTo(x - size, axis.y + option.size + size2)
+        this.setRotation(axis.x, axis.y, rotate + -this.loadingDirection);
+        // this.setRotation(axis.x, axis.y, -this.loadingDirection);
+      } else {
+        // option.x = (option.QuadrilateralOption as any).width;
+        // option.y = (option.QuadrilateralOption as any).height;
+        axis = this.getAxis(option)
+
+        x = axis.x - (option.QuadrilateralOption as any).width;
+        y = axis.y - (option.QuadrilateralOption as any).height;
+        option.size = (option.QuadrilateralOption as any).height;
+        max = ((option.progress * ((option.QuadrilateralOption as any).width)) /100) ;
+        console.log(x, max, size, option.size, max*2)
+        
+        this.setRotation(axis.x, axis.y, this.loadingDirection + -rotate);
+        
+        this.context.moveTo(x - size, y - size2*2);
+        this.context.lineTo(x + max*2, y - size2*2);
+        this.context.lineTo(x + max*2, axis.y + option.size *2 + size2);
+        this.context.lineTo(x - size, axis.y + option.size *2 + size2)
+        this.setRotation(axis.x, axis.y, rotate + -this.loadingDirection);
+        // this.setRotation(axis.x, axis.y, -this.loadingDirection);
+      }
+    }
+    this.setRotation(option.x, option.y, this.loadingDirection + -rotate);
+    this.context.fill()
+    this.setRotation(option.x, option.y, rotate + -this.loadingDirection);
+
+    this.context.closePath()
+    this.context.beginPath();
+
+    this.context.strokeStyle = option.outline.color? colorCheck(option.outline.color) : "#FF0000";
+    this.context.fillStyle = "rgba(0,0,0,0)"
+    
+    this.setShape(shape, option);
+    this.context.fill();
+    this.context.stroke();
     this.context.closePath()
     this.restore();
+
     return this;
   };
 
+  private setLoadingDirection(direction: LoadingDirection) {
+    if (direction == "DownRightToUpLeft") {
+      this.loadingDirection = -135
+    } else if (direction == "DownToUp") {
+      this.loadingDirection = -90;
+    } else if (direction == "DownLeftToUpRight") {
+      this.loadingDirection = -45
+    } else if (direction == "LeftToRight") {
+      this.loadingDirection = 0;
+    } else if (direction == "UpLeftToDownRight") {
+      this.loadingDirection = 45
+    } else if (direction == "UpToDown") {
+      this.loadingDirection = 90;
+    } else if (direction == "UpRightToDownLeft") {
+      this.loadingDirection = 135
+    } else if (direction == "RightToLeft") {
+      this.loadingDirection = 180;
+    }
+  }
 
   public setAxis(axis: Axis): this {
     this.axis = axis;

@@ -1,13 +1,21 @@
-import { Canvas, CanvasGradient, gifVersion, loadImage, registerFont } from "canvas";
-import { Axis, CustomProfile, Edge, FilterBuilder, ImageChannels, NessBuilder, Progress } from "..";
-import { colorCheck, gifExtractor } from "../function"
-import { writeFileSync } from "fs";
+import { Canvas, CanvasGradient, loadImage } from "canvas";
+import { NessBuilder } from "..";
 // import RankupBuilder from "../Managers/RankupBuilder";
 // import {canvasGif} from '../Managers/test';
 // const fs = require('fs');
 // const path = require('path');
 
 async function test() {
+  // const canvas = new Canvas(400, 400);
+  // const context = canvas.getContext('2d')
+
+  const builder = new NessBuilder(400, 400)
+
+  const gradient = builder.context.createLinearGradient(0, 0, 200, 0);
+  gradient.addColorStop(0, "green");
+  gradient.addColorStop(0.7, "white");
+  gradient.addColorStop(1, "pink");
+
   // const canvas = new Canvas(400, 400);
     
   // const ctx = canvas.getContext('2d');
@@ -30,13 +38,14 @@ async function test() {
 
 
 
-  const avatar = await loadImage('https://media.discordapp.net/attachments/758031322244710601/1000153437813616650/perso_anime_U565bW7EhY2InkF.png');
+  // const avatar = await loadImage('https://media.discordapp.net/attachments/758031322244710601/1000153437813616650/perso_anime_U565bW7EhY2InkF.png');
   // const canvas = new Canvas(400, 400);
 
   // const centerX = 200;
   // const centerY = 200;
   // const radius = 100;
-  const builder = new NessBuilder(400, 400)
+  // const builder = new NessBuilder(400, 400)
+  builder
   // // .setLoading("Circle", { x: 200, y:200, size: 100, outline: { color: "#00FF00", width: 15 }, progress: 50, color: "#8b4513"})
   // .setAxis("TopLeft")
   // .setFrame("Rectangle", { x: 200, y: 200, size: 50 }, { type: "Text", color: "Brown", content: "TL", textOptions: { size: 50 } })
@@ -54,9 +63,11 @@ async function test() {
   // .setFrame("Rectangle", { x: 200, y: 200, size: 50 }, { type: "Text", color: "Brown", content: "L", textOptions: { size: 50 } })
   // .setAxis("Right")
   // .setFrame("Rectangle", { x: 200, y: 200, size: 50 }, { type: "Text", color: "Brown", content: "R", textOptions: { size: 50 } })
+  
   .setAxis("Center")
-  .setFrame("Square", { x: 200, y: 200, size: 100, rotate: 100 }, { type: "Image", color: "Gray", content: avatar })
-  .setFrame("Heptagon", { x: 200, y: 200, size: 100 }, { type: "Text", color: "Green", content: "O", textOptions: { size: 50 } })
+  .setLoading("Rectangle", { x: 200, y: 200, size: 50, fill: { type: "Line", start: "UpLeftToDownRight" }, rotate: 45, color: /*"rgb(255,0,0)"*/ gradient, progress: 50, outline: { color: "White", width: 3}, QuadrilateralOption: { height: 100, width: 150, radius: 20} })
+  // .setFrame("Rectangle", { x: 200, y: 200, size: 100, QuadrilateralOption: { radius: 50, height: 100, width: 150 }}, { type: "Color", content: "Coral", color: "Lime" })
+//   .setFrame("Heptagon", { x: 200, y: 200, size: 100 }, { type: "Text", color: "Green", content: "O", textOptions: { size: 50 } })
 // .setAxis(Axis.Center)
 
   // const builder = new NessBuilder(250, 110);
