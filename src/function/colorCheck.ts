@@ -1,4 +1,5 @@
-import { CustomColor } from "..";
+import { rgbToHex } from ".";
+import { CustomColor, RGBAColor, RGBColor } from "..";
 import { CanvasPattern, CanvasGradient } from "canvas"
 
 export function colorCheck(color: CustomColor): CustomColor {
@@ -27,5 +28,7 @@ export function colorCheck(color: CustomColor): CustomColor {
 
     if (!isHexColorCode(<string>color) && !isRGBColorCode(<string>color) && !isRGBAColorCode(<string>color) && !isPredefinedColorName(<string>color) && !(color instanceof CanvasGradient) && !(color instanceof CanvasPattern) ) {
         console.error(new Error(`\x1b[33mColor Checker: \x1b[31m${color} \x1b[32mIs not valid\n\x1b[36mValid syntaxes: \x1b[32m#hex \x1b[36m| \x1b[32mrgb \x1b[36m| \x1b[32mrgba \x1b[36m| \x1b[32mcolorName \x1b[36m| \x1b[32mCanvasGradient \x1b[36m| \x1b[32mCanvasPattern\x1b[0m`))
+    } else if (isRGBAColorCode(<string>color) || isRGBColorCode(<string>color)) {
+        return rgbToHex(<RGBColor | RGBAColor>color)
     } else return color
 }

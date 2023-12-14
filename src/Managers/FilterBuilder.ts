@@ -1532,7 +1532,7 @@ export default class FilterBuilder {
           } else {
             // nearest neighbor
             // round tx, ty
-            // TODO edge actions!!
+            
             srcIndex = ((ty + 0.5 | 0) * this.srcWidth + (tx + 0.5 | 0)) << 2;
             this.dstPixels[dstIndex]     = this.srcPixels[srcIndex];
             this.dstPixels[dstIndex + 1] = this.srcPixels[srcIndex + 1];

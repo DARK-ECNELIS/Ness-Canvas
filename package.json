@@ -12,7 +12,7 @@
     "url": "git+https://github.com/DARK-ECNELIS/ness-canvas.git"
   },
   "engines": {
-    "node": ">=20"
+    "node": ">=8.17.0 <=20.9.0"
   },
   "bugs": {
     "url": "https://github.com/DARK-ECNELIS/ness-canvas/issues"

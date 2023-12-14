@@ -4,7 +4,7 @@ import { FontOption } from "./Interfaces";
 declare type CanvasImage = Image | Canvas;
 declare type ImageExtention = "png" | "jpg" | "jpeg";
 
-declare type CustomColor = `#${string}` | RGBColor | RGBAColor | ColorName | CanvasGradient /*| CanvasPattern*/;
+declare type CustomColor = `#${string}` | RGBColor | RGBAColor | ColorName | CanvasGradient | CanvasPattern;
 declare type InvertColor = `#${string}` | RGBColor | RGBAColor;
 
 declare type RGBColor = `rgb(${number},${number},${number})`;
@@ -57,7 +57,8 @@ enum Edge {
 declare type Preset = 'classic';
 
 
-export { Preset, Shape, CustomColor, CanvasImage, ImageExtention, ImageChannels, Edge, CustomFont, FrameType, ShapeEnum, ShapeLoad, Progress, Axis, InvertColor, LoadingDirection, Hourly };
+export { Preset, Shape, CustomColor, CanvasImage, ImageExtention, ImageChannels, Edge, CustomFont, FrameType, ShapeEnum, ShapeLoad, Progress, Axis, InvertColor, LoadingDirection, Hourly, RGBAColor,RGBColor };
+
 export { ImagelocationOption, DrawlocationOption, FrameOption, ExpLocationOption, ExpSizeOption, FrameContent, TextOption, FontOption, LoadingOption } from './Interfaces';
 
 export { default as NessBuilder } from './Managers/NessBuilder';

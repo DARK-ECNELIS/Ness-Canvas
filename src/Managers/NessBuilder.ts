@@ -1,5 +1,5 @@
 import { writeFileSync } from "fs";
-import { Canvas, CanvasRenderingContext2D, registerFont } from "canvas";
+import { Canvas, CanvasRenderingContext2D, registerFont, CanvasPattern, CanvasGradient } from "canvas";
 import { CanvasImage, CustomColor, ImageExtention, Shape, ImagelocationOption, DrawlocationOption, ExpLocationOption, ExpSizeOption, FrameOption, TextOption, CustomFont, FrameContent, FrameType, ShapeEnum, LoadingOption, ShapeLoad, Axis, LoadingDirection, Hourly } from "..";
 import { colorCheck, convertRGBtoRGBA } from "../function";
 
@@ -44,6 +44,20 @@ export default class NessBuilder {
 
     return this;
   };
+  
+  /**
+   * Special image background
+   * @param color CustomColor<CanvasGradient | CanvasPattern>
+   */
+  private customBackground(color: CustomColor) {
+    const canvas = new Canvas(this.canvas.width, this.canvas.height);
+    const context = canvas.getContext("2d");
+    
+    context.fillStyle = color
+    context.fillRect(0, 0, canvas.width, canvas.height)
+
+    this.setImage(canvas, { sx: 0, sy:0 })
+  };
 
   /**
    * canvas outline radius
@@ -77,8 +91,10 @@ export default class NessBuilder {
    * @param imageColor The image to set (no link, use loadImage() from canvas) or a custom color (Valid syntaxes: #hex | rgb | rgba | colorName | CanvasGradient | CanvasPattern)
    */
   public setBackground(imageColor: CanvasImage | CustomColor): this {
-    if (typeof imageColor == "object") {
+    if (typeof imageColor == "object" && !(imageColor instanceof CanvasPattern) && !(imageColor instanceof CanvasGradient)) {
       this.setImage(<CanvasImage>imageColor, { sx: 0, sy: 0, sWidth: this.canvas.width, sHeight: this.canvas.height })
+    } else if ((imageColor instanceof CanvasPattern) || (imageColor instanceof CanvasGradient)) {
+      this.customBackground(imageColor);
     } else {
       this.context.fillStyle = colorCheck(imageColor)
       this.context.fillRect(0, 0, this.canvas.width, this.canvas.height)
@@ -137,7 +153,14 @@ export default class NessBuilder {
       };
       this.restore();
 
-      this.setText(options.content.toString(), { x: this.frameTextCoordinate.x, y: this.frameTextCoordinate.y }, { size: textOptions.size, font: textOptions.font? textOptions.font : "*Arial" , color: textOptions.color? colorCheck(textOptions.color) : "#FFFFFF", textAlign: textOptions.textAlign? textOptions.textAlign : "center", textBaseline: textOptions.textBaseline? textOptions.textBaseline : "middle" });
+      const defaultTextOption: TextOption = {
+        size: 30,
+      };
+  
+      const textOption = textOptions?.size? { ...defaultTextOption, ...textOptions } : { ...textOptions, ...defaultTextOption }
+  
+
+      this.setText(options.content.toString(), { x: this.frameTextCoordinate.x, y: this.frameTextCoordinate.y }, { size: textOption.size, font: textOptions?.font? textOptions?.font : "*Arial" , color: textOptions?.color? colorCheck(textOptions.color) : "#FFFFFF", textAlign: textOptions?.textAlign? textOptions.textAlign : "center", textBaseline: textOptions?.textBaseline? textOptions.textBaseline : "middle" });
       
       return this;
     } else if (options.type == "Color") {
@@ -271,8 +294,11 @@ export default class NessBuilder {
     const size = this.frameCoordinate.rotate? 0.009 * this.frameCoordinate.rotate : 0;
     const size2 = this.frameCoordinate.rotate? 0.018 * this.frameCoordinate.rotate : 0;
 
-    
-    this.setImage(image, {sx: this.frameCoordinate.x - this.frameCoordinate.size*(1 + size), sy: this.frameCoordinate.y - this.frameCoordinate.size*(1 + size), sWidth: this.frameCoordinate.size*(2 + size2), sHeight: this.frameCoordinate.size*(2 + size2) });
+    if (typeof image == "object" && !(image instanceof CanvasPattern) && !(image instanceof CanvasGradient)) {
+      this.setImage(image, {sx: this.frameCoordinate.x - this.frameCoordinate.size*(1 + size), sy: this.frameCoordinate.y - this.frameCoordinate.size*(1 + size), sWidth: this.frameCoordinate.size*(2 + size2), sHeight: this.frameCoordinate.size*(2 + size2) });
+    } else {
+      this.customBackground(image);
+    }
 
     this.context.restore();
 
