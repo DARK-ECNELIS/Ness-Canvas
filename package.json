@@ -1,7 +1,7 @@
 {
   "name": "ness-canvas",
   "version": "2.0.3",
-  "description": "Canvas Builder, Image Filter, Gif Generator",
+  "description": "Canvas Builder, Image Filter",
   "main": "lib/index.js",
   "author": "DARK ECNELIS darkecnelis@gmail.com",
   "license": "BSD 3-Clause",
@@ -27,28 +27,13 @@
     "graphics",
     "image",
     "images",
-    "filter",
-    "gif generator",
-    "gif"
+    "filter"
   ],
   "devDependencies": {
-    "@types/get-pixels": "^3.3.2",
-    "@types/mime-types": "^2.1.1",
     "@types/node": "^20.3.2",
-    "@types/omggif": "^1.0.3",
-    "@types/pngjs": "^6.0.1",
-    "@types/save-pixels": "^2.3.2",
     "typescript": "^5.1.6"
   },
   "dependencies": {
-    "canvas": "^2.11.2",
-    "gif-encoder-2": "^1.0.5",
-    "multi-integer-range": "^5.2.0",
-    "ndarray-pack": "^1.2.1",
-    "node-bitmap": "^0.0.1",
-    "omggif": "^1.0.10",
-    "parse-data-uri": "^0.2.0",
-    "pngjs": "^7.0.0",
-    "save-pixels": "^2.3.6"
+    "canvas": "^2.11.2"
   }
 }
