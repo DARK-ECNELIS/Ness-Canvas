@@ -394,88 +394,68 @@ export default class NessBuilder {
    * @param location Coordinate to set ExpBar
    * @param size Size of the first progression bar
    * @param radius Radius to set
-   * @param cloneWidth Size of the second progression bar
+   * @param progress Progression of the second progression bar 0 - 100%
    * @param color Text color. White color is used by Default
    */
-  public setExp(horizontal: boolean, location: ExpLocationOption, size: ExpSizeOption, radius: number, cloneWidth: number, color?: CustomColor): this {
+  public setExp(option: ExpOption, progress: IntRange<0, 101>, color?: ExpColor): this {
     
+    const axis = this.getAxis({ x: option.x, y: option.y, size: option.width }, option.height)
+    this.setRotation(axis.x, axis.y, option.rotate);
+
     this.context.save();
     this.context.beginPath();
-    this.context.strokeStyle = color? colorCheck(color) : "#FF0000";
-    this.context.lineWidth = 0.1;
+    this.context.strokeStyle = color?.outlineColor1? colorCheck(color.outlineColor1) : "#FF0000";
+    this.context.lineWidth = 2;
 
-    if (!horizontal) {
-      
-      // Barre N°1
-      this.context.moveTo(location.x, location.y);
-      this.context.lineTo(size.width, location.y);
-      this.context.quadraticCurveTo(size.width + radius, location.y, size.width + radius, location.y + (size.height /2));
-      this.context.quadraticCurveTo(size.width + radius, size.height + location.y, size.width, size.height + location.y);
-      this.context.lineTo(location.x, size.height + location.y);
-      this.context.quadraticCurveTo(location.x - radius, size.height + location.y, location.x - radius, location.y + (size.height /2));
-      this.context.quadraticCurveTo(location.x - radius, location.y, location.x, location.y);
+    this.context.globalAlpha = option.alphat ? option.alphat/100 : 0.3;
 
-      this.context.fillStyle = "#FFFFFF20"
-      this.context.fill()
-      this.context.stroke();
+    // Barre N°1
+    this.context.moveTo(axis.x - option.width, axis.y - option.height);
+    this.context.lineTo(axis.x, axis.y - option.height);
+    this.context.quadraticCurveTo(axis.x + option.radius, axis.y - option.height, axis.x + option.radius, axis.y - (option.height /2));
+    this.context.quadraticCurveTo(axis.x + option.radius, axis.y, axis.x, axis.y);
+    this.context.lineTo(axis.x - option.width, axis.y);
+    this.context.quadraticCurveTo(axis.x - option.width - option.radius, axis.y, axis.x - option.width - option.radius, axis.y - (option.height /2));
+    this.context.quadraticCurveTo(axis.x - option.width - option.radius, axis.y - option.height, axis.x - option.width, axis.y - option.height);
 
-      if ((cloneWidth * 100) / size.width < 6.8) {
-        this.context.clip()
-      }
-
-
-      // Barre N°2
-      this.context.beginPath();
-      this.context.strokeStyle = color? colorCheck(color) : "#000000";
-      this.context.lineWidth = 2;
-      
-      this.context.moveTo(location.x, location.y);
-      this.context.lineTo(cloneWidth, location.y);
-      this.context.quadraticCurveTo(cloneWidth + radius, location.y, cloneWidth + radius, location.y + (size.height /2));
-      this.context.quadraticCurveTo(cloneWidth + radius, location.y + size.height, cloneWidth, location.y + size.height);
-      this.context.lineTo(location.x, location.y + size.height);
-      this.context.quadraticCurveTo(location.x - radius, location.y + size.height, location.x - radius, location.y + (size.height /2));
-      this.context.quadraticCurveTo(location.x - radius, location.y, location.x, location.y);
-
-    } else {
-
-      // Barre N°1
-
-      this.context.moveTo(location.x + size.height, location.y);
-      this.context.lineTo(location.x + size.height, size.width);
-      this.context.quadraticCurveTo(location.x + size.height, size.width + radius, location.x + (size.height/2), size.width + radius);
-      this.context.quadraticCurveTo(location.x, size.width + radius, location.x, size.width);
-      this.context.lineTo(location.x, location.y);
-
-      this.context.quadraticCurveTo(location.x, location.y - radius, location.x + (size.height/2), location.y - radius);
-      this.context.quadraticCurveTo(location.x + size.height, location.y - radius, location.x + size.height, location.y);
-
-      this.context.fillStyle = "#FFFFFF20"
-      this.context.fill()
-      this.context.stroke();
-
-      if ((cloneWidth * 100) / size.width < 6.8) {
-        this.context.clip()
-      }
-
-
-      // Barre N°2
-      this.context.beginPath();
-      this.context.strokeStyle = color? colorCheck(color) : "#000000";
-      this.context.lineWidth = 2;
-      
-      this.context.moveTo(location.x + size.height, location.y);
-      this.context.lineTo(location.x + size.height, cloneWidth);
-      this.context.quadraticCurveTo(location.x + size.height, cloneWidth + radius, location.x + (size.height/2), cloneWidth + radius);
-      this.context.quadraticCurveTo(location.x, cloneWidth + radius, location.x, cloneWidth);
-      this.context.lineTo(location.x, location.y);
-
-      this.context.quadraticCurveTo(location.x, location.y - radius, location.x + (size.height/2), location.y - radius);
-      this.context.quadraticCurveTo(location.x + size.height, location.y - radius, location.x + size.height, location.y);
-    };
-
-    this.context.fillStyle = "#BB00FF"
+    this.context.fillStyle = color?.color1? colorCheck(color.color1) : "#FFFFFF"
     this.context.fill()
+    this.context.stroke();
+
+    if ((progress * 100) / option.width < 6.8) {
+      this.context.clip()
+    }
+    this.context.closePath()
+
+    const progressFill = ((progress * option.width) / 100) - axis.x + option.x
+
+    this.context.globalAlpha = 1;
+
+    // Barre N°2
+    this.context.beginPath();
+    this.context.strokeStyle = color?.outlineColor2? colorCheck(color.outlineColor2) : "#000000";
+    this.context.lineWidth = 2;
+
+    this.context.moveTo(axis.x - option.width, axis.y - option.height);
+    this.context.lineTo(axis.x + progressFill, axis.y - option.height);
+    this.context.quadraticCurveTo(axis.x + option.radius + progressFill, axis.y - option.height, axis.x + option.radius + progressFill, axis.y - (option.height /2));
+    this.context.quadraticCurveTo(axis.x + option.radius + progressFill, axis.y, axis.x + progressFill, axis.y);
+    this.context.lineTo(axis.x - option.width, axis.y);
+    this.context.quadraticCurveTo(axis.x - option.width - option.radius, axis.y, axis.x - option.width - option.radius, axis.y - (option.height /2));
+    this.context.quadraticCurveTo(axis.x - option.width - option.radius, axis.y - option.height, axis.x - option.width, axis.y - option.height);
+
+
+    // this.context.moveTo(axis.x, axis.y);
+    // this.context.lineTo(axis.x + progressFill, axis.y);
+    // this.context.quadraticCurveTo(axis.x + progressFill + option.radius, axis.y, axis.x + progressFill + option.radius, axis.y + (option.height /2));
+    // this.context.quadraticCurveTo(axis.x + progressFill + option.radius, axis.y + option.height, axis.x + progressFill, axis.y + option.height);
+    // this.context.lineTo(axis.x, axis.y + option.height);
+    // this.context.quadraticCurveTo(axis.x - option.radius, axis.y + option.height, axis.x - option.radius, axis.y + (option.height /2));
+    // this.context.quadraticCurveTo(axis.x - option.radius, axis.y, axis.x, axis.y);
+
+
+    this.context.fillStyle = color?.color2? colorCheck(color.color2) : "#BB00FF";
+    this.context.fill();
     this.context.stroke();
 
     this.context.restore();

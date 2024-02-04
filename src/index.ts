@@ -57,9 +57,8 @@ enum Edge {
 declare type Preset = 'classic';
 
 
-export { Preset, Shape, CustomColor, CanvasImage, ImageExtention, ImageChannels, Edge, CustomFont, FrameType, ShapeEnum, ShapeLoad, Progress, Axis, InvertColor, LoadingDirection, Hourly, RGBAColor,RGBColor };
 
-export { ImagelocationOption, DrawlocationOption, FrameOption, ExpLocationOption, ExpSizeOption, FrameContent, TextOption, FontOption, LoadingOption } from './Interfaces';
+export { ImagelocationOption, DrawlocationOption, FrameOption, ExpOption, FrameContent, TextOption, FontOption, LoadingOption } from './Interfaces';
 
 export { default as NessBuilder } from './Managers/NessBuilder';
 export { default as FilterBuilder } from './Managers/FilterBuilder';
