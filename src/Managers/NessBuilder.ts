@@ -634,8 +634,12 @@ export default class NessBuilder {
   /**
    * Return canvas Buffer
    */
-  public toBuffer(): Buffer {
-    return this.canvas.toBuffer();
+  public toBuffer(ext?: ImageExtention | "raw" | "pdf"): Buffer {
+    if (ext == "jpeg" || ext == "jpg") return this.canvas.toBuffer("image/jpeg");
+    else if (ext == "png") return this.canvas.toBuffer("image/png");
+    else if (ext == "raw") return this.canvas.toBuffer("raw");
+    else if (ext == "pdf") return this.canvas.toBuffer("application/pdf");
+    else return this.canvas.toBuffer();
   };
 
   /**
@@ -646,7 +650,9 @@ export default class NessBuilder {
    * @param type Image extention
    */
   public generatedTo(location: string, name: string, type: ImageExtention): void {
-    writeFileSync(`${location}/${name}.${type}`, this.toBuffer());
+
+    if (type == "png" || type == "jpeg" || type == "jpg") writeFileSync(`${location}/${name}.${type}`, this.toBuffer(type));
+    else writeFileSync(`${location}/${name}.${type}`, this.toBuffer());
   };
 
   /**
