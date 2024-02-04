@@ -2,7 +2,7 @@ import { Canvas, Image } from "canvas";
 import { FontOption } from "./Interfaces";
 
 declare type CanvasImage = Image | Canvas;
-declare type ImageExtention = "png" | "jpg" | "jpeg";
+declare type ImageExtention = "png" | "jpg" | "jpeg" | "bmp" | "tif" | "tiff";
 
 declare type CustomColor = `#${string}` | RGBColor | RGBAColor | ColorName | CanvasGradient | CanvasPattern;
 declare type InvertColor = `#${string}` | RGBColor | RGBAColor;
@@ -21,7 +21,7 @@ declare type LoadingDirection = "UpToDown" | "DownToUp" | "LeftToRight" | "Right
 
 declare type CustomFont = Array<{file: `${string}.ttf`, font: FontOption}>;
 
-type Enumerate<N extends number, Acc extends number[] = []> = Acc['length'] extends N? Acc[number] : Enumerate<N, [...Acc, Acc['length']]>;
+type Enumerate<N extends number, Acc extends number[] = []> = Acc['length']extends N? Acc[number] : Enumerate<N, [...Acc, Acc['length']]>;
 type IntRange<F extends number, T extends number> = Exclude<Enumerate<T>, Enumerate<F>>;
 declare type Progress = IntRange<0, 101>;
 
