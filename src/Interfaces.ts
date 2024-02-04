@@ -1,4 +1,4 @@
-import { CanvasImage, CustomColor, FrameType, LoadingDirection, Progress, Shape, ShapeLoad, Hourly } from ".";
+import { CanvasImage, CustomColor, FrameType, LoadingDirection, Progress, Shape, ShapeLoad, Hourly, IntRange } from ".";
 
 /**
  * Source image coordinates to draw in the context of Canvas.
@@ -45,7 +45,7 @@ export interface DrawlocationOption {
 }
 
 /**
- * Coordinates to draw frame in Canvas.
+ * Frame positioning in Canvas.
  */
 export interface FrameOption <S extends Shape> {
   /**
@@ -150,32 +150,32 @@ export interface LoadingOption <D extends ShapeLoad, S extends Shape> {
    } : never
 }
 
-/**
- * Coordinates to draw ExpBar in Canvas.
- */
-export interface ExpLocationOption {
-  /**
-   * Coordinate X from the upper left corner ExpBar location
-   */
+export interface ExpOption {
+   /**
+    * Coordinate X from the upper left corner ExpBar location
+    */
    x: number;
-  /**
-   * Coordinate Y from the upper left corner ExpBar location
-   */
+   /**
+    * Coordinate Y from the upper left corner ExpBar location
+    */
    y: number;
-}
-
-/**
- * Coordinates to draw frame in Canvas.
- */
-export interface ExpSizeOption {
-  /**
-   * Width from ExpBar
-   */
+   /**
+    * Width from ExpBar
+    */
    width: number;
-  /**
-   * Height from ExpBar
-   */
+   /**
+    * Height from ExpBar
+    */
    height: number;
+   /**
+    * Pivot the frame of a certain degree
+    */
+   rotate?: number;
+   /**
+    * Corner Radius
+    */
+   radius?: number,
+   alphat?: IntRange<0, 101>
 }
 
 /**
@@ -225,4 +225,11 @@ export interface FontOption {
     * Default police style
     */
    style?: "italic" | "normal" | "oblique" | "inherit" | "initial" | "unset"
+}
+
+export interface ExpColor { 
+   color1?: CustomColor,
+   color2?: CustomColor,
+   outlineColor1?: CustomColor,
+   outlineColor2?: CustomColor
 }
