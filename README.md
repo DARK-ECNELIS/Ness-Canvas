@@ -33,15 +33,24 @@ const { loadImage } = require('canvas')
 
 const background = await loadImage('https://media.discordapp.net/attachments/1006600590408818810/1006600665298116728/background-3147808.jpg');
 const avatar = await loadImage('https://media.discordapp.net/attachments/758031322244710601/1000153437813616650/perso_anime_U565bW7EhY2InkF.png');
+const builder = new NessBuilder(700, 250);
 
-const builder = new NessBuilder(700, 250)
-  .setCornerRadius(15)
+const gradient = builder.context.createLinearGradient(25, 25, 185 , 185  );
+const gradient2 = builder.context.createLinearGradient(25, 200, 660 , 130);
+
+gradient.addColorStop(0, 'red');
+...
+gradient2.addColorStop(0, 'red');
+...
+
+builder.setCornerRadius(15)
   .setBackground(background)
-  .setAxis("TopLeft")
-  .setFrame("Circle", { x: 25, y: 25, size: 80 }, { type: "Color", content: "Coral", color: "Blue" } )
-  .setExp({ x: 45, y: 45, width: 655, height: 30, radius: 10 }, 50)
-  .setText('Hello World!', {x:350, y:100}, {size: 40, font: 'Impact'})
-  .generatedTo('src/test/', "test", "png");
+  .setAxis("BottomRight")
+  .setFrame("Square", { x: 25, y: 25, size: 80 }, { type: "Image", content: avatar, color: gradient, lineWidth: 5 })
+  .setFrame("Hexagon", { x: 520, y: 25, size: 80, rotate: 90 }, { type: "Text", content: "33", color: "Black", textOptions: { size: 50 } })
+  .setExp({ x: 40, y: 200, width: 620, height: 30, radius: 15 }, 50, { outlineColor1: gradient2, outlineColor2: "HotPink", color2: "Plum" })
+  .setText('Hello World!', {x:250, y:100}, {size: 40, font: '*Impact'})
+  .generatedTo('.', "test", "png");
 
 // Generate canvas in a specific file
 builder.generateTo('FileLocation', 'ImageName', "PNG | JPEG | JPG")
@@ -79,7 +88,8 @@ This project is an implementation of the Canvas module. For more on the latter v
 The filter builder has documentation specifying all filters you find <a href="https://github.com/DARK-ECNELIS/Ness-Canvas/blob/main/FilterGuide.md" style="color: #00FFFF">here</a>.
 
 
-> ⚠️ You can find an example of using the Gif Builder <a href="https://github.com/DARK-ECNELIS/Ness-Canvas/blob/main/GifGuide.md" style="color: #00FFFF">here</a>
+> ⚠️ Gif Builder has been move in a external package you can find <a href="https://www.npmjs.com/package/gif-ness-canvas" style="color: #00FFFF">here</a><br>
+> ⚠️ You can also find an example of using the Gif Builder <a href="https://github.com/DARK-ECNELIS/Ness-Canvas/blob/main/GifGuide.md" style="color: #00FFFF">here</a>
 
 
 <div style="display:flex; text-align:center; justify-content:space-evenly">
@@ -88,8 +98,6 @@ The filter builder has documentation specifying all filters you find <a href="ht
     <img style="display:block" src="https://github.com/DARK-ECNELIS/Ness-Canvas/blob/main/Assets/test.gif?raw=true" height=80/>
   </div>
 </div>
-
-> ⚠️ Gif Builder has been move in a external package you can find <a href="https://www.npmjs.com/package/gif-ness-canvas" style="color: #00FFFF">here</a>
 
 ## Builder
 
