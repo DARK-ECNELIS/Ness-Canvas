@@ -1,7 +1,8 @@
 import { writeFileSync } from "fs";
 import { Canvas, CanvasRenderingContext2D, registerFont, CanvasPattern, CanvasGradient } from "canvas";
-import { CanvasImage, CustomColor, ImageExtention, Shape, ImagelocationOption, DrawlocationOption, ExpLocationOption, ExpSizeOption, FrameOption, TextOption, CustomFont, FrameContent, FrameType, ShapeEnum, LoadingOption, ShapeLoad, Axis, LoadingDirection, Hourly } from "..";
-import { colorCheck, convertRGBtoRGBA } from "../function";
+import { CanvasImage, CustomColor, ImageExtention, Shape, ImagelocationOption, DrawlocationOption, ExpOption, FrameOption, TextOption, CustomFont, FrameContent, FrameType, ShapeEnum, LoadingOption, ShapeLoad, Axis, LoadingDirection, Hourly, IntRange } from "..";
+import { colorCheck } from "../function";
+import { ExpColor } from "../Interfaces";
 
 export default class NessBuilder {
   
@@ -162,7 +163,7 @@ export default class NessBuilder {
       const textOption = textOptions?.size? { ...defaultTextOption, ...textOptions } : { ...textOptions, ...defaultTextOption }
   
 
-      this.setText(options.content.toString(), { x: this.frameTextCoordinate.x, y: this.frameTextCoordinate.y }, { size: textOption.size, font: textOptions?.font? textOptions?.font : "*Arial" , color: textOptions?.color? colorCheck(textOptions.color) : "#FFFFFF", textAlign: textOptions?.textAlign? textOptions.textAlign : "center", textBaseline: textOptions?.textBaseline? textOptions.textBaseline : "middle" });
+      this.setText(options.content.toString(), { x: this.frameTextCoordinate.x, y: this.frameTextCoordinate.y }, { size: textOption.size, font: textOptions?.font? textOptions?.font : "*Arial" , color: textOptions?.color? textOptions.color : "#FFFFFF", textAlign: textOptions?.textAlign? textOptions.textAlign : "center", textBaseline: textOptions?.textBaseline? textOptions.textBaseline : "middle" });
       
       this.restore();
       return this;
@@ -372,7 +373,7 @@ export default class NessBuilder {
    * @param path Path to font file (file.ttf)
    * @param option Font default settings
    */
-  public registerFont(font: CustomFont) {
+  private /*public*/ registerFont(font: CustomFont) {
 
     font.forEach(e => {
       if (this.getFont(e.font.family, { path: e.file })) {
@@ -383,7 +384,7 @@ export default class NessBuilder {
     });
 
 
-    // return this;
+    return this;
   };
 
   // Restore la sélection
