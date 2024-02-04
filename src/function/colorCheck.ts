@@ -5,7 +5,7 @@ import { CanvasPattern, CanvasGradient } from "canvas"
 export function colorCheck(color: CustomColor): CustomColor {
     
     function isHexColorCode(input: string): boolean {
-        const hexColorCodeRegex = /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/;
+        const hexColorCodeRegex = /^#?([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3}|[A-Fa-f0-9]{4}|[A-Fa-f0-9]{8})$/;
         return hexColorCodeRegex.test(input);
     }
 
