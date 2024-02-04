@@ -145,13 +145,15 @@ export default class NessBuilder {
     if (options.type == "Image") {
       return this.setFrameBackground(<CanvasImage>options.content);
     } else if (options.type == "Text") {
+      
+      if (frame.rotate) this.setRotation(frame.x, frame.y, -frame.rotate)
+
       const textOptions = options.textOptions;
 
       if (textOptions?.backgroundColor) {
         this.context.fillStyle = colorCheck(textOptions.backgroundColor);
         this.context.fill();
       };
-      this.restore();
 
       const defaultTextOption: TextOption = {
         size: 30,
@@ -162,6 +164,7 @@ export default class NessBuilder {
 
       this.setText(options.content.toString(), { x: this.frameTextCoordinate.x, y: this.frameTextCoordinate.y }, { size: textOption.size, font: textOptions?.font? textOptions?.font : "*Arial" , color: textOptions?.color? colorCheck(textOptions.color) : "#FFFFFF", textAlign: textOptions?.textAlign? textOptions.textAlign : "center", textBaseline: textOptions?.textBaseline? textOptions.textBaseline : "middle" });
       
+      this.restore();
       return this;
     } else if (options.type == "Color") {
       this.context.fillStyle = colorCheck(<CustomColor>options.content);
@@ -188,8 +191,8 @@ export default class NessBuilder {
 
     const radius = (["Square", "Rectangle"].includes(shape) && frame.QuadrilateralOption)? frame.QuadrilateralOption.radius : 15;
 
-    const sizeX = (frame.QuadrilateralOption as any)?.width? (frame.QuadrilateralOption as any).width : frame.size;
-    const sizeY = (frame.QuadrilateralOption as any)?.height? (frame.QuadrilateralOption as any).height : frame.size;
+    const sizeX = (frame.QuadrilateralOption as any)?.width && shape.includes("Rectangle") ? (frame.QuadrilateralOption as any).width : frame.size;
+    const sizeY = (frame.QuadrilateralOption as any)?.height && shape.includes("Rectangle") ? (frame.QuadrilateralOption as any).height : frame.size;
 
     const r = frame.x + sizeX;
     const b = frame.y + sizeY;
@@ -313,7 +316,7 @@ export default class NessBuilder {
    * @param option Text option
    */
   public setText(text: string, coordinate: {x: number, y: number}, option: TextOption): this {
-    this.setFont(option.font, option.size);
+    option.font? this.setFont(option.font, option.size) : this.setFont("*Sans", option.size);
 
     this.context.fillStyle = option.color ? colorCheck(option.color) : "#FFF";
     this.context.textAlign = option.textAlign;
@@ -339,9 +342,11 @@ export default class NessBuilder {
   // Récupère une police enregistrer hormis celle du système
   private getFont(name: string, option?: { path?: `${string}.ttf` }): boolean {
     const dataF = this.fontData.find(x => x.font.family === name)
+    
     if (option?.path) {
       const dataP = this.fontData.find(x => x.file === option.path)
   
+
       if (dataP) {
         console.error(`\x1b[33mRegisterFont: \x1b[32mThis file (\x1b[31m${option.path.replace(/^.*[\\/]/, "")}\x1b[32m) has already been register for \x1b[35m${dataP.font.family}\x1b[0m`);
         return false;
@@ -480,7 +485,7 @@ export default class NessBuilder {
       option.fill.start = <D extends "Circle"? Hourly : never>`${match[1]}h0${match[2]}`
     };
 
-    const startAngle = ((parseFloat(option.fill.start?.replace("h", ".")) - 3) / 12) * 2 * Math.PI;
+    const startAngle = (((option.fill.start? parseFloat(option.fill.start?.replace("h", ".")) : 0) - 3) / 12) * 2 * Math.PI;
     const endAngle = (startAngle + progress * 2 * Math.PI) % (2 * Math.PI);
     let rotate = 0;
 
@@ -516,7 +521,7 @@ export default class NessBuilder {
       this.context.arc(option.x, option.y, option.size*1.5, startAngle, endAngle);
     } else {
       let axis = this.getAxis(option);
-      const radius = ["Square", "Rectangle"].includes(shape)? 15 : 0;
+      const radius = ["Square", "Rectangle"].includes(shape)? option.QuadrilateralOption.radius : 0;
 
       while (rotate > 45 || rotate < -45) {
         if (rotate > 0) rotate -= 45;
@@ -530,47 +535,39 @@ export default class NessBuilder {
 
 
       const size = rotate? 0.45 * rotate+radius : 0;
-      const size2 = rotate? 0.45 * rotate+radius : 0;
+      // const size2 = rotate? 0.45 * rotate+radius : 0;
 
       // const max = (option.progress * (option.size*2 + size))/100;
-      let max = ((option.progress * (option.size + radius)) /60) * Math.sqrt(2);
+      let max = ((option.progress * (option.size + radius)) /100)*2;
 
       // console.log(max)
-      let x,y;
+      let x = axis.x - option.size - size, y = axis.y - option.size - size;
 
-      if (shape.includes("Square")) {
-        x = axis.x - option.size - size;
-        y = axis.y - option.size - size2;
+      if (["Rectangle" || "Square"].includes(shape)) {
 
-        // this.setRotation(axis.x, axis.y, -rotate);
+        if (shape.includes("Rectangle")) {
+          x = axis.x - (option.QuadrilateralOption as any).width;
+          y = axis.y - (option.QuadrilateralOption as any).height;
+          option.size = ((option.QuadrilateralOption as any).height)*2;
+          max = ((option.progress * ((option.QuadrilateralOption as any).width)) /100)*2;
+        }
+
         this.setRotation(axis.x, axis.y, this.loadingDirection + -rotate);
-        // console.log(this.loadingDirection)
 
-        this.context.moveTo(x - size, y - size2);
-        this.context.lineTo(x + max, y - size2);
-        this.context.lineTo(x + max, axis.y + option.size + size2);
-        this.context.lineTo(x - size, axis.y + option.size + size2)
+        this.context.moveTo(x - size, y - size);
+        this.context.lineTo(x + max, y - size);
+        this.context.lineTo(x + max, axis.y + option.size + size);
+        this.context.lineTo(x - size, axis.y + option.size + size)
         this.setRotation(axis.x, axis.y, rotate + -this.loadingDirection);
-        // this.setRotation(axis.x, axis.y, -this.loadingDirection);
       } else {
-        // option.x = (option.QuadrilateralOption as any).width;
-        // option.y = (option.QuadrilateralOption as any).height;
-        axis = this.getAxis(option)
 
-        x = axis.x - (option.QuadrilateralOption as any).width;
-        y = axis.y - (option.QuadrilateralOption as any).height;
-        option.size = (option.QuadrilateralOption as any).height;
-        max = ((option.progress * ((option.QuadrilateralOption as any).width)) /100) ;
-        console.log(x, max, size, option.size, max*2)
-        
         this.setRotation(axis.x, axis.y, this.loadingDirection + -rotate);
         
-        this.context.moveTo(x - size, y - size2*2);
-        this.context.lineTo(x + max*2, y - size2*2);
-        this.context.lineTo(x + max*2, axis.y + option.size *2 + size2);
-        this.context.lineTo(x - size, axis.y + option.size *2 + size2)
+        this.context.moveTo(x - size, y - size*4);
+        this.context.lineTo(x + max, y - size*4);
+        this.context.lineTo(x + max, axis.y + option.size *4 + size);
+        this.context.lineTo(x - size, axis.y + option.size *4 + size)
         this.setRotation(axis.x, axis.y, rotate + -this.loadingDirection);
-        // this.setRotation(axis.x, axis.y, -this.loadingDirection);
       }
     }
     this.setRotation(option.x, option.y, this.loadingDirection + -rotate);
@@ -618,14 +615,16 @@ export default class NessBuilder {
   };
 
   // Change l'axe par default du cadre donné
-  private getAxis<S extends Shape>(frame: FrameOption<S>) {
-    
-    if (this.axis == "TopLeft") return { x: frame.x - frame.size, y: frame.y - frame.size };
-    else if (this.axis == "TopCenter") return { x: frame.x, y: frame.y - frame.size };
-    else if (this.axis == "TopRight") return { x: frame.x + frame.size, y: frame.y - frame.size };
-    else if (this.axis == "BottomLeft") return { x: frame.x - frame.size, y: frame.y + frame.size };
-    else if (this.axis == "BottomCenter") return { x: frame.x, y: frame.y + frame.size };
-    else if (this.axis == "BottomRight") return { x: frame.x + frame.size, y: frame.y + frame.size };
+  private getAxis<S extends Shape>(frame: FrameOption<S>, height?: number) {
+
+    const heightSize = height? height : frame.size;
+
+    if (this.axis == "TopLeft") return { x: frame.x - frame.size, y: frame.y - heightSize };
+    else if (this.axis == "TopCenter") return { x: frame.x, y: frame.y - heightSize };
+    else if (this.axis == "TopRight") return { x: frame.x + frame.size, y: frame.y - heightSize };
+    else if (this.axis == "BottomLeft") return { x: frame.x - frame.size, y: frame.y + heightSize };
+    else if (this.axis == "BottomCenter") return { x: frame.x, y: frame.y + heightSize };
+    else if (this.axis == "BottomRight") return { x: frame.x + frame.size, y: frame.y + heightSize };
     else if (this.axis == "Left") return { x: frame.x - frame.size, y: frame.y };
     else if (this.axis == "Right") return { x: frame.x + frame.size, y: frame.y };
     else return { x: frame.x, y: frame.y };
