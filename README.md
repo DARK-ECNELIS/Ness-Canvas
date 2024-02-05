@@ -403,7 +403,7 @@ Draws a bar that can act as an experience bar
 
 <details><summary><strong><font color="#CC33FF">Description</font></strong></summary>
 
-* <details><summary><strong>option</strong>: Location to write text</summary>
+* <details><summary><strong>option</strong>: Frame positioning in Canvas</summary>
 
   * **x**: location of th e Experience bar on 
   * **y**: location of the Experience bar
@@ -415,7 +415,7 @@ Draws a bar that can act as an experience bar
   </details>
 * **progress**: Progress of filling from 0% to 100%
 
-* <details><summary><strong>Expcolor?</strong>: Adjust text configuration</summary>
+* <details><summary><strong>Expcolor?</strong>: Adjust Bar color</summary>
 
   * **`color1?`**: Color of the bar in the background
   * **`color2?`**: Filling bar color
@@ -451,7 +451,7 @@ builder.setExp({ x: 30, y: 30, width: 400, height: 30 }, 50, { color1: "Red", ou
 * **shape**: Frame shape (Square/Circle/Polygone...)
 
 
-* <details><summary><strong>option</strong>:</summary>
+* <details><summary><strong>option</strong>: FrameLoading positioning in Canvas.</summary>
 
   * **x**: Frame location on axis x
   * **y**: Frame location on axis y

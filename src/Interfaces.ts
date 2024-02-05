@@ -27,11 +27,11 @@ export interface ImagelocationOption {
  */
 export interface DrawlocationOption {
   /**
-   * Coordinate X from the upper left corner of the image source to draw in the canvas.
+   * Coordinate X  of the image source to draw in the canvas.
    */
    dx: number;
   /**
-   * Coordinate Y from the upper left corner of the image source to draw in the canvas.
+   * Coordinate Y  of the image source to draw in the canvas.
    */
    dy: number;
   /**
@@ -49,11 +49,11 @@ export interface DrawlocationOption {
  */
 export interface FrameOption <S extends Shape> {
   /**
-   * Coordinate X from the upper left corner of the frame to draw in the canvas.
+   * Frame location on axis x.
    */
    x: number;
   /**
-   * Coordinate Y from the upper left corner of the frame to draw in the canvas.
+   * Frame location on axis y.
    */
    y: number;
    /**
@@ -114,21 +114,63 @@ export interface FrameContent <T extends FrameType> {
    lineWidth?: number
 }
 
+/**
+ * FrameLoading positioning in Canvas.
+ */
 export interface LoadingOption <D extends ShapeLoad, S extends Shape> {
+   /**
+    * Frame location on axis x
+    */
    x: number;
+   /**
+    * Frame location on axis y
+    */
    y: number;
+   /**
+    * Frame size
+    */
    size: number;
+   /**
+    * Modify the filling parameters
+    */
    fill: {
+      /**
+       * Filling type (linear or hourly)
+       */
       type: D;
+      /**
+       * Only for hourly filling type (Default start to 12h)
+       */
       start?: D extends "Circle" ? Hourly : LoadingDirection;
    }
+   /**
+    * Frame Rotation
+    */
    rotate?: number;
+   /**
+    * Frame content Color (Valid syntaxes: #hex(a) | rgb(a) | colorName | CanvasGradient | CanvasPattern)
+    */
    color: CustomColor;
+   /**
+    * Progress of filling from 0% to 100%
+    */
    progress: Progress;
+   /**
+    * Modify Outline parameters
+    */
    outline: {
+      /**
+       * line size
+       */
       width: number;
+      /**
+       * line color (Valid syntaxes: #hex(a) | rgb(a) | colorName | CanvasGradient | CanvasPattern)
+       */
       color: CustomColor;
    },
+   /**
+    * Option for the square and the rectangle shape
+    */
    QuadrilateralOption?: S extends "Rectangle" ? {
       /**
        * Corner Radius
@@ -150,13 +192,16 @@ export interface LoadingOption <D extends ShapeLoad, S extends Shape> {
    } : never
 }
 
+/**
+ * Exp bar positioning in Canvas.
+ */
 export interface ExpOption {
    /**
-    * Coordinate X from the upper left corner ExpBar location
+    * Coordinate X of ExpBar location
     */
    x: number;
    /**
-    * Coordinate Y from the upper left corner ExpBar location
+    * Coordinate Y of ExpBar location
     */
    y: number;
    /**
@@ -187,19 +232,19 @@ export interface TextOption {
     */
    size: number,
    /**
-    *  change font to use (add * for use font system) example: *Arial or 
+    *  change font to use, add * for use font system (*Arial or *Calibri, ...)
     */
    font?: string,
    /**
-    * Text color (a degrade can be applied with <createRadialGradient | createLinearGradient] of the Canvas module), White color is used by Default
+    * Text color (Valid syntaxes: #hex(a) | rgb(a) | colorName | CanvasGradient | CanvasPattern)
     */
    color?: CustomColor,
    /**
-    * Background of text color (a degrade can be applied with <createRadialGradient | createLinearGradient] of the Canvas module), White color is used by Default
+    * Background color (Valid syntaxes: #hex(a) | rgb(a) | colorName | CanvasGradient | CanvasPattern)
     */
    backgroundColor?: CustomColor,
    /**
-    * write text with no fill (Color change for white and not compatible with number)
+    * write text with no fill
     */
    stroke?: boolean,
    /**
@@ -211,6 +256,32 @@ export interface TextOption {
     */
    textBaseline?: "top" | "hanging" | "middle" | "alphabetic" | "ideographic" | "bottom"
 }
+
+/**
+* Adjust Bar color
+*/
+export interface ExpColor { 
+   /**
+    * Color of the bar in the background
+    */
+   color1?: CustomColor,
+   /**
+    * Filling bar color
+    */
+   color2?: CustomColor,
+   /**
+    * Color of the contour of the bar in the background
+    */
+   outlineColor1?: CustomColor,
+   /**
+    * Contour color of the filling bar
+    */
+   outlineColor2?: CustomColor
+}
+
+
+
+
 
 export interface FontOption {
    /**
@@ -225,11 +296,4 @@ export interface FontOption {
     * Default police style
     */
    style?: "italic" | "normal" | "oblique" | "inherit" | "initial" | "unset"
-}
-
-export interface ExpColor { 
-   color1?: CustomColor,
-   color2?: CustomColor,
-   outlineColor1?: CustomColor,
-   outlineColor2?: CustomColor
 }
