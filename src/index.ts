@@ -5,7 +5,6 @@ declare type CanvasImage = Image | Canvas;
 declare type ImageExtention = "png" | "jpg" | "jpeg" | "bmp" | "tif" | "tiff";
 
 declare type CustomColor = `#${string}` | RGBColor | RGBAColor | ColorName | CanvasGradient | CanvasPattern;
-declare type InvertColor = `#${string}` | RGBColor | RGBAColor;
 
 declare type RGBColor = `rgb(${number},${number},${number})`;
 declare type RGBAColor = `rgba(${number},${number},${number},${number})`;
@@ -57,12 +56,11 @@ enum Edge {
 declare type Preset = 'classic';
 
 
-export { Preset, Shape, CustomColor, CanvasImage, ImageExtention, ImageChannels, Edge, CustomFont, FrameType, ShapeEnum, ShapeLoad, Progress, Axis, InvertColor, LoadingDirection, Hourly, RGBAColor,RGBColor, IntRange };
+export { Preset, Shape, CustomColor, CanvasImage, ImageExtention, ImageChannels, Edge, CustomFont, FrameType, ShapeEnum, ShapeLoad, Progress, Axis, LoadingDirection, Hourly, RGBAColor,RGBColor, IntRange };
 
 export { ImagelocationOption, DrawlocationOption, FrameOption, ExpOption, FrameContent, TextOption, FontOption, LoadingOption } from './Interfaces';
 
 export { default as NessBuilder } from './Managers/NessBuilder';
 export { default as FilterBuilder } from './Managers/FilterBuilder';
-export { default as ColorConverter } from './Managers/ColorConverter';
 export { default as CustomProfile } from './Extra/CustomProfile';
 export { default as RankupBuilder } from './Extra/RankupBuilder';
