@@ -89,7 +89,7 @@ The filter builder has documentation specifying all filters you find <a href="ht
 
 
 > ⚠️ Gif Builder has been move in a external package you can find <a href="https://www.npmjs.com/package/gif-ness-canvas" style="color: #00FFFF">here</a><br>
-> ⚠️ You can also find an example of using the Gif Builder <a href="https://github.com/DARK-ECNELIS/Ness-Canvas/blob/main/GifGuide.md" style="color: #00FFFF">here</a>
+> ⚠️ You can also find an example of using the Gif Builder <a href="https://github.com/DARK-ECNELIS/Gif-Ness-Canvas/blob/main/README.md" style="color: #00FFFF">here</a>
 
 
 <div style="display:flex; text-align:center; justify-content:space-evenly">

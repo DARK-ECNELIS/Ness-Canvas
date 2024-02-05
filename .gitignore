@@ -4,6 +4,5 @@ package-lock.json
 dist
 npm
 src/test/
-wow
 .npmrc
 README copy.md
