@@ -1,4 +1,4 @@
-# Ness-Canvas 2.4.0 Comming Soon
+# Ness-Canvas 2.4.0
 
 <div align="center">
   <br/>
