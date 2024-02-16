@@ -183,10 +183,10 @@ export default class NessBuilder {
   private setShape<S extends Shape>(shape: S, frame: FrameOption<S>): this {
 
     const axis = this.getAxis(frame);
-    frame.x = axis.x, frame.y = axis.y;
-    this.frameCoordinate = frame;
+    // frame.x = axis.x, frame.y = axis.y;
+    this.frameCoordinate = {...frame, ...axis};
     
-    if (frame.rotate) this.setRotation(frame.x, frame.y, frame.rotate);
+    if (frame.rotate) this.setRotation(axis.x, axis.y, frame.rotate);
 
     this.context.beginPath();
 
@@ -195,57 +195,57 @@ export default class NessBuilder {
     const sizeX = (frame.QuadrilateralOption as any)?.width && shape.includes("Rectangle") ? (frame.QuadrilateralOption as any).width : frame.size;
     const sizeY = (frame.QuadrilateralOption as any)?.height && shape.includes("Rectangle") ? (frame.QuadrilateralOption as any).height : frame.size;
 
-    const r = frame.x + sizeX;
-    const b = frame.y + sizeY;
+    const r = axis.x + sizeX;
+    const b = axis.y + sizeY;
 
     switch (shape) {
       case "Square": {
-        this.context.moveTo(frame.x + radius - frame.size, frame.y - frame.size);
-        this.context.lineTo(r - radius, frame.y - frame.size);
-        this.context.quadraticCurveTo(r, frame.y - frame.size, r, frame.y + radius - frame.size);
-        this.context.lineTo(r, frame.y + frame.size - radius);
+        this.context.moveTo(axis.x + radius - frame.size, axis.y - frame.size);
+        this.context.lineTo(r - radius, axis.y - frame.size);
+        this.context.quadraticCurveTo(r, axis.y - frame.size, r, axis.y + radius - frame.size);
+        this.context.lineTo(r, axis.y + frame.size - radius);
         this.context.quadraticCurveTo(r, b, r - radius, b);
-        this.context.lineTo(frame.x + radius - frame.size, b);
-        this.context.quadraticCurveTo(frame.x - frame.size, b, frame.x - frame.size, b - radius);
-        this.context.lineTo(frame.x - frame.size, frame.y + radius - frame.size);
-        this.context.quadraticCurveTo(frame.x - frame.size, frame.y - frame.size, frame.x + radius - frame.size, frame.y - frame.size);
+        this.context.lineTo(axis.x + radius - frame.size, b);
+        this.context.quadraticCurveTo(axis.x - frame.size, b, axis.x - frame.size, b - radius);
+        this.context.lineTo(axis.x - frame.size, axis.y + radius - frame.size);
+        this.context.quadraticCurveTo(axis.x - frame.size, axis.y - frame.size, axis.x + radius - frame.size, axis.y - frame.size);
 
-        this.frameTextCoordinate = { x: frame.x, y: frame.y };
+        this.frameTextCoordinate = { x: axis.x, y: axis.y };
         break;
       }
       case "Rectangle": {
-        const sizeX = (frame.QuadrilateralOption as any)?.width? (frame.QuadrilateralOption as any).width : frame.x;
-        const r = frame.x + sizeX;
+        const sizeX = (frame.QuadrilateralOption as any)?.width? (frame.QuadrilateralOption as any).width : axis.x;
+        const r = axis.x + sizeX;
 
-        this.context.moveTo(frame.x + radius - sizeX, frame.y - sizeY);
-        this.context.lineTo(r - radius, frame.y - sizeY);
-        this.context.quadraticCurveTo(r, frame.y - sizeY, r, frame.y + radius - sizeY);
-        this.context.lineTo(r, frame.y + sizeY - radius);
+        this.context.moveTo(axis.x + radius - sizeX, axis.y - sizeY);
+        this.context.lineTo(r - radius, axis.y - sizeY);
+        this.context.quadraticCurveTo(r, axis.y - sizeY, r, axis.y + radius - sizeY);
+        this.context.lineTo(r, axis.y + sizeY - radius);
         this.context.quadraticCurveTo(r, b, r - radius, b);
-        this.context.lineTo(frame.x + radius - sizeX, b);
-        this.context.quadraticCurveTo(frame.x - sizeX, b, frame.x - sizeX, b - radius);
-        this.context.lineTo(frame.x - sizeX, frame.y + radius - sizeY);
-        this.context.quadraticCurveTo(frame.x - sizeX, frame.y - sizeY, frame.x + radius - sizeX, frame.y - sizeY);
+        this.context.lineTo(axis.x + radius - sizeX, b);
+        this.context.quadraticCurveTo(axis.x - sizeX, b, axis.x - sizeX, b - radius);
+        this.context.lineTo(axis.x - sizeX, axis.y + radius - sizeY);
+        this.context.quadraticCurveTo(axis.x - sizeX, axis.y - sizeY, axis.x + radius - sizeX, axis.y - sizeY);
 
-        this.frameTextCoordinate = { x: frame.x, y: frame.y };
+        this.frameTextCoordinate = { x: axis.x, y: axis.y };
         break;
       }
       case "Circle": {
-        this.context.arc(frame.x, frame.y, frame.size , 0, 2 * Math.PI);
-        this.frameTextCoordinate = { x: frame.x, y: frame.y };
+        this.context.arc(axis.x, axis.y, frame.size , 0, 2 * Math.PI);
+        this.frameTextCoordinate = { x: axis.x, y: axis.y };
         break;
       }
       default: {
         const angle = (Math.PI * 2) / ShapeEnum[shape as keyof typeof ShapeEnum];
 
         for (let i = 0; i <= ShapeEnum[shape as keyof typeof ShapeEnum]; i++) {
-          const x = frame.x + frame.size * Math.cos(angle * i);
-          const y = frame.y + frame.size * Math.sin(angle * i);
+          const x = axis.x + frame.size * Math.cos(angle * i);
+          const y = axis.y + frame.size * Math.sin(angle * i);
         
           if (i === 0) this.context.moveTo(x, y);
           else this.context.lineTo(x, y);
         };
-        this.frameTextCoordinate = { x: frame.x, y: frame.y };
+        this.frameTextCoordinate = { x: axis.x, y: axis.y };
         break;
       };
       
@@ -256,19 +256,19 @@ export default class NessBuilder {
       //   this.context.beginPath();
 
       //   for (let i = 0; i < spikes; i++) {
-      //     let x = frame.x + frame.size / 2 + Math.cos(rot) * frame.size / 4;
-      //     let y = frame.y + frame.size / 2 + Math.sin(rot) * frame.size / 4;
+      //     let x = axis.x + frame.size / 2 + Math.cos(rot) * frame.size / 4;
+      //     let y = axis.y + frame.size / 2 + Math.sin(rot) * frame.size / 4;
       //     this.context.lineTo(x, y);
       //     rot += step;
 
-      //     x = frame.x + frame.size / 2 + Math.cos(rot) * frame.size / 2;
-      //     y = frame.y + frame.size / 2 + Math.sin(rot) * frame.size / 2;
+      //     x = axis.x + frame.size / 2 + Math.cos(rot) * frame.size / 2;
+      //     y = axis.y + frame.size / 2 + Math.sin(rot) * frame.size / 2;
       //     this.context.lineTo(x, y);
       //     rot += step;
       //   }
 
-      //   this.frameTextCoordinate.x = frame.x + frame.size / 2 + Math.cos(rot);
-      //   this.frameTextCoordinate.y = frame.y + frame.size / 2 + Math.cos(rot);
+      //   this.frameTextCoordinate.x = axis.x + frame.size / 2 + Math.cos(rot);
+      //   this.frameTextCoordinate.y = axis.y + frame.size / 2 + Math.cos(rot);
       //   this.context.closePath();
       //   break;
       // };
