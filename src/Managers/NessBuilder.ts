@@ -544,7 +544,7 @@ export default class NessBuilder {
       // console.log(max)
       let x = axis.x - option.size - size, y = axis.y - option.size - size;
 
-      if (["Rectangle" || "Square"].includes(shape)) {
+      if (["Rectangle", "Square"].includes(shape)) {
 
         if (shape.includes("Rectangle")) {
           x = axis.x - (option.QuadrilateralOption as any).width;
