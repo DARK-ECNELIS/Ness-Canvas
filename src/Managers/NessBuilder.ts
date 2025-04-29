@@ -1,6 +1,6 @@
 import { writeFileSync } from "fs";
-import { Canvas, CanvasRenderingContext2D, registerFont, CanvasPattern, CanvasGradient } from "canvas";
-import { CanvasImage, CustomColor, ImageExtention, Shape, ImagelocationOption, DrawlocationOption, ExpOption, FrameOption, TextOption, CustomFont, FrameContent, FrameType, ShapeEnum, LoadingOption, ShapeLoad, Axis, LoadingDirection, Hourly, IntRange } from "..";
+import { Canvas, CanvasRenderingContext2D, CanvasPattern, CanvasGradient } from "canvas";
+import { CanvasImage, CustomColor, ImageExtention, Shape, ImagelocationOption, DrawlocationOption, ExpOption, FrameOption, TextOption, FrameContent, FrameType, ShapeEnum, LoadingOption, ShapeLoad, Axis, LoadingDirection, Hourly, IntRange } from "..";
 import { colorCheck } from "../function";
 import { ExpColor } from "../Interfaces";
 
@@ -17,20 +17,12 @@ export default class NessBuilder {
   private axis: Axis;
   private frameCoordinate: FrameOption<Shape>;
   private frameTextCoordinate = { x: 0, y: 0};
-  private fontData: CustomFont = [];
   private loadingDirection: number;
 
   constructor(width: number, height: number) {
     this.setCanvas(width, height);
     this.context = this.canvas.getContext('2d');
   };
-
-  // private async initialize(dataPath: `${string}.ttf`, dataFont: FontOption): Promise<void> {
-  //   if (registerFont) {
-  //     await this.registerFont(dataPath, dataFont);
-  //   }
-  //   // Continuer avec l'initialisation du reste de votre objet ici
-  // }
 
   /**
    * New Canvas Dimension
@@ -128,7 +120,7 @@ export default class NessBuilder {
    *
    * @param typeShape Frame format
    * @param coordinate Coordinate X and Y from upper left corner of the frame
-   * @param size Frame size
+   * @param size Frame size (40px => 80px)
    * @param options Frame configuration
    */
   public setFrame<T extends FrameType, S extends Shape>(shape: S, frame: FrameOption<S>, options: FrameContent<T>): this {
@@ -139,7 +131,6 @@ export default class NessBuilder {
    
     this.setShape(shape, frame);
 
-    // this.context.closePath();
     this.context.stroke();
     this.context.clip();
 
@@ -147,7 +138,7 @@ export default class NessBuilder {
       return this.setFrameBackground(<CanvasImage>options.content);
     } else if (options.type == "Text") {
       
-      if (frame.rotate) this.setRotation(frame.x, frame.y, -frame.rotate)
+      // if (frame.rotate) this.setRotation(frame.x, frame.y, -frame.rotate)
 
       const textOptions = options.textOptions;
 
@@ -155,17 +146,11 @@ export default class NessBuilder {
         this.context.fillStyle = colorCheck(textOptions.backgroundColor);
         this.context.fill();
       };
-
-      const defaultTextOption: TextOption = {
-        size: 30,
-      };
-  
-      const textOption = textOptions?.size? { ...defaultTextOption, ...textOptions } : { ...textOptions, ...defaultTextOption }
-  
-
-      this.setText(options.content.toString(), { x: this.frameTextCoordinate.x, y: this.frameTextCoordinate.y }, { size: textOption.size, font: textOptions?.font? textOptions?.font : "*Arial" , color: textOptions?.color? textOptions.color : "#FFFFFF", textAlign: textOptions?.textAlign? textOptions.textAlign : "center", textBaseline: textOptions?.textBaseline? textOptions.textBaseline : "middle" });
+      
+      this.setText(options.content.toString(), { x: this.frameTextCoordinate.x, y: this.frameTextCoordinate.y }, { color: textOptions?.color? textOptions.color : "#FFFFFF", textAlign: textOptions?.textAlign? textOptions.textAlign : "center", textBaseline: textOptions?.textBaseline? textOptions.textBaseline : "middle" });
       
       this.restore();
+
       return this;
     } else if (options.type == "Color") {
       this.context.fillStyle = colorCheck(<CustomColor>options.content);
@@ -269,12 +254,10 @@ export default class NessBuilder {
 
       //   this.frameTextCoordinate.x = axis.x + frame.size / 2 + Math.cos(rot);
       //   this.frameTextCoordinate.y = axis.y + frame.size / 2 + Math.cos(rot);
-      //   this.context.closePath();
       //   break;
       // };
     };
     
-    // this.context.closePath();
     return this;
   };
 
@@ -316,13 +299,12 @@ export default class NessBuilder {
    * @param coordinate Text location
    * @param option Text option
    */
-  public setText(text: string, coordinate: {x: number, y: number}, option: TextOption): this {
-    option.font? this.setFont(option.font, option.size) : this.setFont("*Sans", option.size);
+  public setText(text: string, coordinate: {x: number, y: number}, option?: TextOption): this {
 
-    this.context.fillStyle = option.color ? colorCheck(option.color) : "#FFF";
-    this.context.textAlign = option.textAlign;
-    this.context.textBaseline = option.textBaseline;
-    option.stroke ? this.context.strokeText(text, coordinate.x, coordinate.y) : this.context.fillText(text, coordinate.x, coordinate.y);
+    this.context.fillStyle = option?.color ? colorCheck(option.color) : "#FFF";
+    this.context.textAlign = option?.textAlign;
+    this.context.textBaseline = option?.textBaseline;
+    option?.stroke ? this.context.strokeText(text, coordinate.x, coordinate.y) : this.context.fillText(text, coordinate.x, coordinate.y);
 
     return this;
   };
@@ -330,61 +312,18 @@ export default class NessBuilder {
   /**
    * Change font to use
    * 
-   * @param name Add * to use the system font (*Arial) or CustomFont (RegisterFont)
+   * @param name System font name
    * @param size Font size
    */
   public setFont(name: string, size?: number): this {
-    if (this.getFont(name)) {
-      this.context.font = `${size}px ${name.replace("*", "")}`;
-    };
-    return this;
-  };
-
-  // Récupère une police enregistrer hormis celle du système
-  private getFont(name: string, option?: { path?: `${string}.ttf` }): boolean {
-    const dataF = this.fontData.find(x => x.font.family === name)
-    
-    if (option?.path) {
-      const dataP = this.fontData.find(x => x.file === option.path)
-  
-
-      if (dataP) {
-        console.error(`\x1b[33mRegisterFont: \x1b[32mThis file (\x1b[31m${option.path.replace(/^.*[\\/]/, "")}\x1b[32m) has already been register for \x1b[35m${dataP.font.family}\x1b[0m`);
-        return false;
-      } else if (dataF) {
-        console.error(`\x1b[33mRegisterFont: \x1b[32mThis name (\x1b[31m${dataF.font.family}\x1b[32m) has already been register for \x1b[35m${dataF.file.replace(/^.*[\\/]/, "")}\x1b[0m`);
-        return false;
-      }
-
-      return true;
-    } else {
-      if (!dataF && !name.startsWith('*')) {
-        console.error(`\x1b[33mRegisterFont: \x1b[31m${name} \x1b[32mis not part of the police register\x1b[0m`);
-        return false;
-      }
-
-      return true;
-    }
-  }
-
-  /**
-   * register a new font
-   * 
-   * @param path Path to font file (file.ttf)
-   * @param option Font default settings
-   */
-  private /*public*/ registerFont(font: CustomFont) {
-
-    font.forEach(e => {
-      if (this.getFont(e.font.family, { path: e.file })) {
-        registerFont(e.file, e.font);
-        this.fontData.push({ file: e.file, font: e.font });
-        console.log(`\x1b[33mRegisterFont: \x1b[35m${e.font.family} \x1b[30m| \x1b[32msize - \x1b[35m${e.font.size? e.font.size + "px" : "Default"} \x1b[30m| \x1b[32mStyle - \x1b[35m${e.font.style}\x1b[0m`);
-      };
-    });
-
+    this.context.font = `${size}px ${name}` 
 
     return this;
+
+    //  * @param name Add * to use the system font (*Arial) or CustomFont (RegisterFont)
+    // if (this.getFont(name)) {
+      // this.context.font = `${size}px ${name.replace("*", "")}`;
+    // };
   };
 
   // Restore la sélection
@@ -625,11 +564,71 @@ export default class NessBuilder {
     else if (this.axis == "TopRight") return { x: frame.x + frame.size, y: frame.y - heightSize };
     else if (this.axis == "BottomLeft") return { x: frame.x - frame.size, y: frame.y + heightSize };
     else if (this.axis == "BottomCenter") return { x: frame.x, y: frame.y + heightSize };
-    else if (this.axis == "BottomRight") return { x: frame.x + frame.size, y: frame.y + heightSize };
+    else if (this.axis == "BottomRight") return { x: frame.x + frame.size , y: frame.y + heightSize };
     else if (this.axis == "Left") return { x: frame.x - frame.size, y: frame.y };
     else if (this.axis == "Right") return { x: frame.x + frame.size, y: frame.y };
     else return { x: frame.x, y: frame.y };
   };
+
+  public setBanner({x, y, size1, size2, n, color, lineWidth, extend, join }) {
+
+    const axis = this.getAxis({ x, y, size: size1 }, size2)
+    
+    this.context.save();
+    this.context.strokeStyle = color? colorCheck(color) : "#FF0000";
+    this.context.lineWidth = lineWidth? lineWidth : 3;
+    
+    // ctx.lineJoin = "round"; ["round", "bevel", "miter"]
+    
+    this.context.lineJoin = join
+    
+    this.context.beginPath();
+    this.context.moveTo(x, y);
+    this.context.lineTo(size1, y);
+
+    switch (/*shape*/n) {
+      default: {
+        const angle = (Math.PI * 2) / /*ShapeEnum[shape as keyof typeof ShapeEnum]*/n;
+        let b = 0
+
+        for (let i = n/2; i <= /*ShapeEnum[shape as keyof typeof ShapeEnum]*/n; i++) {
+          const autoX = size1 + extend * Math.sin(angle * i);
+          const autoY = size2 + (size2/2) * Math.cos(angle * i);
+
+          this.context.lineTo(autoX, autoY);
+          b = i;
+        };
+
+        
+    this.context.lineTo( x, y + size2);
+
+        for (let i = 0; i <= /*ShapeEnum[shape as keyof typeof ShapeEnum]*/n/2; i++) {
+          const autoX = x + extend * Math.sin(angle * i);
+          const autoY = size2 + (size2/2) * Math.cos(angle * i);
+
+          this.context.lineTo(autoX, autoY);
+        };
+
+        this.frameTextCoordinate = { x: axis.x, y: axis.y };
+        break;
+      };
+    };
+
+    this.context.closePath()
+    this.context.stroke();
+    this.context.clip();
+
+
+
+
+
+
+
+
+    
+    this.restore();
+    return this;
+  }
 
   /**
    * Return canvas Buffer
@@ -663,3 +662,77 @@ export default class NessBuilder {
   };
 
 }
+
+
+
+
+
+
+
+
+
+  // Old Code / Don't work for now
+
+
+
+
+  // private fontData: CustomFont = [];
+
+
+
+  // private async initialize(dataPath: `${string}.ttf`, dataFont: FontOption): Promise<void> {
+  //   if (registerFont) {
+  //     await this.registerFont(dataPath, dataFont);
+  //   }
+  //   // Continuer avec l'initialisation du reste de votre objet ici
+  // }
+
+
+
+  // // Récupère une police enregistrer hormis celle du système
+  // private getFont(name: string, option?: { path?: `${string}.ttf` }): boolean {
+  //   const dataF = this.fontData.find(x => x.font.family === name)
+    
+  //   if (option?.path) {
+  //     const dataP = this.fontData.find(x => x.file === option.path)
+  
+
+  //     if (dataP) {
+  //       console.error(`\x1b[33mRegisterFont: \x1b[32mThis file (\x1b[31m${option.path.replace(/^.*[\\/]/, "")}\x1b[32m) has already been register for \x1b[35m${dataP.font.family}\x1b[0m`);
+  //       return false;
+  //     } else if (dataF) {
+  //       console.error(`\x1b[33mRegisterFont: \x1b[32mThis name (\x1b[31m${dataF.font.family}\x1b[32m) has already been register for \x1b[35m${dataF.file.replace(/^.*[\\/]/, "")}\x1b[0m`);
+  //       return false;
+  //     }
+
+  //     return true;
+  //   } else {
+  //     if (!dataF && !name.startsWith('*')) {
+  //       console.error(`\x1b[33mRegisterFont: \x1b[31m${name} \x1b[32mis not part of the police register\x1b[0m`);
+  //       return false;
+  //     }
+
+  //     return true;
+  //   }
+  // }
+
+
+  // /**
+  //  * register a new font
+  //  * 
+  //  * @param path Path to font file (file.ttf)
+  //  * @param option Font default settings
+  //  */
+  // private /*public*/ registerFont(font: CustomFont) {
+
+  //   font.forEach(e => {
+  //     if (this.getFont(e.font.family, { path: e.file })) {
+  //       registerFont(e.file, e.font);
+  //       this.fontData.push({ file: e.file, font: e.font });
+  //       console.log(`\x1b[33mRegisterFont: \x1b[35m${e.font.family} \x1b[30m| \x1b[32msize - \x1b[35m${e.font.size? e.font.size + "px" : "Default"} \x1b[30m| \x1b[32mStyle - \x1b[35m${e.font.style}\x1b[0m`);
+  //     };
+  //   });
+
+
+  //   return this;
+  // };

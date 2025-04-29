@@ -7,6 +7,9 @@
   "license": "BSD 3-Clause",
   "private": false,
   "types": "./index.d.ts",
+  "scripts": {
+    "dev": "ts-node ./src/test/main.ts"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/DARK-ECNELIS/ness-canvas.git"
@@ -27,8 +30,8 @@
     "filter"
   ],
   "devDependencies": {
-    "@types/node": "^20.17.24",
-    "typescript": "^5.8.2"
+    "@types/node": "^20.17.32",
+    "typescript": "^5.8.3"
   },
   "dependencies": {
     "canvas": "^3.1.0"

@@ -228,14 +228,6 @@ export interface ExpOption {
  */
 export interface TextOption {
    /**
-    * text size
-    */
-   size: number,
-   /**
-    *  change font to use, add * for use font system (*Arial or *Calibri, ...)
-    */
-   font?: string,
-   /**
     * Text color (Valid syntaxes: #hex(a) | rgb(a) | colorName | CanvasGradient | CanvasPattern)
     */
    color?: CustomColor,
