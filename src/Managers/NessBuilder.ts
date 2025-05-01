@@ -1,8 +1,7 @@
 import { writeFileSync } from "fs";
-import { Canvas, CanvasRenderingContext2D, CanvasPattern, CanvasGradient, Image } from "canvas";
-import { CanvasImage, CustomColor, ImageExtention, Shape, ImagelocationOption, DrawlocationOption, ExpOption, FrameOption, TextOption, FrameContent, FrameType, ShapeEnum, LoadingOption, ShapeLoad, Axis, LoadingDirection, Hourly, IntRange } from "..";
+import { Canvas, CanvasRenderingContext2D, CanvasPattern, CanvasGradient } from "canvas";
+import { CanvasImage, CustomColor, ImageExtention, Shape, ImagelocationOption, DrawlocationOption, ExpOption, FrameOption, TextOption, FrameContent, FrameType, ShapeEnum, LoadingOption, ShapeLoad, Axis, LoadingDirection, Hourly, IntRange, ExpColor, Banner } from "..";
 import { colorCheck } from "../function";
-import { Banner, ExpColor } from "../Interfaces";
 
 export default class NessBuilder {
   

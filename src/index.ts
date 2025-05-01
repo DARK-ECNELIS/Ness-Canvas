@@ -1,5 +1,5 @@
 import { Canvas, Image } from "canvas";
-import { FontOption } from "./Interfaces";
+// import { FontOption } from "./Interfaces";
 
 declare type CanvasImage = Image | Canvas;
 declare type ImageExtention = "png" | "jpg" | "jpeg" | "bmp" | "tif" | "tiff";
@@ -18,7 +18,7 @@ declare type ShapeLoad = "Circle" | "Line";
 declare type Axis = "Left" | "Center" | "Right" | "TopLeft" | "TopCenter" | "TopRight" | "BottomLeft" | "BottomCenter" | "BottomRight";
 declare type LoadingDirection = "UpToDown" | "DownToUp" | "LeftToRight" | "RightToLeft" | "UpLeftToDownRight" | "UpRightToDownLeft" | "DownRightToUpLeft" | "DownLeftToUpRight";
 
-declare type CustomFont = Array<{file: `${string}.ttf`, font: FontOption}>;
+// declare type CustomFont = Array<{file: `${string}.ttf`, font: FontOption}>;
 
 type Enumerate<N extends number, Acc extends number[] = []> = Acc['length']extends N? Acc[number] : Enumerate<N, [...Acc, Acc['length']]>;
 type IntRange<F extends number, T extends number> = Exclude<Enumerate<T>, Enumerate<F>>;
@@ -56,9 +56,9 @@ enum Edge {
 declare type Preset = 'classic';
 
 
-export { Preset, Shape, CustomColor, CanvasImage, ImageExtention, ImageChannels, Edge, CustomFont, FrameType, ShapeEnum, ShapeLoad, Progress, Axis, LoadingDirection, Hourly, RGBAColor,RGBColor, IntRange };
+export { Preset, Shape, CustomColor, CanvasImage, ImageExtention, ImageChannels, Edge, /*CustomFont,*/ FrameType, ShapeEnum, ShapeLoad, Progress, Axis, LoadingDirection, Hourly, RGBAColor,RGBColor, IntRange };
 
-export { ImagelocationOption, DrawlocationOption, FrameOption, ExpOption, FrameContent, TextOption, FontOption, LoadingOption } from './Interfaces';
+export { ImagelocationOption, DrawlocationOption, FrameOption, ExpOption, FrameContent, TextOption, /*FontOption,*/ LoadingOption, Banner, ExpColor } from './Interfaces';
 
 export { default as NessBuilder } from './Managers/NessBuilder';
 export { default as FilterBuilder } from './Managers/FilterBuilder';
