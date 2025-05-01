@@ -1,8 +1,8 @@
 import { writeFileSync } from "fs";
-import { Canvas, CanvasRenderingContext2D, CanvasPattern, CanvasGradient } from "canvas";
+import { Canvas, CanvasRenderingContext2D, CanvasPattern, CanvasGradient, Image } from "canvas";
 import { CanvasImage, CustomColor, ImageExtention, Shape, ImagelocationOption, DrawlocationOption, ExpOption, FrameOption, TextOption, FrameContent, FrameType, ShapeEnum, LoadingOption, ShapeLoad, Axis, LoadingDirection, Hourly, IntRange } from "..";
 import { colorCheck } from "../function";
-import { ExpColor } from "../Interfaces";
+import { Banner, ExpColor } from "../Interfaces";
 
 export default class NessBuilder {
   
@@ -570,41 +570,39 @@ export default class NessBuilder {
     else return { x: frame.x, y: frame.y };
   };
 
-  public setBanner({x, y, size1, size2, n, color, lineWidth, extend, join }) {
+  public setBanner<T extends FrameType>(banner: Banner, content: FrameContent<T>) {
 
-    const axis = this.getAxis({ x, y, size: size1 }, size2)
-    
+    const { location: { x, y }, size: { width, height }, outline: { size, color, join }, Side: { n, extend } } = banner
+
+    const axis = this.getAxis({ x, y, size: width/2 }, height/2)
+
     this.context.save();
     this.context.strokeStyle = color? colorCheck(color) : "#FF0000";
-    this.context.lineWidth = lineWidth? lineWidth : 3;
-    
-    // ctx.lineJoin = "round"; ["round", "bevel", "miter"]
-    
-    this.context.lineJoin = join
+    this.context.lineWidth = size? size : 3;
+    this.context.lineJoin = join;
     
     this.context.beginPath();
-    this.context.moveTo(x, y);
-    this.context.lineTo(size1, y);
+    this.context.moveTo(axis.x - width/2, axis.y - height/2);
+    this.context.lineTo(axis.x + width/2, axis.y - height/2);
 
-    switch (/*shape*/n) {
+    switch (n) {
       default: {
-        const angle = (Math.PI * 2) / /*ShapeEnum[shape as keyof typeof ShapeEnum]*/n;
+        const angle = (Math.PI * 2) / (n*2);
         let b = 0
 
-        for (let i = n/2; i <= /*ShapeEnum[shape as keyof typeof ShapeEnum]*/n; i++) {
-          const autoX = size1 + extend * Math.sin(angle * i);
-          const autoY = size2 + (size2/2) * Math.cos(angle * i);
+        for (let i = n; i <= n*2; i++) {
+          const autoX = axis.x + width/2 + extend * Math.sin(angle * i);
+          const autoY = axis.y + (height/2) * Math.cos(angle * i);
 
           this.context.lineTo(autoX, autoY);
           b = i;
         };
-
         
-    this.context.lineTo( x, y + size2);
+        this.context.lineTo(axis.x - width/2, axis.y + height/2);
 
-        for (let i = 0; i <= /*ShapeEnum[shape as keyof typeof ShapeEnum]*/n/2; i++) {
-          const autoX = x + extend * Math.sin(angle * i);
-          const autoY = size2 + (size2/2) * Math.cos(angle * i);
+        for (let i = 0; i <= n; i++) {
+          const autoX = axis.x - width/2 + extend * Math.sin(angle * i);
+          const autoY = axis.y + (height/2) * Math.cos(angle * i);
 
           this.context.lineTo(autoX, autoY);
         };
@@ -618,16 +616,34 @@ export default class NessBuilder {
     this.context.stroke();
     this.context.clip();
 
+    if (content.type == "Image") {
+      return this.setImage(<CanvasImage>content.content, { sx: axis.x - width/2 + (extend < 0 ? extend : 0), sy: axis.y - height/2, sWidth: width - (extend < 0 ? extend*2 : 0), sHeight: height })
+    } else if (content.type == "Text") {
+      
+      // if (frame.rotate) this.setRotation(frame.x, frame.y, -frame.rotate)
 
+      const textOptions = content.textOptions;
 
+      if (textOptions?.backgroundColor) {
+        this.context.fillStyle = colorCheck(textOptions.backgroundColor);
+        this.context.fill();
+      };
+      
+      this.setText(content.content.toString(), { x: this.frameTextCoordinate.x, y: this.frameTextCoordinate.y }, { color: textOptions?.color? textOptions.color : "#FFFFFF", textAlign: textOptions?.textAlign? textOptions.textAlign : "center", textBaseline: textOptions?.textBaseline? textOptions.textBaseline : "middle" });
+      
+      this.restore();
 
+      return this;
+    } else if (content.type == "Color") {
+      this.context.fillStyle = colorCheck(<CustomColor>content.content);
 
-
-
-
-    
-    this.restore();
-    return this;
+      this.context.fill();
+      this.restore();
+      return this;
+    } else {
+      this.restore();
+      return this;
+    }
   }
 
   /**

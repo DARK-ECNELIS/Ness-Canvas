@@ -1,6 +1,58 @@
 import { CanvasImage, CustomColor, FrameType, LoadingDirection, Progress, Shape, ShapeLoad, Hourly, IntRange } from ".";
 
 /**
+ * Two-dimensional point on the canvas
+ */
+interface Location {
+   /**
+    * Horizontal coordinate (X-axis)
+    */
+   x: number;
+ 
+   /**
+    * Vertical coordinate (Y-axis)
+    */
+   y: number;
+}
+
+/**
+ * Size on two-dimensional canvas point 
+ */
+interface Size {
+   /**
+    * Size on X-axis
+    */
+   width: number;
+   /**
+    * Size on Y-axis
+    */
+   height: number;
+}
+
+/**
+ * Outline parameter
+ */
+interface Outline {
+   /**
+    * Outline size
+    */
+   size: number;
+   /**
+    * Outline color
+    * 
+    * colorName | #hex(a) | rgb(a) | CanvasGradient | CanvasPattern
+    */
+   color: CustomColor;
+   /**
+    * Connection type between drawing segments 
+    * 
+    * bevel | miter | round
+    */
+   join: CanvasLineJoin
+}
+
+
+/**
  * Source image coordinates to draw in the context of Canvas.
  */
 export interface ImagelocationOption {
@@ -272,20 +324,52 @@ export interface ExpColor {
 }
 
 
-
-
-
-export interface FontOption {
+export interface Banner {
    /**
-    * Default name to use
+    * Banner position on the two-dimensional canvas point
     */
-   family: string,
+   location: Location
    /**
-    * Default font size
+    * Banner size
     */
-   size?: string,
+   size: Size
    /**
-    * Default police style
+    * Outline parameter
     */
-   style?: "italic" | "normal" | "oblique" | "inherit" | "initial" | "unset"
+   outline: Outline
+   /**
+    * Side parameter
+    */
+   Side: {
+      /**
+       * Number of segments
+       */
+      n: number
+      /**
+       * Stretching segments
+       * 
+       * positive number extends inward and negative number outwards
+       */
+      extend: number
+   }
+
 }
+
+
+
+
+
+// export interface FontOption {
+//    /**
+//     * Default name to use
+//     */
+//    family: string,
+//    /**
+//     * Default font size
+//     */
+//    size?: string,
+//    /**
+//     * Default police style
+//     */
+//    style?: "italic" | "normal" | "oblique" | "inherit" | "initial" | "unset"
+// }
