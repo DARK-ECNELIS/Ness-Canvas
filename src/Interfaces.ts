@@ -65,6 +65,10 @@ export interface FrameOption <S extends Shape> {
     */
    rotate?: number;
    /**
+    * Frame line size
+    */
+   lineWidth?: number
+   /**
     * Additional parameter for the square and Rectangle
     */
    QuadrilateralOption?: S extends "Rectangle" ? {
@@ -107,11 +111,7 @@ export interface FrameContent <T extends FrameType> {
    /**
     * Frame line color (a degrade can be applied with [createRadialGradient | createLinearGradient] of canvas module)
     */
-   color: CustomColor,
-   /**
-    * Frame line size
-    */
-   lineWidth?: number
+   color: CustomColor
 }
 
 /**

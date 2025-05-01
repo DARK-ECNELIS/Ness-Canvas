@@ -127,7 +127,7 @@ export default class NessBuilder {
 
     this.context.save();
     this.context.strokeStyle = options.color? colorCheck(options.color) : "#FF0000";
-    this.context.lineWidth = options.lineWidth? options.lineWidth : 3;
+    this.context.lineWidth = frame.lineWidth? frame.lineWidth : 3;
    
     this.setShape(shape, frame);
 
