@@ -1,4 +1,4 @@
-# Ness-Canvas 2.4.0
+# Ness-Canvas 2.5.0
 
 <div align="center">
   <br/>
@@ -6,8 +6,7 @@
     <h1 href="https://discord.gg/sjABtBmTWa">Join Discord</h1>
   </p>
   <p>
-    <a href="https://discord.gg/sjABtBmTWa"><img src="https://dcbadge.vercel.app/api/server/sjABtBmTWa?style=plastic&theme=discord-inverted&compact=true" alt="discord server" height=18/>
-    </a>
+    <img alt="Discord" src="https://img.shields.io/discord/726208970489987152?style=plastic&logo=discord&label=Discord&color=%239400D3&link=https%3A%2F%2Fdiscord.gg%2FsjABtBmTWa">
     <a href="https://www.npmjs.com/package/ness-canvas"><img src="https://badge.fury.io/js/ness-canvas.png" alt="npm version" height=18 />
     </a>
     <a href="https://www.npmjs.com/package/ness-canvas"><img src="https://img.shields.io/npm/dt/ness-canvas.png" alt="npm download" height=18 />
