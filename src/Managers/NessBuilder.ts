@@ -1,6 +1,6 @@
 import { writeFileSync } from "fs";
 import { Canvas, CanvasRenderingContext2D, CanvasPattern, CanvasGradient } from "canvas";
-import { CanvasImage, CustomColor, ImageExtention, Shape, ImagelocationOption, DrawlocationOption, ExpOption, FrameOption, TextOption, FrameContent, FrameType, ShapeEnum, LoadingOption, ShapeLoad, Axis, LoadingDirection, Hourly, IntRange, ExpColor, Banner } from "..";
+import { CanvasImage, CustomColor, ImageExtention, Shape, ImagelocationOption, DrawlocationOption, Text, FrameType, ShapeEnum, ShapeLoad, Axis, LoadingDirection, Hourly, IntRange, Banner, AxisInt, Frame, Content, Loading, Experience, ExperienceColor } from "..";
 import { colorCheck } from "../function";
 
 export default class NessBuilder {
@@ -14,7 +14,7 @@ export default class NessBuilder {
   };
 
   private axis: Axis;
-  private frameCoordinate: FrameOption<Shape>;
+  private frameCoordinate: Frame<Shape>;
   private frameTextCoordinate = { x: 0, y: 0};
   private loadingDirection: number;
 
@@ -122,37 +122,37 @@ export default class NessBuilder {
    * @param size Frame size (40px => 80px)
    * @param options Frame configuration
    */
-  public setFrame<T extends FrameType, S extends Shape>(shape: S, frame: FrameOption<S>, options: FrameContent<T>): this {
+  public setFrame<T extends FrameType, S extends Shape>(shape: S, frame: Frame<S>, content: Content<T>): this {
 
     this.context.save();
-    this.context.strokeStyle = options.color? colorCheck(options.color) : "#FF0000";
-    this.context.lineWidth = frame.lineWidth? frame.lineWidth : 3;
-   
+    this.context.strokeStyle = colorCheck(frame.outline.color)
+    this.context.lineWidth = frame.outline.size;
+
     this.setShape(shape, frame);
 
     this.context.stroke();
     this.context.clip();
 
-    if (options.type == "Image") {
-      return this.setFrameBackground(<CanvasImage>options.content);
-    } else if (options.type == "Text") {
+    if (content.type == "Image") {
+      return this.setFrameBackground(<CanvasImage>content.content);
+    } else if (content.type == "Text") {
       
       // if (frame.rotate) this.setRotation(frame.x, frame.y, -frame.rotate)
 
-      const textOptions = options.textOptions;
+      const textOptions = content.text;
 
       if (textOptions?.backgroundColor) {
         this.context.fillStyle = colorCheck(textOptions.backgroundColor);
         this.context.fill();
       };
       
-      this.setText(options.content.toString(), { x: this.frameTextCoordinate.x, y: this.frameTextCoordinate.y }, { color: textOptions?.color? textOptions.color : "#FFFFFF", textAlign: textOptions?.textAlign? textOptions.textAlign : "center", textBaseline: textOptions?.textBaseline? textOptions.textBaseline : "middle" });
+      this.setText(content.content.toString(), { x: this.frameTextCoordinate.x, y: this.frameTextCoordinate.y }, { color: textOptions?.color? textOptions.color : "#FFFFFF", textAlign: textOptions?.textAlign? textOptions.textAlign : "center", textBaseline: textOptions?.textBaseline? textOptions.textBaseline : "middle" });
       
       this.restore();
 
       return this;
-    } else if (options.type == "Color") {
-      this.context.fillStyle = colorCheck(<CustomColor>options.content);
+    } else if (content.type == "Color") {
+      this.context.fillStyle = colorCheck(<CustomColor>content.content);
 
       this.context.fill();
       this.restore();
@@ -164,9 +164,9 @@ export default class NessBuilder {
   };
   
   // Mise en palce d'un cadre
-  private setShape<S extends Shape>(shape: S, frame: FrameOption<S>): this {
+  private setShape<S extends Shape>(shape: S, frame: Frame<S>): this {
 
-    const axis = this.getAxis(frame);
+    const axis = this.getAxis({location: { x: frame.location.x, y: frame.location.y }, size: frame.size });
     // frame.x = axis.x, frame.y = axis.y;
     this.frameCoordinate = {...frame, ...axis};
     
@@ -174,10 +174,10 @@ export default class NessBuilder {
 
     this.context.beginPath();
 
-    const radius = (["Square", "Rectangle"].includes(shape) && frame.QuadrilateralOption)? frame.QuadrilateralOption.radius : 15;
+    const radius = (["Square", "Rectangle"].includes(shape) && frame.Quadrilateral)? frame.Quadrilateral.radius : 15;
 
-    const sizeX = (frame.QuadrilateralOption as any)?.width && shape.includes("Rectangle") ? (frame.QuadrilateralOption as any).width : frame.size;
-    const sizeY = (frame.QuadrilateralOption as any)?.height && shape.includes("Rectangle") ? (frame.QuadrilateralOption as any).height : frame.size;
+    const sizeX = (frame.Quadrilateral as any)?.width && shape.includes("Rectangle") ? (frame.Quadrilateral as any).width : frame.size;
+    const sizeY = (frame.Quadrilateral as any)?.height && shape.includes("Rectangle") ? (frame.Quadrilateral as any).height : frame.size;
 
     const r = axis.x + sizeX;
     const b = axis.y + sizeY;
@@ -198,7 +198,7 @@ export default class NessBuilder {
         break;
       }
       case "Rectangle": {
-        const sizeX = (frame.QuadrilateralOption as any)?.width? (frame.QuadrilateralOption as any).width : axis.x;
+        const sizeX = (frame.Quadrilateral as any)?.width? (frame.Quadrilateral as any).width : axis.x;
         const r = axis.x + sizeX;
 
         this.context.moveTo(axis.x + radius - sizeX, axis.y - sizeY);
@@ -256,6 +256,8 @@ export default class NessBuilder {
       //   break;
       // };
     };
+
+    this.context.closePath()
     
     return this;
   };
@@ -270,7 +272,7 @@ export default class NessBuilder {
   // Définition du background du cadre
   private setFrameBackground(image: CanvasImage): this {
 
-    this.setRotation(this.frameCoordinate.x , this.frameCoordinate.y , -this.frameCoordinate.rotate);
+    this.setRotation(this.frameCoordinate.location.x , this.frameCoordinate.location.y , -this.frameCoordinate.rotate);
 
     while (this.frameCoordinate.rotate > 45 || this.frameCoordinate.rotate < -45) {
       if (this.frameCoordinate.rotate > 0) this.frameCoordinate.rotate -= 45;
@@ -281,7 +283,7 @@ export default class NessBuilder {
     const size2 = this.frameCoordinate.rotate? 0.018 * this.frameCoordinate.rotate : 0;
 
     if (typeof image == "object" && !(image instanceof CanvasPattern) && !(image instanceof CanvasGradient)) {
-      this.setImage(image, {sx: this.frameCoordinate.x - this.frameCoordinate.size*(1 + size), sy: this.frameCoordinate.y - this.frameCoordinate.size*(1 + size), sWidth: this.frameCoordinate.size*(2 + size2), sHeight: this.frameCoordinate.size*(2 + size2) });
+      this.setImage(image, {sx: this.frameCoordinate.location.x - this.frameCoordinate.size*(1 + size), sy: this.frameCoordinate.location.y - this.frameCoordinate.size*(1 + size), sWidth: this.frameCoordinate.size*(2 + size2), sHeight: this.frameCoordinate.size*(2 + size2) });
     } else {
       this.customBackground(image);
     }
@@ -298,7 +300,7 @@ export default class NessBuilder {
    * @param coordinate Text location
    * @param option Text option
    */
-  public setText(text: string, coordinate: {x: number, y: number}, option?: TextOption): this {
+  public setText(text: string, coordinate: {x: number, y: number}, option?: Text): this {
 
     this.context.fillStyle = option?.color ? colorCheck(option.color) : "#FFF";
     this.context.textAlign = option?.textAlign;
@@ -341,64 +343,64 @@ export default class NessBuilder {
    * @param progress Progression of the second progression bar 0 - 100%
    * @param color Text color. White color is used by Default
    */
-  public setExp(option: ExpOption, progress: IntRange<0, 101>, color?: ExpColor): this {
+  public setExp(exp: Experience, progress: IntRange<0, 101>, color?: ExperienceColor): this {
     
-    const axis = this.getAxis({ x: option.x, y: option.y, size: option.width }, option.height)
-    this.setRotation(axis.x, axis.y, option.rotate);
+    const axis = this.getAxis({ location: exp.location, size: exp.size.width, height: exp.size.height })
+    this.setRotation(axis.x, axis.y, exp.rotate);
 
     this.context.save();
     this.context.beginPath();
-    this.context.strokeStyle = color?.outlineColor1? colorCheck(color.outlineColor1) : "#FF0000";
+    this.context.strokeStyle = color?.backOutlineColor? colorCheck(color.backOutlineColor) : "#FF0000";
     this.context.lineWidth = 2;
 
-    this.context.globalAlpha = option.alphat ? option.alphat/100 : 0.3;
+    this.context.globalAlpha = color.transparency ? color.transparency/100 : 0.3;
 
     // Barre N°1
-    this.context.moveTo(axis.x - option.width, axis.y - option.height);
-    this.context.lineTo(axis.x, axis.y - option.height);
-    this.context.quadraticCurveTo(axis.x + option.radius, axis.y - option.height, axis.x + option.radius, axis.y - (option.height /2));
-    this.context.quadraticCurveTo(axis.x + option.radius, axis.y, axis.x, axis.y);
-    this.context.lineTo(axis.x - option.width, axis.y);
-    this.context.quadraticCurveTo(axis.x - option.width - option.radius, axis.y, axis.x - option.width - option.radius, axis.y - (option.height /2));
-    this.context.quadraticCurveTo(axis.x - option.width - option.radius, axis.y - option.height, axis.x - option.width, axis.y - option.height);
+    this.context.moveTo(axis.x - exp.size.width, axis.y - exp.size.height);
+    this.context.lineTo(axis.x, axis.y - exp.size.height);
+    this.context.quadraticCurveTo(axis.x + exp.radius, axis.y - exp.size.height, axis.x + exp.radius, axis.y - (exp.size.height /2));
+    this.context.quadraticCurveTo(axis.x + exp.radius, axis.y, axis.x, axis.y);
+    this.context.lineTo(axis.x - exp.size.width, axis.y);
+    this.context.quadraticCurveTo(axis.x - exp.size.width - exp.radius, axis.y, axis.x - exp.size.width - exp.radius, axis.y - (exp.size.height /2));
+    this.context.quadraticCurveTo(axis.x - exp.size.width - exp.radius, axis.y - exp.size.height, axis.x - exp.size.width, axis.y - exp.size.height);
 
-    this.context.fillStyle = color?.color1? colorCheck(color.color1) : "#FFFFFF"
+    this.context.fillStyle = color?.backColor? colorCheck(color.backColor) : "#FFFFFF"
     this.context.fill()
     this.context.stroke();
 
-    if ((progress * 100) / option.width < 6.8) {
+    if ((progress * 100) / exp.size.width < 6.8) {
       this.context.clip()
     }
     this.context.closePath()
 
-    const progressFill = ((progress * option.width) / 100) - axis.x + option.x
+    const progressFill = ((progress * exp.size.width) / 100) - axis.x + exp.location.x
 
     this.context.globalAlpha = 1;
 
     // Barre N°2
     this.context.beginPath();
-    this.context.strokeStyle = color?.outlineColor2? colorCheck(color.outlineColor2) : "#000000";
+    this.context.strokeStyle = color?.outlineColor? colorCheck(color.outlineColor) : "#000000";
     this.context.lineWidth = 2;
 
-    this.context.moveTo(axis.x - option.width, axis.y - option.height);
-    this.context.lineTo(axis.x + progressFill, axis.y - option.height);
-    this.context.quadraticCurveTo(axis.x + option.radius + progressFill, axis.y - option.height, axis.x + option.radius + progressFill, axis.y - (option.height /2));
-    this.context.quadraticCurveTo(axis.x + option.radius + progressFill, axis.y, axis.x + progressFill, axis.y);
-    this.context.lineTo(axis.x - option.width, axis.y);
-    this.context.quadraticCurveTo(axis.x - option.width - option.radius, axis.y, axis.x - option.width - option.radius, axis.y - (option.height /2));
-    this.context.quadraticCurveTo(axis.x - option.width - option.radius, axis.y - option.height, axis.x - option.width, axis.y - option.height);
+    this.context.moveTo(axis.x - exp.size.width, axis.y - exp.size.height);
+    this.context.lineTo(axis.x + progressFill, axis.y - exp.size.height);
+    this.context.quadraticCurveTo(axis.x + exp.radius + progressFill, axis.y - exp.size.height, axis.x + exp.radius + progressFill, axis.y - (exp.size.height /2));
+    this.context.quadraticCurveTo(axis.x + exp.radius + progressFill, axis.y, axis.x + progressFill, axis.y);
+    this.context.lineTo(axis.x - exp.size.width, axis.y);
+    this.context.quadraticCurveTo(axis.x - exp.size.width - exp.radius, axis.y, axis.x - exp.size.width - exp.radius, axis.y - (exp.size.height /2));
+    this.context.quadraticCurveTo(axis.x - exp.size.width - exp.radius, axis.y - exp.size.height, axis.x - exp.size.width, axis.y - exp.size.height);
 
 
     // this.context.moveTo(axis.x, axis.y);
     // this.context.lineTo(axis.x + progressFill, axis.y);
-    // this.context.quadraticCurveTo(axis.x + progressFill + option.radius, axis.y, axis.x + progressFill + option.radius, axis.y + (option.height /2));
-    // this.context.quadraticCurveTo(axis.x + progressFill + option.radius, axis.y + option.height, axis.x + progressFill, axis.y + option.height);
-    // this.context.lineTo(axis.x, axis.y + option.height);
-    // this.context.quadraticCurveTo(axis.x - option.radius, axis.y + option.height, axis.x - option.radius, axis.y + (option.height /2));
-    // this.context.quadraticCurveTo(axis.x - option.radius, axis.y, axis.x, axis.y);
+    // this.context.quadraticCurveTo(axis.x + progressFill + exp.radius, axis.y, axis.x + progressFill + exp.radius, axis.y + (exp.size.height /2));
+    // this.context.quadraticCurveTo(axis.x + progressFill + exp.radius, axis.y + exp.size.height, axis.x + progressFill, axis.y + exp.size.height);
+    // this.context.lineTo(axis.x, axis.y + exp.size.height);
+    // this.context.quadraticCurveTo(axis.x - exp.radius, axis.y + exp.size.height, axis.x - exp.radius, axis.y + (exp.size.height /2));
+    // this.context.quadraticCurveTo(axis.x - exp.radius, axis.y, axis.x, axis.y);
 
 
-    this.context.fillStyle = color?.color2? colorCheck(color.color2) : "#BB00FF";
+    this.context.fillStyle = color?.color? colorCheck(color.color) : "#BB00FF";
     this.context.fill();
     this.context.stroke();
 
@@ -406,7 +408,7 @@ export default class NessBuilder {
     return this;
   };
 
-  public setLoading<D extends ShapeLoad, S extends Shape>(shape: Shape, option: LoadingOption<D, S>): this {
+  public setLoading<D extends ShapeLoad, S extends Shape>(shape: Shape, option: Loading<S, D>): this {
 
     const progress = option.progress/100;
     // const endAngle = progress * 2 * Math.PI;
@@ -434,7 +436,7 @@ export default class NessBuilder {
 
     this.context.save();
     this.context.beginPath();
-    this.context.lineWidth = option.outline.width? option.outline.width : 5;
+    this.context.lineWidth = option.outline.size;
 
     this.setShape(shape, option);
     rotate = option.rotate;
@@ -442,9 +444,9 @@ export default class NessBuilder {
     this.context.globalAlpha = 0.38
     this.context.fillStyle = option.color
 
-    this.setRotation(option.x, option.y, this.loadingDirection + -rotate);
+    this.setRotation(option.location.x, option.location.y, this.loadingDirection + -rotate);
     this.context.fill()
-    this.setRotation(option.x, option.y, rotate + -this.loadingDirection);
+    this.setRotation(option.location.x, option.location.y, rotate + -this.loadingDirection);
 
     this.context.closePath()
     this.context.clip();
@@ -455,11 +457,11 @@ export default class NessBuilder {
     this.context.globalAlpha = 1
 
     if (option.fill.type == "Circle") {
-      this.context.moveTo(option.x, option.y);
+      this.context.moveTo(option.location.x, option.location.y);
       shape.includes("Rectangle")? option.size = (option.QuadrilateralOption as any).width >= (option.QuadrilateralOption as any).height? (option.QuadrilateralOption as any).width : (option.QuadrilateralOption as any).height : undefined
-      this.context.arc(option.x, option.y, option.size*1.5, startAngle, endAngle);
+      this.context.arc(option.location.x, option.location.y, option.size*1.5, startAngle, endAngle);
     } else {
-      let axis = this.getAxis(option);
+      let axis = this.getAxis({location: { x: option.location.x, y: option.location.y }, size: option.size });
       const radius = ["Square", "Rectangle"].includes(shape)? option.QuadrilateralOption.radius : 0;
 
       while (rotate > 45 || rotate < -45) {
@@ -509,9 +511,9 @@ export default class NessBuilder {
         this.setRotation(axis.x, axis.y, rotate + -this.loadingDirection);
       }
     }
-    this.setRotation(option.x, option.y, this.loadingDirection + -rotate);
+    this.setRotation(option.location.x, option.location.y, this.loadingDirection + -rotate);
     this.context.fill()
-    this.setRotation(option.x, option.y, rotate + -this.loadingDirection);
+    this.setRotation(option.location.x, option.location.y, rotate + -this.loadingDirection);
 
     this.context.closePath()
     this.context.beginPath();
@@ -554,26 +556,27 @@ export default class NessBuilder {
   };
 
   // Change l'axe par default du cadre donné
-  private getAxis<S extends Shape>(frame: FrameOption<S>, height?: number) {
+  private getAxis(axis: AxisInt) {
 
-    const heightSize = height? height : frame.size;
+    const { location: { x, y }, size, height } = axis
+    const heightSize = height? height : size;
 
-    if (this.axis == "TopLeft") return { x: frame.x - frame.size, y: frame.y - heightSize };
-    else if (this.axis == "TopCenter") return { x: frame.x, y: frame.y - heightSize };
-    else if (this.axis == "TopRight") return { x: frame.x + frame.size, y: frame.y - heightSize };
-    else if (this.axis == "BottomLeft") return { x: frame.x - frame.size, y: frame.y + heightSize };
-    else if (this.axis == "BottomCenter") return { x: frame.x, y: frame.y + heightSize };
-    else if (this.axis == "BottomRight") return { x: frame.x + frame.size , y: frame.y + heightSize };
-    else if (this.axis == "Left") return { x: frame.x - frame.size, y: frame.y };
-    else if (this.axis == "Right") return { x: frame.x + frame.size, y: frame.y };
-    else return { x: frame.x, y: frame.y };
+    if (this.axis == "TopLeft") return { x: x - size, y: y - heightSize };
+    else if (this.axis == "TopCenter") return { x, y: y - heightSize };
+    else if (this.axis == "TopRight") return { x: x + size, y: y - heightSize };
+    else if (this.axis == "BottomLeft") return { x: x - size, y: y + heightSize };
+    else if (this.axis == "BottomCenter") return { x, y: y + heightSize };
+    else if (this.axis == "BottomRight") return { x: x + size, y: y + heightSize };
+    else if (this.axis == "Left") return { x: x - size, y };
+    else if (this.axis == "Right") return { x: x + size, y };
+    else return { x, y };
   };
 
-  public setBanner<T extends FrameType>(banner: Banner, content: FrameContent<T>) {
+  public setBanner<T extends FrameType>(banner: Banner, content: Content<T>) {
 
     const { location: { x, y }, size: { width, height }, outline: { size, color, join }, Side: { n, extend } } = banner
 
-    const axis = this.getAxis({ x, y, size: width/2 }, height/2)
+    const axis = this.getAxis({ location: { x, y }, size: width/2, height: height/2 })
 
     this.context.save();
     this.context.strokeStyle = color? colorCheck(color) : "#FF0000";
@@ -621,7 +624,7 @@ export default class NessBuilder {
       
       // if (frame.rotate) this.setRotation(frame.x, frame.y, -frame.rotate)
 
-      const textOptions = content.textOptions;
+      const textOptions = content.text;
 
       if (textOptions?.backgroundColor) {
         this.context.fillStyle = colorCheck(textOptions.backgroundColor);
@@ -663,10 +666,10 @@ export default class NessBuilder {
    * @param name Image name
    * @param type Image extention
    */
-  public generatedTo(location: string, name: string, type: ImageExtention): void {
+  public generatedTo(path: string, name: string, type: ImageExtention): void {
 
-    if (type == "png" || type == "jpeg" || type == "jpg") writeFileSync(`${location}/${name}.${type}`, this.toBuffer(type));
-    else writeFileSync(`${location}/${name}.${type}`, this.toBuffer());
+    if (type == "png" || type == "jpeg" || type == "jpg") writeFileSync(`${path}/${name}.${type}`, this.toBuffer(type));
+    else writeFileSync(`${path}/${name}.${type}`, this.toBuffer());
   };
 
   /**
@@ -677,77 +680,3 @@ export default class NessBuilder {
   };
 
 }
-
-
-
-
-
-
-
-
-
-  // Old Code / Don't work for now
-
-
-
-
-  // private fontData: CustomFont = [];
-
-
-
-  // private async initialize(dataPath: `${string}.ttf`, dataFont: FontOption): Promise<void> {
-  //   if (registerFont) {
-  //     await this.registerFont(dataPath, dataFont);
-  //   }
-  //   // Continuer avec l'initialisation du reste de votre objet ici
-  // }
-
-
-
-  // // Récupère une police enregistrer hormis celle du système
-  // private getFont(name: string, option?: { path?: `${string}.ttf` }): boolean {
-  //   const dataF = this.fontData.find(x => x.font.family === name)
-    
-  //   if (option?.path) {
-  //     const dataP = this.fontData.find(x => x.file === option.path)
-  
-
-  //     if (dataP) {
-  //       console.error(`\x1b[33mRegisterFont: \x1b[32mThis file (\x1b[31m${option.path.replace(/^.*[\\/]/, "")}\x1b[32m) has already been register for \x1b[35m${dataP.font.family}\x1b[0m`);
-  //       return false;
-  //     } else if (dataF) {
-  //       console.error(`\x1b[33mRegisterFont: \x1b[32mThis name (\x1b[31m${dataF.font.family}\x1b[32m) has already been register for \x1b[35m${dataF.file.replace(/^.*[\\/]/, "")}\x1b[0m`);
-  //       return false;
-  //     }
-
-  //     return true;
-  //   } else {
-  //     if (!dataF && !name.startsWith('*')) {
-  //       console.error(`\x1b[33mRegisterFont: \x1b[31m${name} \x1b[32mis not part of the police register\x1b[0m`);
-  //       return false;
-  //     }
-
-  //     return true;
-  //   }
-  // }
-
-
-  // /**
-  //  * register a new font
-  //  * 
-  //  * @param path Path to font file (file.ttf)
-  //  * @param option Font default settings
-  //  */
-  // private /*public*/ registerFont(font: CustomFont) {
-
-  //   font.forEach(e => {
-  //     if (this.getFont(e.font.family, { path: e.file })) {
-  //       registerFont(e.file, e.font);
-  //       this.fontData.push({ file: e.file, font: e.font });
-  //       console.log(`\x1b[33mRegisterFont: \x1b[35m${e.font.family} \x1b[30m| \x1b[32msize - \x1b[35m${e.font.size? e.font.size + "px" : "Default"} \x1b[30m| \x1b[32mStyle - \x1b[35m${e.font.style}\x1b[0m`);
-  //     };
-  //   });
-
-
-  //   return this;
-  // };

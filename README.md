@@ -3,10 +3,11 @@
 <div align="center">
   <br/>
   <p>
-    <a href="https://discord.gg/sjABtBmTWa"><h1>Join Discord > <img src="https://dcbadge.vercel.app/api/server/sjABtBmTWa?style=plastic&theme=discord-inverted&compact=true" alt="discord server" />
-    </a>
+    <h1 href="https://discord.gg/sjABtBmTWa">Join Discord</h1>
   </p>
   <p>
+    <a href="https://discord.gg/sjABtBmTWa"><img src="https://dcbadge.vercel.app/api/server/sjABtBmTWa?style=plastic&theme=discord-inverted&compact=true" alt="discord server" height=18/>
+    </a>
     <a href="https://www.npmjs.com/package/ness-canvas"><img src="https://badge.fury.io/js/ness-canvas.png" alt="npm version" height=18 />
     </a>
     <a href="https://www.npmjs.com/package/ness-canvas"><img src="https://img.shields.io/npm/dt/ness-canvas.png" alt="npm download" height=18 />
@@ -104,24 +105,40 @@ The filter builder has documentation specifying all filters you find <a href="ht
 * [NessBuilder()]()
 * ~~[RankupBuilder()]()~~
 * ~~[CustomProfile()]()~~
-
-### Utility Methods
+---
+### Methods
 
 <!-- * [NessBuider()](#nessbuilder) -->
-* <a href="#setcornerradius" style="color: #F97E72">setCornerRadius</a>
+* <a href="#context" style="color: #F97E72">context</a>
 
+* <a href="#setcornerradius" style="color: #F97E72">setCornerRadius</a>
 * <a href="#setbackground" style="color: #F97E72 ">setBackground</a>
-* <a href="#setImage" style="color: #F97E72 ">setImage
-* <a href="#setFrame" style="color: #F97E72 ">setFrame</a>
-* <a href="#setText" style="color: #F97E72">setText</a>
-* <a href="#setExp" style="color: #F97E72">setExp</a>
-* <a href="#setloading" style="color: #F97E72">setLoading</a>
 * <a href="#setAxis" style="color: #F97E72">setAxis</a>
+
+* <a href="#setFont" style="color: #F97E72">setFont</a>
+* <a href="#setText" style="color: #F97E72">setText</a>
+
+* <a href="#setImage" style="color: #F97E72 ">setImage
+
+* <a href="#setFrame" style="color: #F97E72 ">setFrame</a>
+* <a href="#setBanner" style="color: #F97E72">setBanner</a> (Not add to the doc yet)
+
+* <a href="#setExp" style="color: #F97E72">setExp</a>
+* <a href="#setloading" style="color: #F97E72">setLoading</a> (Doc need to be update)
+
 * <a href="#toBuffer" style="color: #F97E72">toBuffer</a>
 * <a href="#generatedTo" style="color: #F97E72">generatedTo</a>
 * <a href="#toDataURL" style="color: #F97E72">toDataURL</a>
-<!-- * setFont -->
 
+---
+### Types
+
+* <a href="#CustomColor" style="color: #F97E72">CustomColor</a> (Not add to the doc yet)
+* <a href="#CanvasImage" style="color: #F97E72">CanvasImage</a> (Not add to the doc yet)
+* <a href="#IntRange" style="color: #F97E72">IntRange</a> (Not add to the doc yet)
+* <a href="#Text" style="color: #F97E72">Text</a> (Not add to the doc yet)
+
+---
 ### NessBuilder()
 
 > ```ts
@@ -144,17 +161,50 @@ const builder = new NessBuilder(250, 300)
 ```
 </details>
 
+### context
+
+> ```ts
+> context => CanvasRenderingContext2D
+> ```
+
+Canvas context.
+
+<details><summary><strong><font color="#CC33FF">Description</font></strong></summary>
+
+Give access to Node Canvas context methods
+</details>
+
+<details><summary><strong><font color= "#7c00a5">Example</font></strong></summary> 
+
+```js
+const { NessBuilder } = require('ness-canvas')
+const builder = new NessBuilder(250, 300)
+
+builder.context.beginPath()...
+builder.context.moveTo...
+...
+builder.context.clip...
+builder.context.closePath...
+builder.context.fill...
+```
+</details>
+
 ### setCornerRadius()
 
 > ```ts
-> setCornerRadius(radius: number) => this
+> setCornerRadius(radius: number, outline?: number, color?: CustomColor) => this
 > ```
+> Type definition [CustomColor](#CustomColor)
 
 Round the edges of the canvas
 
 <details><summary><strong><font color="#CC33FF">Description</font></strong></summary> 
 
 * **radius**: Rounded the edges of the canvas
+* **outline**: ouline size (default 3)
+* **color**: outline color (default white)
+
+</details>
 
 </details>
 
@@ -177,6 +227,7 @@ builder.setCornerRadius(15)
 > ```ts
 > setBackground(imageColor: CanvasImage | CustomColor): this;
 > ```
+> Type definition [CanvasImage](#CanvasImage) | [CustomColor](#CustomColor)
 
 Replaces the space of the canvas with an image, a plain color or a degrader
 
@@ -216,11 +267,134 @@ builder.setBackground(patern); // Patern have a bug where he just zoom upper lef
   </div>
 </details>
 
+### setAxis()
+
+> ```ts
+> setBackground(imageColor: CanvasImage | CustomColor): this;
+> ```
+> Type definition [CanvasImage](#CanvasImage) | [CustomColor](#CustomColor)
+
+Replaces the space of the canvas with an image, a plain color or a degrader
+
+<details><summary><strong><font color="#CC33FF">Description</font></strong></summary> 
+
+* **imageColor**: Define the type and background to use (Valid syntaxes: #hex(a) | rgb(a) | colorName | CanvasGradient | CanvasPattern)
+</details>
+
+<details><summary><strong><font color= "#7c00a5">Example</font></strong></summary>
+
+```js
+const { NessBuilder } = require('ness-canvas')
+const { loadImage } = require('canvas')
+
+const builder = new NessBuilder(400, 200)
+const img = await loadImage("./assets/image/background/color-2174052.png");
+
+const patern = builder.context.createPattern(img, "repeat");
+const linGradient = builder.context.createLinearGradient(0, 0, 400, 0);
+const radGradient = builder.context.createRadialGradient(200, 100, 75, 200, 100, 200);
+
+linGradient.addColorStop(...);
+radGradient.addColorStop(...);
+
+builder.setBackground(img);
+builder.setBackground("Coral");
+builder.setBackground("#ff0000");
+builder.setBackground("rgb(155, 135, 85)");
+builder.setBackground("rgba(155, 135, 85, 0.5)");
+builder.setBackground(linGradient);
+builder.setBackground(radGradient);
+builder.setBackground(patern); // Patern have a bug where he just zoom upper left corner so don't use it
+```
+
+<div style="display:inline-block">
+  <img style="display:block" src="https://github.com/DARK-ECNELIS/Ness-Canvas/blob/main/Assets/SetBackground.png?raw=true" height=180/>
+  </div>
+</details>
+
+### setFont()
+
+>```ts
+> setFont(name: string, size?: number): this
+>```
+
+Change Font used
+
+<details><summary><strong><font color="#CC33FF">Description</font></strong></summary>
+
+* **name**: System font name
+* **size**: Font default size
+> Also works with `registerFont`, but it is still advisable to install the fonts directly in your operating system because registerFont does not work for everyone.
+
+</details>
+
+<details><summary><strong><font color= "#7c00a5">Example</font></strong></summary>
+
+```js
+const { NessBuilder } = require('ness-canvas')
+const builder = new NessBuilder(250, 300)
+
+builder.setFont("Sketch Gothic School", 50)
+
+.setFrame("Square", { location:{x: 350, y: 125}, size: 50, Quadrilateral: { radius: 0}, outline: { size: 2, color: "Aquamarine"} }, { type: "Text", content: "Hellow world", text: { color: "Brown"}})
+...
+.setFont("Arial", 15)
+.setText(...)
+...
+```
+
+</details>
+
+### setText()
+
+> ```ts
+> setText(text: string, coordinate: {x: number, y: number}, option?: Text) => this
+> ```
+> Type definition [Text](#Text)
+
+Writes text in the canvas
+
+<details><summary><strong><font color="#CC33FF">Description</font></strong></summary>
+
+* **text**: Text to write
+* <details><summary><strong>coordinate</strong>: Location to write text</summary>
+
+  * **x**: location of text on axis x
+  * **y**: location of text on axis y
+  </details>
+
+* <details><summary><strong>option</strong>: Adjust text configuration</summary>
+
+    * **size**: Text size
+    * **`font?`**: Change font to use, add `*` for use font system (*Arial, *Calibri, ...)
+    * **`color?`**: Text color (Valid syntaxes: #hex(a) | rgb(a) | colorName | CanvasGradient | CanvasPattern)
+    * **`backgroundColor?`**: Background color (Valid syntaxes: #hex(a) | rgb(a) | colorName | CanvasGradient | CanvasPattern)
+    * **`stroke?`**: Write text with no fill
+    * **`textAlign?`**: Align the text on the vertical axis
+    * **`textBaseline?`**: Align the text on the horizontal axis
+    > The use of `*` for `font` is intended for future addition not yet implemented
+
+    </details>
+
+</details>
+
+<details><summary><strong><font color= "#7c00a5">Example</font></strong></summary>
+
+```js
+const { NessBuilder } = require('ness-canvas')
+const builder = new NessBuilder(250, 300)
+
+builder.setText("Hello World", { x: 62, y: 150 }, { font: "sans-serif", size: 80, color: "#000000", textAlign: "center", textBaseline: "middle" })
+```
+
+</details>
+
 ### setImage()
 
 > ```ts
 > setImage(image: CanvasImage, imageOption: ImagelocationOption, locationOption?: DrawlocationOption): this;
 > ```
+> Type definition [CanvasImage](#CanvasImage)
 
 Draw an image or a Canvas to S coordinates with D dimensions
 
@@ -266,7 +440,7 @@ builder.setImage(image, {sx: 25, sy: 25, sWidth: 100, sHeight: 75}, {dx: 0, dy: 
 ### setFrame()
 
 > ```ts
-> setFrame<T extends FrameType, S extends Shape>(shape: S, frame: FrameOption<S>, options: FrameContent<T>): this;
+> setFrame<T extends FrameType, S extends Shape>(shape: S, frame: Frame<S>, content: Content<T>): this;
 > ```
 
 Draw a frame containing an image, a text or a color
@@ -276,11 +450,21 @@ Draw a frame containing an image, a text or a color
 * **shape**: Shape of your frame (Square/Circle/...)
 * <details><summary><strong>frame</strong>: Frame positioning in Canvas</summary>
 
-  * **x**: Frame location on axis x
-  * **y**: Frame location on axis y
+  * <details><summary><strong>location</strong>: Frame location in Canvas </summary>
+  
+    * **x**: Frame location on axis x
+    * **y**: Frame location on axis y
+    </details>
+
   * **size**: Frame size
+  * <details><summary><strong>outline</strong>: Frame ouline parameter </summary>
+
+    * **size**: Frame Outline Size
+    * **color**: Frame Outline Color (Valid syntaxes: #hex(a) | rgb(a) | colorName | CanvasGradient | CanvasPattern)
+    </details>
+
   * **`rotate?`**: Frame Rotation
-  * <details><summary><strong>QuadrilateralOption?</strong>: Option for the square and the rectangle shape</summary>
+  * <details><summary><strong>Quadrilateral?</strong>: Option for the square and the rectangle shape</summary>
   
     * **radius**: Corner Radius
     * **width**: Replace Size parameter for axis x
@@ -289,26 +473,22 @@ Draw a frame containing an image, a text or a color
     > `width & height` is used for the rectangle `shape`
     </details>
 
-  > `QuadrilateralOption` Additional parameter for the square and Rectangle of `shape`
+  > `Quadrilateral` Additional parameter for the square and Rectangle of `shape`
   
   </details>
 
-* <details><summary><strong>options</strong>: Modify Frame property </summary>
+* <details><summary><strong>content</strong>: Modify Frame property </summary>
 
   * **type**: Specifies the type of content to use
   * **content**: Frame content (Image | Gradiant | Patern | Text)
-  * **color**: Frame Outline Color (Valid syntaxes: #hex(a) | rgb(a) | colorName | CanvasGradient | CanvasPattern)
-  * **`lineWidth?`**: Frame line size
-  * <details><summary><strong>textOptions?</strong>: Modify Text property (not used if <strong>type</strong> is not of type <strong>Text</strong> and <strong>content</strong> is not a text or a number) </summary>
+  * <details><summary><strong>text?</strong>: Modify Text property (not used if <strong>type</strong> is not of type <strong>Text</strong> and <strong>content</strong> is not a text or a number) </summary>
 
     * **size**: Text size
-    * **`font?`**: Change font to use, add `*` for use font system (*Arial, *Calibri, ...)
     * **`color?`**: Text color (Valid syntaxes: #hex(a) | rgb(a) | colorName | CanvasGradient | CanvasPattern)
     * **`backgroundColor?`**: Background color (Valid syntaxes: #hex(a) | rgb(a) | colorName | CanvasGradient | CanvasPattern)
     * **`stroke?`**: Write text with no fill
     * **`textAlign?`**: Align the text on the vertical axis
     * **`textBaseline?`**: Align the text on the horizontal axis
-    > The use of `*` for `font` is intended for future addition not yet implemented
 
     </details>
 
@@ -326,13 +506,13 @@ const builder = new NessBuilder(250, 300)
 const image = await loadImage('./assets/image/background/color-2174052.png')
 const linGradient = builder.context.createLinearGradient(0, 0, 240, 0);
 
-builder.setFrame("Pentagon", { x: 100, y: 100, size: 80 }, { type: "Color", content: "Coral", color: "Blue" })
+builder.setFrame("Pentagon", { location: { x: 100, y: 100 }, size: 80 }, { type: "Color", content: "Coral", color: "Blue" })
 
-builder.setFrame("Square", { x: 10, y: 10, size: 50 }, { type: "Empty", content: "Empty", color: "Blue" })
+builder.setFrame("Square", { location: { x: 10, y: 10 }, size: 50 }, { type: "Empty", content: "Empty", color: "Blue" })
 
 linGradient.addColorStop(...)
 
-builder.setFrame("Square", { x: 220, y: 165, size: 50 }, { type: "Text", content: "linGrad I am out context but not my color gradiant", color: "Blue", textOptions: { size: 20, color: linGradient, backgroundColor: "White" } })
+builder.setFrame("Square", { location: { x: 220, y: 165 }, size: 50 }, { type: "Text", content: "linGrad I am out context but not my color gradiant", color: "Blue", text: { size: 20, color: linGradient, backgroundColor: "White" } })
 
 ```
 
@@ -349,78 +529,41 @@ builder.setFrame("Square", { x: 220, y: 165, size: 50 }, { type: "Text", content
 
 </details>
 
-
-### setText()
-
-> ```ts
-> setText(text: string, coordinate: {x: number, y: number}, option: TextOption) => this
-> ```
-
-Writes text in the canvas
-
-<details><summary><strong><font color="#CC33FF">Description</font></strong></summary>
-
-* **text**: Text to write
-* <details><summary><strong>coordinate</strong>: Location to write text</summary>
-
-  * **x**: location of text on axis x
-  * **y**: location of text on axis y
-  </details>
-
-* <details><summary><strong>option</strong>: Adjust text configuration</summary>
-
-    * **size**: Text size
-    * **`font?`**: Change font to use, add `*` for use font system (*Arial, *Calibri, ...)
-    * **`color?`**: Text color (Valid syntaxes: #hex(a) | rgb(a) | colorName | CanvasGradient | CanvasPattern)
-    * **`backgroundColor?`**: Background color (Valid syntaxes: #hex(a) | rgb(a) | colorName | CanvasGradient | CanvasPattern)
-    * **`stroke?`**: Write text with no fill
-    * **`textAlign?`**: Align the text on the vertical axis
-    * **`textBaseline?`**: Align the text on the horizontal axis
-    > The use of `*` for `font` is intended for future addition not yet implemented
-
-    </details>
-
-</details>
-
-<details><summary><strong><font color= "#7c00a5">Example</font></strong></summary>
-
-```js
-const { NessBuilder } = require('ness-canvas')
-const builder = new NessBuilder(250, 300)
-
-builder.setText("Hello World", { x: 62, y: 150 }, { font: "sans-serif", size: 80, color: "#000000", textAlign: "center", textBaseline: "middle" })
-```
-
-</details>
-
 ### setExp()
 
 > ```ts
-> setExp(option: ExpOption, progress: IntRange<0, 101>, color?: ExpColor) => this
+> setExp(exp: Experience, progress: IntRange<0, 101>, color?: ExperienceColor) => this
 > ```
+> Type definition [IntRange](#IntRange)
 
 Draws a bar that can act as an experience bar
 
 <details><summary><strong><font color="#CC33FF">Description</font></strong></summary>
 
-* <details><summary><strong>option</strong>: Frame positioning in Canvas</summary>
+* <details><summary><strong>exp</strong>: Experience bar positioning in Canvas</summary>
 
-  * **x**: location of th e Experience bar on 
-  * **y**: location of the Experience bar
-  * **Width**: Width of the Experience bar
-  * **Height**: Height of the Experience bar
+  * <details><summary><strong>location</strong>: Experience bar location in Canvas </summary>
+    
+      * **x**: Experience bar location on axis x
+      * **y**: Experience bar location on axis y
+      </details>
+  * <details><summary><strong>size</strong>: Experience bar location in Canvas </summary>
+    
+    * **Width**: Width of the Experience bar
+    * **Height**: Height of the Experience bar
+    </details>
   * **`rotate?`**: Pivot the Experience bar to a certain degree
   * **`radius?`**: Round the edge
-  * **`alphat?`**: Set the transparency of the bar in the background
   </details>
 * **progress**: Progress of filling from 0% to 100%
 
-* <details><summary><strong>Expcolor?</strong>: Adjust Bar color</summary>
+* <details><summary><strong>color?</strong>: Adjust Bar color</summary>
 
-  * **`color1?`**: Color of the bar in the background
-  * **`color2?`**: Filling bar color
-  * **`outlineColor1?`**: Color of the contour of the bar in the background
-  * **`outlineColor2?`**: Contour color of the filling bar
+  * **backColor**: Color of the bar in the background
+  * **color**: Filling bar color
+  * **outlineColor**: Color of the contour of the bar in the background
+  * **backOutlineColor**: Contour color of the filling bar
+  * **`transparency?`**: Background transparency
   > Valid syntaxes: #hex(a) | rgb(a) | colorName | CanvasGradient | CanvasPattern
 
   </details>
@@ -433,9 +576,9 @@ Draws a bar that can act as an experience bar
 const { NessBuilder } = require('ness-canvas')
 const builder = new NessBuilder(250, 300)
 
-builder.setExp({ x: 30, y: 30, width: 400, height: 30, radius: 10, rotate: 90 }, 50)
+builder.setExp({ location: { x: 30, y: 30 }, size: { width: 400, height: 30 }, radius: 10, rotate: 90 }, 50)
 
-builder.setExp({ x: 30, y: 30, width: 400, height: 30 }, 50, { color1: "Red", outlineColor2: "Coral" })
+builder.setExp({ location: { x: 30, y: 30 }, size: { width: 400, height: 30 } }, 50, { backColor: "Red", backOutlineColor: "Coral" })
 
 ```
 
@@ -494,38 +637,6 @@ const builder = new NessBuilder(250, 300)
 
 builder.setLoading("Decagon", { x: 300, y: 300, size: 250, fill: { type: "Line" }, color: radGradient, outline: { color: "Green", width: 3 }, progress: 50, QuadrilateralOption: { width: 250, height: 100, radius: 0 } })
 ```
-
-</details>
-
-### setAxis()
-
->```ts
-> setAxis(axis: Axis): this
->```
-
-Change X and Y axis for the element
-
-<details><summary><strong><font color="#CC33FF">Description</font></strong></summary>
-
-* **axis**: Change where is the x0, y0 for the element
->  The default axis is defined on `Center` the 0 on the image. If you are used to using <font color="#00FFFF">Canvas</font> and you do not want to change the start -up axis, you must use the axis `BottomRight` the BR on the image
-
-</details>
-
-<details><summary><strong><font color= "#7c00a5">Example</font></strong></summary>
-
-```js
-const { NessBuilder } = require('ness-canvas')
-const builder = new NessBuilder(250, 300)
-
-builder.setFrame(...) // Axis => O
-.setAxis("BottomRight")
-.setFrame(...) // Axis => BR
-```
-
-<div style="display:inline-block">
-  <img style="display:block" src="https://github.com/DARK-ECNELIS/Ness-Canvas/blob/main/Assets/Axis.png?raw=true" height=180/>
-</div>
 
 </details>
 
@@ -595,3 +706,16 @@ const builder = new NessBuilder(250, 300)
 builder.toDataURL()
 ```
 </details>
+
+
+____
+
+
+
+
+
+### CustomColor
+
+### CanvasImage
+### IntRange
+### Text

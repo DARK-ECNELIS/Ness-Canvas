@@ -26,6 +26,9 @@ declare type Progress = IntRange<0, 101>;
 
 declare type Hourly = `${IntRange<0, 12>}h${IntRange<0, 100>}` | "12h00";
 
+
+
+
 enum ShapeEnum {
   Triangle = 3,
   Square = undefined,
@@ -58,7 +61,7 @@ declare type Preset = 'classic';
 
 export { Preset, Shape, CustomColor, CanvasImage, ImageExtention, ImageChannels, Edge, /*CustomFont,*/ FrameType, ShapeEnum, ShapeLoad, Progress, Axis, LoadingDirection, Hourly, RGBAColor,RGBColor, IntRange };
 
-export { ImagelocationOption, DrawlocationOption, FrameOption, ExpOption, FrameContent, TextOption, /*FontOption,*/ LoadingOption, Banner, ExpColor } from './Interfaces';
+export { ImagelocationOption, DrawlocationOption, Frame, Experience, Content, Text, /*FontOption,*/ Loading, Banner, ExperienceColor, AxisInt } from './Interfaces';
 
 export { default as NessBuilder } from './Managers/NessBuilder';
 export { default as FilterBuilder } from './Managers/FilterBuilder';

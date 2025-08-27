@@ -1,15 +1,34 @@
 import { loadImage } from "canvas";
 import { NessBuilder } from "..";
+import { Banner } from "../Interfaces";
 
 async function test() {
   const background = await loadImage('./src/test/assets/image/background/background-3147808.jpg');
-
+  const banner = await loadImage('./src/test/assets/image/background/poster-885148.jpg');
   const builder = new NessBuilder(700, 250);
+
+  const gradient2 = builder.context.createLinearGradient(150, 75, 600 , 175);
+
+  gradient2.addColorStop(0, 'red');
+  gradient2.addColorStop(1/6, 'orange');
+  gradient2.addColorStop(2/6, 'yellow');
+  gradient2.addColorStop(3/6, 'green');
+  gradient2.addColorStop(4/6, 'blue');
+  gradient2.addColorStop(5/6, 'indigo');
+  gradient2.addColorStop(1, 'violet');
   
   builder.setCornerRadius(15)
   
+  builder
+
   .setBackground(background)
-  .setBanner({ x: 50, y: 50, size1: 500, size2: 100, n: 6, color: "#0000FF", lineWidth: 5, extend: 50, join: "miter" })
+    .setFont("Sketch Gothic School", 50)
+    // .setFrame("Square", { location:{x: 350, y: 125}, size: 50, Quadrilateral: { radius: 0}, outline: { size: 2, color: "Aquamarine"} }, { type: "Color", content: "Black", color: "Red"})
+  // .setBanner({ location: {x: 350, y: 125}, size: {width: 500, height: 100}, Side: {n: 3, extend: -50}, outline: {size: 5, join: "miter",color: "Silver" } }, {type: "Text", color: "Silver", content: "Hellow Wolrd", textOptions: { backgroundColor: gradient2, color: "Black" }})
+  .setAxis("BottomRight")
+  .setExp({ location: {x: 40, y: 200}, size: {width: 620, height: 30}, radius: 15 }, 50, { backOutlineColor: "White", backColor: gradient2, outlineColor: "HotPink", color: gradient2, transparency: 50 })
+
+
   .generatedTo('./src/test', "test", "png");
 };
 
