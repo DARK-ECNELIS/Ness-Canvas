@@ -1,6 +1,6 @@
 {
   "name": "ness-canvas",
-  "version": "2.4.2",
+  "version": "2.5.2",
   "description": "Canvas Builder, Image Filter",
   "main": "lib/index.js",
   "author": "DARK ECNELIS darkecnelis@gmail.com",

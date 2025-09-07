@@ -281,9 +281,13 @@ export default class NessBuilder {
 
     const size = this.frameCoordinate.rotate? 0.009 * this.frameCoordinate.rotate : 0;
     const size2 = this.frameCoordinate.rotate? 0.018 * this.frameCoordinate.rotate : 0;
-
+    
     if (typeof image == "object" && !(image instanceof CanvasPattern) && !(image instanceof CanvasGradient)) {
-      this.setImage(image, {sx: this.frameCoordinate.location.x - this.frameCoordinate.size*(1 + size), sy: this.frameCoordinate.location.y - this.frameCoordinate.size*(1 + size), sWidth: this.frameCoordinate.size*(2 + size2), sHeight: this.frameCoordinate.size*(2 + size2) });
+      if (this.frameCoordinate.rotate == undefined) {
+        this.setImage(image, {sx: this.frameCoordinate.location.x, sy: this.frameCoordinate.location.y, sWidth: this.frameCoordinate.size*(2 + size2), sHeight: this.frameCoordinate.size*(2 + size2) });
+      } else {
+        this.setImage(image, {sx: this.frameCoordinate.location.x /*- this.frameCoordinate.size*(1 + size)*/, sy: this.frameCoordinate.location.y /*- this.frameCoordinate.size*(1 + size)*/, sWidth: this.frameCoordinate.size*(2 + size2), sHeight: this.frameCoordinate.size*(2 + size2) });
+      }
     } else {
       this.customBackground(image);
     }
