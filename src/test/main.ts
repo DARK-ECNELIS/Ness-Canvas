@@ -7,7 +7,7 @@ async function test() {
   const banner = await loadImage('./src/test/assets/image/background/poster-885148.jpg');
   const builder = new NessBuilder(700, 250);
   
-    const avatar = await loadImage('https://media.discordapp.net/attachments/777308989280485376/1366791225641930863/perso_anime_U565bW7EhY2InkF.png?ex=68beef85&is=68bd9e05&hm=b64f7c29d7b963a9d0b16086790541d44c0ce6bb1999b859a82445164216014d&=&format=png&quality=lossless');
+    const avatar = await loadImage('https://cdn.discordapp.com/attachments/777308989280485376/1366791225641930863/perso_anime_U565bW7EhY2InkF.png?ex=68c04105&is=68beef85&hm=485b9276fca57039913d2cb0098ec1c75f418397e4c5e30d89dd2e1d35b92d8b&');
 
   const gradient2 = builder.context.createLinearGradient(150, 75, 600 , 175);
 
@@ -26,7 +26,7 @@ async function test() {
   .setBackground(background)
     .setFont("Sketch Gothic School", 50)
     .setFrame("Square", { location:{x: 350, y: 125}, size: 50, Quadrilateral: { radius: 0}, outline: { size: 2, color: "Aquamarine"} }, { type: "Color", content: "Black"})
-  // .setBanner({ location: {x: 350, y: 125}, size: {width: 500, height: 100}, Side: {n: 3, extend: -50}, outline: {size: 5, join: "miter",color: "Silver" } }, {type: "Text", color: "Silver", content: "Hellow Wolrd", textOptions: { backgroundColor: gradient2, color: "Black" }})
+  .setBanner({ location: {x: 350, y: 125}, size: {width: 500, height: 100}, Side: {n: 3, extend: -50}, outline: {size: 5, join: "miter",color: "Silver" } }, {type: "Image", content: banner})
   .setAxis("BottomRight")
   .setExp({ location: {x: 40, y: 200}, size: {width: 620, height: 30}, radius: 15 }, 50, { backOutlineColor: "White", backColor: gradient2, outlineColor: "HotPink", color: gradient2, transparency: 50 })
     .setFrame("Square", { location: { x: 25, y: 25 }, size: 80, outline: { color: "Brown", size: 2 }, rotate: 25 }, { type: "Image", content: avatar })

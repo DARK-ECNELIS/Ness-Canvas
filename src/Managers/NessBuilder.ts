@@ -292,7 +292,7 @@ export default class NessBuilder {
       this.customBackground(image);
     }
 
-    this.context.restore();
+    this.restore();
 
     return this
   };
@@ -618,12 +618,14 @@ export default class NessBuilder {
       };
     };
 
-    this.context.closePath()
     this.context.stroke();
     this.context.clip();
 
     if (content.type == "Image") {
-      return this.setImage(<CanvasImage>content.content, { sx: axis.x - width/2 + (extend < 0 ? extend : 0), sy: axis.y - height/2, sWidth: width - (extend < 0 ? extend*2 : 0), sHeight: height })
+      this.setImage(<CanvasImage>content.content, { sx: axis.x - width/2 + (extend < 0 ? extend : 0), sy: axis.y - height/2, sWidth: width - (extend < 0 ? extend*2 : 0), sHeight: height });
+      
+      this.restore();
+      return this;
     } else if (content.type == "Text") {
       
       // if (frame.rotate) this.setRotation(frame.x, frame.y, -frame.rotate)
