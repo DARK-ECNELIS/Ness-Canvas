@@ -1,9 +1,9 @@
-# Ness-Canvas 2.5.0
+# Ness-Canvas 2.5.3
 
 <div align="center">
   <br/>
   <p>
-    <h1 href="https://discord.gg/sjABtBmTWa">Join Discord</h1>
+    <a href="https://discord.gg/sjABtBmTWa"><h1>Join Discord</h1></a>
   </p>
   <p>
     <a href="https://discord.gg/sjABtBmTWa">
