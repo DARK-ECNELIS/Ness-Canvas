@@ -270,47 +270,34 @@ builder.setBackground(patern); // Patern have a bug where he just zoom upper lef
 
 ### setAxis()
 
-> ```ts
-> setBackground(imageColor: CanvasImage | CustomColor): this;
-> ```
-> Type definition [CanvasImage](#CanvasImage) | [CustomColor](#CustomColor)
+>```ts
+> setAxis(axis: Axis): this
+>```
 
-Replaces the space of the canvas with an image, a plain color or a degrader
+Change X and Y axis for the element
 
-<details><summary><strong><font color="#CC33FF">Description</font></strong></summary> 
+<details><summary><strong><font color="#CC33FF">Description</font></strong></summary>
 
-* **imageColor**: Define the type and background to use (Valid syntaxes: #hex(a) | rgb(a) | colorName | CanvasGradient | CanvasPattern)
+* **axis**: Change where is the x0, y0 for the element
+>  The default axis is defined on `Center` the 0 on the image. If you are used to using <font color="#00FFFF">Canvas</font> and you do not want to change the start -up axis, you must use the axis `BottomRight` the BR on the image
+
 </details>
 
 <details><summary><strong><font color= "#7c00a5">Example</font></strong></summary>
 
 ```js
 const { NessBuilder } = require('ness-canvas')
-const { loadImage } = require('canvas')
+const builder = new NessBuilder(250, 300)
 
-const builder = new NessBuilder(400, 200)
-const img = await loadImage("./assets/image/background/color-2174052.png");
-
-const patern = builder.context.createPattern(img, "repeat");
-const linGradient = builder.context.createLinearGradient(0, 0, 400, 0);
-const radGradient = builder.context.createRadialGradient(200, 100, 75, 200, 100, 200);
-
-linGradient.addColorStop(...);
-radGradient.addColorStop(...);
-
-builder.setBackground(img);
-builder.setBackground("Coral");
-builder.setBackground("#ff0000");
-builder.setBackground("rgb(155, 135, 85)");
-builder.setBackground("rgba(155, 135, 85, 0.5)");
-builder.setBackground(linGradient);
-builder.setBackground(radGradient);
-builder.setBackground(patern); // Patern have a bug where he just zoom upper left corner so don't use it
+builder.setFrame(...) // Axis => O
+.setAxis("BottomRight")
+.setFrame(...) // Axis => BR
 ```
 
 <div style="display:inline-block">
-  <img style="display:block" src="https://github.com/DARK-ECNELIS/Ness-Canvas/blob/main/Assets/SetBackground.png?raw=true" height=180/>
-  </div>
+  <img style="display:block" src="https://github.com/DARK-ECNELIS/Ness-Canvas/blob/main/Assets/Axis.png?raw=true" height=180/>
+</div>
+
 </details>
 
 ### setFont()
